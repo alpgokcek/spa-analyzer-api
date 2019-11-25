@@ -22,6 +22,18 @@ class BalanceController extends ApiController
         if ($request->has('sortBy'))
             $query->orderBy($request->query('sortBy'), $request->query('sort', 'DESC'));
 
+        if ($request->has('select')) {
+            $selects = explode(',', $request->query('select'));
+            $query->select($selects);
+        }
+
+        if ($request->has('start')) {
+            $start = $request->query('start');
+            $end = $request->query('end');
+            $query->whereBetween('created_at',[$start,$end]);
+
+        }
+
         $data = $query->offset($offset)->limit($limit)->get();
 
         if (count($data) >= 1) {
@@ -70,6 +82,7 @@ class BalanceController extends ApiController
         $business = Business::where('token','=',$token)->first();
         if (count($business) >= 1) {
             $data = Balance::where('business','=',$business->id)->get();
+            // join bank info
             return $this->apiResponse(ResaultType::Success, $data, 'Content Detail', 201);
         } else {
             return $this->apiResponse(ResaultType::Error, null, 'Content Not Found', 404);

@@ -39,4 +39,43 @@ class AuthController extends Controller
             'message' => 'User Not Found'
         ]);
     }
+    public function register(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'name' => 'required',
+            'email' => 'required|unique:users,email|email',
+            'password' => 'required',
+            'userPhone' => 'required',
+        ]);
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'errors' => $validator->errors(),
+                'message' => 'Validation Error',
+            ], 422);
+        }
+        $data = new User();
+        $data->name = request('name');
+        $data->company = 1;
+        $data->business = 1;
+        $data->email = request('email');
+        $data->password = Hash::make(request('password'));
+        $data->level = 9;
+        $data->userPhone = request('userPhone');
+        $data->api_token = Str::random(64);
+        $data->save();
+        if ($data) {
+            return response()->json([
+                'success' => true,
+                'data' => $data,
+                'message' => 'User Created',
+            ], 201);
+        } else {
+            return response()->json([
+                'success' => true,
+                'errors' => null,
+                'message' => 'User Not Created',
+            ], 500);
+        }
+    }
 }

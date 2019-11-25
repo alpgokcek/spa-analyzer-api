@@ -6,6 +6,7 @@ use App\Business;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use Validator;
 
 class BusinessController extends ApiController
@@ -13,15 +14,22 @@ class BusinessController extends ApiController
     public function index(Request $request)
     {
         $offset = $request->offset ? $request->offset : 0;
-        $limit = $request->limit ? $request->limit : 10;
+        $limit = $request->limit ? $request->limit : 50;
         $query = Business::query();
+
         if ($request->has('search'))
             $query->where('title', 'like', '%' . $request->query('search') . '%');
+
         if ($request->has('sortBy'))
             $query->orderBy($request->query('sortBy'), $request->query('sort', 'DESC'));
 
+        if ($request->has('select')) {
+            $selects = explode(',', $request->query('select'));
+            $query->select($selects);
+        }
+
         $data = $query->offset($offset)->limit($limit)->get();
-        $data->each->setAppends(['fullAddress']);
+        $data->each->setAppends(['fullAddress','balanceCredit','salesStatus']);
 
         if (count($data) >= 1) {
             return $this->apiResponse(ResaultType::Success, $data, 'Listing: '.$offset.'-'.$limit, 200);
@@ -33,28 +41,29 @@ class BusinessController extends ApiController
     public function store(Request $request)
     {
         /* burası çok karışık oldu!!!! */
+        /* user emaili gönderilecek! email kayıtlıysa id tabloya eklenecek. */
         $validator = Validator::make($request->all(), [
-            'company' => 'required|integer',
-            'user' => 'nullable|integer',
+            'company' => 'required',
+            'code' => 'nullable',
             'title' => 'required|string',
-            'address' => 'nullable|string',
-            'city' => 'nullable|string',
-            'postal_code' => 'nullable|string',
-            'country' => 'nullable|string',
-            'mwst_nummer' => 'nullable|string',
-            'telephone' => 'nullable|string',
-            'fax' => 'nullable|string',
-            'website' => 'nullable|string',
-            'type' => 'nullable|integer',
-            'balance' => 'nullable|string',
-            'credit' => 'nullable|string',
-            'disclaimer' => 'nullable|string',
-            'discount' => 'nullable|string',
-            'status' => 'nullable|integer',
+            'address' => 'nullable',
+            'city' => 'nullable',
+            'postal_code' => 'nullable',
+            'country' => 'nullable',
+            'mwst_number' => 'nullable',
+            'telephone' => 'nullable',
+            'fax' => 'nullable',
+            'website' => 'nullable',
+            'type' => 'nullable',
+            'balance' => 'nullable',
+            'credit' => 'nullable',
+            'disclaimer' => 'nullable',
+            'discount' => 'nullable',
+            'status' => 'nullable',
             'token' => 'unique:business,token',
             'name' => 'required|string',
             'email' => 'required|email',
-            'userphone' => 'nullable|string',
+            'userphone' => 'nullable',
             'level' => 'nullable',
             ]);
         if ($validator->fails()) {
@@ -62,13 +71,13 @@ class BusinessController extends ApiController
         }
         $data = new Business();
         $data->company = request('company');
-        $data->user = request('user');
+        $data->code = request('code');
         $data->title = request('title');
         $data->address = request('address');
         $data->city = request('city');
         $data->postal_code = request('postal_code');
         $data->country = request('country');
-        $data->mwst_nummer = request('mwst_nummer');
+        $data->mwst_number = request('mwst_number');
         $data->telephone = request('telephone');
         $data->fax = request('fax');
         $data->website = request('website');
@@ -87,6 +96,7 @@ class BusinessController extends ApiController
                     'name' => request('name'),
                     'email' => request('email'),
                     'password' => Hash::make(request('password')),
+                    'api_token' => Str::random(64),
                 ]);
                 if ($user) {
                     $bsns = Business::where('id','=',$data->id)->first();
@@ -139,7 +149,7 @@ class BusinessController extends ApiController
             'city' => 'nullable',
             'postal_code' => 'nullable',
             'country' => 'nullable',
-            'mwst_nummer' => 'nullable',
+            'mwst_number' => 'nullable',
             'telephone' => 'nullable',
             'fax' => 'nullable',
             'website' => 'nullable',
@@ -162,7 +172,7 @@ class BusinessController extends ApiController
             $data->city = request('city');
             $data->postal_code = request('postal_code');
             $data->country = request('country');
-            $data->mwst_nummer = request('mwst_nummer');
+            $data->mwst_number = request('mwst_number');
             $data->telephone = request('telephone');
             $data->fax = request('fax');
             $data->website = request('website');

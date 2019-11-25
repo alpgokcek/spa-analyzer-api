@@ -8,19 +8,19 @@ class ApiToken
 {
     public function handle($request, Closure $next)
     {
-        // hata mesajları kurala göre şekillendirilecek!
-
         $auth = $request->header('Authorization');
         if ($auth) {
             $token = str_replace('Bearer ', '', $auth);
             if (!$token) {
                 return response()->json([
+                    'success' => false,
                     'message' => 'No Token'
                 ], 401);
             }
             $user = User::where('api_token', $token)->first();
             if (!$user) {
                 return response()->json([
+                    'success' => false,
                     'message' => 'Token is not match'
                 ], 401);
             }
@@ -29,6 +29,7 @@ class ApiToken
             return $next($request);
         }
         return response()->json([
+            'success' => false,
             'message' => 'No a valid token'
         ], 401);
     }

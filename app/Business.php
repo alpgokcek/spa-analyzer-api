@@ -27,6 +27,14 @@ class Business extends Model
 
     // birçok datayı alıp evirip çevirip farklı bir data haline getirebiliriz.
     public function getFullAddressAttribute() {
-        return $this->address . ' - ' . $this->city;
+        return $this->address . ' - ' . $this->postal_code. ' - ' . $this->city;
+    }
+    public function getBalanceCreditAttribute() {
+        $bcClass = $this->balance <= $this->credit ? 'bg-danger' : 'bg-success';
+        return '<span class="'.$bcClass.'  d-inline-block w-75 mx-auto text-light rounded-sm py-1">'.$this->balance.'</span>';
+    }
+
+    public function getSalesStatusAttribute() {
+        return true;
     }
 }
