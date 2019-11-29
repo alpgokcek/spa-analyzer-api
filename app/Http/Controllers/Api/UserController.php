@@ -39,29 +39,32 @@ class UserController extends ApiController
         $validator = Validator::make($request->all(), [
             'name' => 'required',
             'company' => 'required|integer',
-            'business' => 'required|integer',
             'email' => 'required|unique:users,email|email',
             'password' => 'required',
             'level' => 'required|integer',
-            'userPhone' => 'required',
+            'phone' => 'required',
         ]);
         if ($validator->fails()) {
             return $this->apiResponse(ResaultType::Error, $validator->errors(), 'Validation Error', 422);
         }
-        $data = new User();
-        $data->name = request('name');
-        $data->company = request('company');
-        $data->business = request('business');
-        $data->email = request('email');
-        $data->password = Hash::make(request('password'));
-        $data->level = request('level');
-        $data->userPhone = request('userPhone');
-        $data->api_token = Str::random(64);
-        $data->save();
-        if ($data) {
-            return $this->apiResponse(ResaultType::Success, $data, 'User Created', 201);
+        $control = count(User::where('email','=',request('email'))->first());
+        if ($control >= 1) {
+            return $this->apiResponse(ResaultType::Error, $control->email, 'User Already Registered', 500);
         } else {
-            return $this->apiResponse(ResaultType::Error, null, 'User Not Created', 500);
+            $data = new User();
+            $data->name = request('name');
+            $data->company = request('company');
+            $data->email = request('email');
+            $data->password = Hash::make(request('password'));
+            $data->level = request('level');
+            $data->phone = request('phone');
+            $data->api_token = Str::random(64);
+            $data->save();
+            if ($data) {
+                return $this->apiResponse(ResaultType::Success, $data, 'User Created', 201);
+            } else {
+                return $this->apiResponse(ResaultType::Error, null, 'User Not Created', 500);
+            }
         }
     }
 

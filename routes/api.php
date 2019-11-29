@@ -20,4 +20,5 @@ Route::middleware('api-token')->group(function() {
     Route::apiResource('/business', 'Api\BusinessController');
     Route::apiResource('/balance', 'Api\BalanceController');
     Route::apiResource('/user', 'Api\UserController');
+    Route::apiResource('/authority', 'Api\AuthorityController');
 });

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
+use App\Authority;
 use App\Business;
 use App\User;
 use Illuminate\Http\Request;
@@ -9,13 +10,13 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Validator;
 
-class BusinessController extends ApiController
+class AuthorityController extends ApiController
 {
     public function index(Request $request)
     {
         $offset = $request->offset ? $request->offset : 0;
         $limit = $request->limit ? $request->limit : 99999999999999;
-        $query = Business::query();
+        $query = Authority::query();
 
         if ($request->has('search'))
             $query->where('title', 'like', '%' . $request->query('search') . '%');
@@ -29,7 +30,7 @@ class BusinessController extends ApiController
         }
         $length = count($query->get());
         $data = $query->offset($offset)->limit($limit)->get();
-        $data->each->setAppends(['fullAddress','balanceCredit','balanceTitle','salesStatus']);
+        $data->each->setAppends(['authorityStatus']);
 
         if (count($data) >= 1) {
             return $this->apiResponse(ResaultType::Success, $data, 'Listing: '.$offset.'-'.$limit, $length, 200);
@@ -40,65 +41,42 @@ class BusinessController extends ApiController
 
     public function store(Request $request)
     {
-        /* burası çok karışık oldu!!!! */
-        /* user emaili gönderilecek! email kayıtlıysa id tabloya eklenecek. */
         $validator = Validator::make($request->all(), [
-            'company' => 'required',
-            'code' => 'nullable',
-            'title' => 'required|string',
-            'address' => 'nullable',
-            'city' => 'nullable',
-            'postal_code' => 'nullable',
-            'country' => 'nullable',
-            'mwst_number' => 'nullable',
-            'telephone' => 'nullable',
-            'fax' => 'nullable',
-            'website' => 'nullable',
-            'type' => 'nullable',
-            'balance' => 'nullable',
-            'credit' => 'nullable',
-            'disclaimer' => 'nullable',
-            'discount' => 'nullable',
-            'token' => 'unique:business,token'
+            'business' => 'required',
+            'user' => 'required',
+            'work' => 'required|integer',
+            'c' => 'required|integer',
+            'r' => 'required|integer',
+            'u' => 'required|integer',
+            'd' => 'required|integer',
             ]);
         if ($validator->fails()) {
             return $this->apiResponse(ResaultType::Error, $validator->errors(), 'Validation Error', 422);
         }
-        $data = new Business();
-        $data->company = request('company');
-        $data->code = request('code');
-        $data->title = request('title');
-        $data->address = request('address');
-        $data->city = request('city');
-        $data->postal_code = request('postal_code');
-        $data->country = request('country');
-        $data->mwst_number = request('mwst_number');
-        $data->telephone = request('telephone');
-        $data->fax = request('fax');
-        $data->website = request('website');
-        $data->type = request('type');
-        $data->balance = request('balance');
-        $data->credit = request('credit');
-        $data->disclaimer = request('disclaimer');
-        $data->discount = request('discount');
-        $data->status = 1;
-        $data->token = str_random(64);
+        $data = new Authority();
+        $data->business = request('business');
+        $data->user = request('user');
+        $data->work = request('work');
+        $data->c = request('c');
+        $data->r = request('r');
+        $data->u = request('u');
+        $data->d = request('d');
         $data->save();
         if ($data) {
-            return $this->apiResponse(ResaultType::Success, $data, 'Business Created', 201);
+            return $this->apiResponse(ResaultType::Success, $data, 'Authorization Successful', 201);
         } else {
             return $this->apiResponse(ResaultType::Error, null, 'Content not saved', 500);
         }
     }
 
-    public function show($token)
+    public function show($id)
     {
-        $data = Business::where('token','=',$token)->get();
-        $data->each->setAppends(['balanceCredit','balanceTitle','salesStatus']);
+        $data = Authority::find($id);
+        $data->each->setAppends(['authorityStatus']);
         if (count($data) >= 1) {
-            return $this->apiResponse(ResaultType::Success, $data, 'Content Detail', 201);
+            return $this->apiResponse(ResaultType::Success, $data, 'Authority Detail', 201);
         } else {
-            return $this->apiResponse(ResaultType::Error, null, 'Content Not Found', 404);
+            return $this->apiResponse(ResaultType::Error, null, 'Authority Not Found', 404);
         }
     }
 
@@ -156,12 +134,12 @@ class BusinessController extends ApiController
         }
     }
 
-    public function destroy($token)
+    public function destroy($id)
     {
-        $data = Business::where('token','=',$token)->first();
+        $data = Authority::where('id','=',$id)->first();
         if (count($data) >= 1) {
             $data->delete();
-            return $this->apiResponse(ResaultType::Success, $data, 'Content Deleted', 200);
+            return $this->apiResponse(ResaultType::Success, $data, 'Authority Deleted', 200);
         } else {
             return $this->apiResponse(ResaultType::Error, $data, 'Deleted Error', 500);
         }

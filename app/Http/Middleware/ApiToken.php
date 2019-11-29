@@ -25,7 +25,6 @@ class ApiToken
                 ], 401);
             }
             auth()->setUser($user);
-
             return $next($request);
         }
         return response()->json([
