@@ -8,11 +8,12 @@ use Illuminate\Http\Request;
 
 class ApiController extends Controller
 {
-    public function apiResponse($resaultType, $data, $message = null, $code = 200)
+    public function apiResponse($resaultType, $data, $message = null, $count, $code = 200)
     {
         $response = [];
         $response['success'] = $resaultType == ResaultType::Success ? true : false;
         $response['message'] = $message;
+        $response['count'] = $count;
         if ($resaultType != ResaultType::Error) {
             $response['data'] = $data;
         }

@@ -30,8 +30,26 @@ class Business extends Model
         return $this->address . ' - ' . $this->postal_code. ' - ' . $this->city;
     }
     public function getBalanceCreditAttribute() {
-        $bcClass = $this->balance <= $this->credit ? 'bg-danger' : 'bg-success';
-        return '<span class="'.$bcClass.'  d-inline-block w-75 mx-auto text-light rounded-sm py-1">'.$this->balance.'</span>';
+        if ($this->credit - ($this->credit * 2) >= $this->balance) {
+            $bcClass = 'bg-danger';
+        } else if ( $this->balance <= 0 ) {
+            $bcClass = 'bg-info';
+        } else {
+            $bcClass = 'bg-success';
+        }
+        return '<span class="'.$bcClass.' d-inline-block w-75 mx-auto text-light rounded-sm py-1">'.$this->balance.'</span>';
+    }
+
+    public function getBalanceTitleAttribute() {
+        if ($this->credit - ($this->credit * 2) >= $this->balance) {
+            $bcTitle = 'Credit limit expired';
+        } else if ( $this->balance <= 0 ) {
+            $bcTitle = 'Credit limit is running out';
+        } else {
+            $bcTitle = '';
+        }
+        return $bcTitle;
+
     }
 
     public function getSalesStatusAttribute() {

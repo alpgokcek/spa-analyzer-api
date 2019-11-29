@@ -14,10 +14,14 @@ class Balance extends Model
         return $this->belongsTo('App\Business','business');
     }
 
+    public function getBankNameAttribute() {
+        return $this->bank . ' bank';
+    }
+
     protected $casts = [
         'created_at' => 'date:d-m-Y',
         'updated_at' => 'date:d-m-Y',
-        'arrival_date' => 'date:d-m-Y H:i:s'
+        'arrival_date' => 'date:d-m-Y'
     ];
 
 }

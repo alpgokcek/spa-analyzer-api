@@ -14,7 +14,7 @@ class BusinessController extends ApiController
     public function index(Request $request)
     {
         $offset = $request->offset ? $request->offset : 0;
-        $limit = $request->limit ? $request->limit : 50;
+        $limit = $request->limit ? $request->limit : 99999999999999;
         $query = Business::query();
 
         if ($request->has('search'))
@@ -27,14 +27,14 @@ class BusinessController extends ApiController
             $selects = explode(',', $request->query('select'));
             $query->select($selects);
         }
-
+        $length = count($query->get());
         $data = $query->offset($offset)->limit($limit)->get();
-        $data->each->setAppends(['fullAddress','balanceCredit','salesStatus']);
+        $data->each->setAppends(['fullAddress','balanceCredit','balanceTitle','salesStatus']);
 
         if (count($data) >= 1) {
-            return $this->apiResponse(ResaultType::Success, $data, 'Listing: '.$offset.'-'.$limit, 200);
+            return $this->apiResponse(ResaultType::Success, $data, 'Listing: '.$offset.'-'.$limit, $length, 200);
         } else {
-            return $this->apiResponse(ResaultType::Error, null, 'Content Not Found', 404);
+            return $this->apiResponse(ResaultType::Error, null, 'Content Not Found', 0, 404);
         }
     }
 
@@ -132,7 +132,8 @@ class BusinessController extends ApiController
 
     public function show($token)
     {
-        $data = Business::where('token','=',$token)->first();
+        $data = Business::where('token','=',$token)->get();
+        $data->each->setAppends(['balanceCredit','balanceTitle','salesStatus']);
         if (count($data) >= 1) {
             return $this->apiResponse(ResaultType::Success, $data, 'Content Detail', 201);
         } else {

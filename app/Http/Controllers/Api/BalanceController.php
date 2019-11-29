@@ -12,34 +12,39 @@ class BalanceController extends ApiController
     public function index(Request $request)
     {
         $offset = $request->offset ? $request->offset : 0;
-        $limit = $request->limit ? $request->limit : 10;
+        $limit = $request->limit ? $request->limit : 99999999999999;
         $token = $request->token ? $request->token : null;
         $query = Balance::query();
         if ($request->has('token')){
             $business = Business::where('token','=',$token)->first();
+            $length = count($query->where('business', '=', $business->id)->get());
             $query->where('business', '=', $business->id);
+        } else {
+            $length = count($query->get());
         }
         if ($request->has('sortBy'))
             $query->orderBy($request->query('sortBy'), $request->query('sort', 'DESC'));
-
+            $query->join('business', 'business.id', '=', 'balance.business');
         if ($request->has('select')) {
             $selects = explode(',', $request->query('select'));
-            $query->select($selects);
+            $query->select($selects,'business.title as businessTitle', 'business.code as businessCode', 'business.token');
+        } else {
+            $query->select('balance.*','business.title as businessTitle', 'business.code as businessCode', 'business.token');
         }
 
         if ($request->has('start')) {
             $start = $request->query('start');
             $end = $request->query('end');
             $query->whereBetween('created_at',[$start,$end]);
-
         }
 
         $data = $query->offset($offset)->limit($limit)->get();
+        $data->each->setAppends(['bankName']);
 
         if (count($data) >= 1) {
-            return $this->apiResponse(ResaultType::Success, $data, 'Listing: '.$offset.'-'.$limit, 200);
+            return $this->apiResponse(ResaultType::Success, $data, 'Listing: '.$offset.'-'.$limit, $length, 200);
         } else {
-            return $this->apiResponse(ResaultType::Error, null, 'Content Not Found', 404);
+            return $this->apiResponse(ResaultType::Error, null, 'Content Not Found', 0, 404);
         }
     }
 
@@ -47,12 +52,13 @@ class BalanceController extends ApiController
     {
         $validator = Validator::make($request->all(), [
             'business' => 'required|integer',
-            'recharge' => 'required|string',
+            'recharge' => 'nullable|string',
             'paid' => 'nullable|string',
             'type' => 'required|integer',
             'action' => 'nullable|string',
             'bank' => 'nullable|integer',
             'remark' => 'nullable|string',
+            'comment' => 'nullable|string',
             'arrival_date' => 'nullable|date',
             'status' => 'required|integer',
         ]);
@@ -71,9 +77,18 @@ class BalanceController extends ApiController
         $data->status = request('status');
         $data->save();
         if ($data) {
-            return $this->apiResponse(ResaultType::Success, $data, 'Content Created', 201);
+            $bsn = Business::find($data->business);
+            $bsnbalance = $bsn->balance;
+            if ($data->recharge) {
+                $bsn->balance = $bsnbalance + $data->recharge;
+            }
+            if ($data->paid) {
+                $bsn->balance = $bsnbalance - $data->paid;
+            }
+            $bsn->save();
+            return $this->apiResponse(ResaultType::Success, $data, 'Balance Added', 201);
         } else {
-            return $this->apiResponse(ResaultType::Error, null, 'Content not saved', 500);
+            return $this->apiResponse(ResaultType::Error, null, 'Balance not Added', 500);
         }
     }
 
@@ -99,6 +114,7 @@ class BalanceController extends ApiController
             'action' => 'nullable|string',
             'bank' => 'nullable|integer',
             'remark' => 'nullable|string',
+            'comment' => 'nullable|string',
             'arrival_date' => 'nullable|date',
             'status' => 'nullable|integer',
         ]);
