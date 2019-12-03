@@ -40,8 +40,6 @@ class BusinessController extends ApiController
 
     public function store(Request $request)
     {
-        /* burası çok karışık oldu!!!! */
-        /* user emaili gönderilecek! email kayıtlıysa id tabloya eklenecek. */
         $validator = Validator::make($request->all(), [
             'company' => 'required',
             'code' => 'nullable',
@@ -56,6 +54,7 @@ class BusinessController extends ApiController
             'website' => 'nullable',
             'type' => 'nullable',
             'balance' => 'nullable',
+            'before' => 'nullable',
             'credit' => 'nullable',
             'disclaimer' => 'nullable',
             'discount' => 'nullable',
@@ -78,6 +77,7 @@ class BusinessController extends ApiController
         $data->website = request('website');
         $data->type = request('type');
         $data->balance = request('balance');
+        $data->before = request('before');
         $data->credit = request('credit');
         $data->disclaimer = request('disclaimer');
         $data->discount = request('discount');
@@ -105,7 +105,7 @@ class BusinessController extends ApiController
     public function update(Request $request, $token)
     {
         $validator = Validator::make($request->all(), [
-            'user' => 'nullable',
+            'code' => 'nullable',
             'title' => 'nullable',
             'address' => 'nullable',
             'city' => 'nullable',
@@ -117,10 +117,11 @@ class BusinessController extends ApiController
             'website' => 'nullable',
             'type' => 'nullable',
             'balance' => 'nullable',
+            'before' => 'nullable',
             'credit' => 'nullable',
             'disclaimer' => 'nullable',
             'discount' => 'nullable',
-            'status' => 'nullable',
+            'status' => 'nullable'
         ]);
         if ($validator->fails()) {
             return $this->apiResponse(ResaultType::Error, $validator->errors(), 'Validation Error', 422);
@@ -128,22 +129,57 @@ class BusinessController extends ApiController
         $data = Business::where('token','=',$token)->first();
 
         if (count($data) >= 1) {
-            $data->user = request('user');
-            $data->title = request('title');
-            $data->address = request('address');
-            $data->city = request('city');
-            $data->postal_code = request('postal_code');
-            $data->country = request('country');
-            $data->mwst_number = request('mwst_number');
-            $data->telephone = request('telephone');
-            $data->fax = request('fax');
-            $data->website = request('website');
-            $data->type = request('type');
-            $data->balance = request('balance');
-            $data->credit = request('credit');
-            $data->disclaimer = request('disclaimer');
-            $data->discount = request('discount');
-            $data->status = request('status');
+            if (request('code') != '') {
+                $data->code = request('code');
+            }
+            if (request('title') != '') {
+                $data->title = request('title');
+            }
+            if (request('address') != '') {
+                $data->address = request('address');
+            }
+            if (request('city') != '') {
+                $data->city = request('city');
+            }
+            if (request('postal_code') != '') {
+                $data->postal_code = request('postal_code');
+            }
+            if (request('country') != '') {
+                $data->country = request('country');
+            }
+            if (request('mwst_number') != '') {
+                $data->mwst_number = request('mwst_number');
+            }
+            if (request('telephone') != '') {
+                $data->telephone = request('telephone');
+            }
+            if (request('fax') != '') {
+                $data->fax = request('fax');
+            }
+            if (request('website') != '') {
+                $data->website = request('website');
+            }
+            if (request('type') != '') {
+                $data->type = request('type');
+            }
+            if (request('balance') != '') {
+                $data->balance = request('balance');
+            }
+            if (request('before') != '') {
+                $data->before = request('before');
+            }
+            if (request('credit') != '') {
+                $data->credit = request('credit');
+            }
+            if (request('disclaimer') != '') {
+                $data->disclaimer = request('disclaimer');
+            }
+            if (request('discount') != '') {
+                $data->discount = request('discount');
+            }
+            if (request('status') != '') {
+                $data->status = request('status');
+            }
             $data->save();
 
             if ($data) {

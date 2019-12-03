@@ -55,9 +55,7 @@ class BalanceController extends ApiController
             'user' => 'required',
             'business' => 'required|integer',
             'recharge' => 'nullable|string',
-            'paid' => 'nullable|string',
             'type' => 'required|integer',
-            'action' => 'nullable|string',
             'bank' => 'nullable|integer',
             'remark' => 'nullable|string',
             'comment' => 'nullable|string',
@@ -72,9 +70,7 @@ class BalanceController extends ApiController
             $data = new Balance();
             $data->business = request('business');
             $data->recharge = request('recharge');
-            $data->paid = request('paid');
             $data->type = request('type');
-            $data->action = request('action');
             $data->bank = request('bank');
             $data->remark = request('remark');
             $data->arrival_date = request('arrival_date');
@@ -82,12 +78,16 @@ class BalanceController extends ApiController
             $data->save();
             if ($data) {
                 $bsn = Business::find($data->business);
-                $bsnbalance = $bsn->balance;
-                if ($data->recharge) {
-                    $bsn->balance = $bsnbalance + $data->recharge;
-                }
-                if ($data->paid) {
-                    $bsn->balance = $bsnbalance - $data->paid;
+                if ($data->type == 3) {
+                    $bsn->credit = $bsn->credit + $data->recharge;
+                } else {
+                    if ($data->recharge) {
+                        $bsn->before = $bsn->balance;
+                        $bsn->balance = $bsn->balance + $data->recharge;
+                    }
+                    if ($data->paid) {
+                        // paid değeri bu güne kadar HARCANMIŞ parayı gösterir.
+                    }
                 }
                 $bsn->save();
                 return $this->apiResponse(ResaultType::Success, $data, 'Balance Added', 201);
@@ -115,8 +115,8 @@ class BalanceController extends ApiController
     {
         $validator = Validator::make($request->all(), [
             'user' => 'required',
-            'bank' => 'required|integer',
-            'arrival_date' => 'nullable',
+            'bank' => 'nullable|integer',
+            'paid_date' => 'nullable',
             'comment' => 'nullable',
             'status' => 'required'
             ]);
@@ -126,8 +126,16 @@ class BalanceController extends ApiController
         $user = User::where('api_token','=',request('user'))->first();
         if ((count($user) >= 1) && ($user->level == 1)) {
             $data = Balance::find($token);
-            $data->bank = request('bank');
-            $data->arrival_date = request('arrival_date');
+            if (request('bank')) {
+                $data->bank = request('bank');
+            }
+            $data->paid_date = request('paid_date');
+            if(request('status') == 1) {
+                $data->paid = $data->recharge;
+            }
+            if(request('status') == 0) {
+                $data->paid = 0;
+            }
             $data->comment = request('comment');
             $data->status = request('status');
             $data->save();

@@ -21,7 +21,8 @@ class Balance extends Model
     protected $casts = [
         'created_at' => 'date:d-m-Y',
         'updated_at' => 'date:d-m-Y',
-        'arrival_date' => 'date:d-m-Y'
+        'arrival_date' => 'date:d-m-Y',
+        'paid_date' => 'date:d-m-Y'
     ];
 
 }

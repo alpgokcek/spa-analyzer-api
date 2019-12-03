@@ -2,21 +2,18 @@
 
 namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
-use App\Authority;
-use App\Business;
-use App\User;
+use App\Keyword;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
 use Validator;
 
-class AuthorityController extends ApiController
+class KeywordController extends ApiController
 {
     public function index(Request $request)
     {
         $offset = $request->offset ? $request->offset : 0;
         $limit = $request->limit ? $request->limit : 99999999999999;
-        $query = Authority::query();
+        $query = Keyword::query();
 
         if ($request->has('search'))
             $query->where('title', 'like', '%' . $request->query('search') . '%');
@@ -30,80 +27,66 @@ class AuthorityController extends ApiController
         }
         $length = count($query->get());
         $data = $query->offset($offset)->limit($limit)->get();
-        $data->each->setAppends(['authorityStatus']);
 
         if (count($data) >= 1) {
             return $this->apiResponse(ResaultType::Success, $data, 'Listing: '.$offset.'-'.$limit, $length, 200);
         } else {
-            return $this->apiResponse(ResaultType::Error, null, 'Content Not Found', 0, 404);
+            return $this->apiResponse(ResaultType::Error, null, 'Keyword Not Found', 0, 404);
         }
     }
 
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'business' => 'required',
-            'user' => 'required',
-            'work' => 'required|integer',
-            'c' => 'required|integer',
-            'r' => 'required|integer',
-            'u' => 'required|integer',
-            'd' => 'required|integer',
+            'website' => 'required',
+            'type' => 'nullable',
+            'title' => 'required',
             ]);
         if ($validator->fails()) {
             return $this->apiResponse(ResaultType::Error, $validator->errors(), 'Validation Error', 422);
         }
-        $data = new Authority();
-        $data->business = request('business');
-        $data->user = request('user');
-        $data->work = request('work');
-        $data->c = request('c');
-        $data->r = request('r');
-        $data->u = request('u');
-        $data->d = request('d');
+        $data = new Keyword();
+        $data->website = request('website');
+        $data->type = request('type');
+        $data->title = request('title');
         $data->save();
         if ($data) {
-            return $this->apiResponse(ResaultType::Success, $data, 'Authorization Successful', 201);
+            return $this->apiResponse(ResaultType::Success, $data, 'Keyword Created', 201);
         } else {
-            return $this->apiResponse(ResaultType::Error, null, 'Content not saved', 500);
+            return $this->apiResponse(ResaultType::Error, null, 'Keyword not saved', 500);
         }
     }
 
     public function show($id)
     {
-        $data = Authority::find($id);
-        $data->each->setAppends(['authorityStatus']);
+        $data = Keyword::find($id);
         if (count($data) >= 1) {
-            return $this->apiResponse(ResaultType::Success, $data, 'Authority Detail', 201);
+            return $this->apiResponse(ResaultType::Success, $data, 'Keyword Detail', 201);
         } else {
-            return $this->apiResponse(ResaultType::Error, null, 'Authority Not Found', 404);
+            return $this->apiResponse(ResaultType::Error, null, 'Keyword Not Found', 404);
         }
     }
 
     public function update(Request $request, $token)
     {
         $validator = Validator::make($request->all(), [
-            'c' => 'nullable',
-            'r' => 'nullable',
-            'u' => 'nullable',
-            'd' => 'nullable'
-        ]);
+            'title' => 'nullable',
+            ]);
         if ($validator->fails()) {
             return $this->apiResponse(ResaultType::Error, $validator->errors(), 'Validation Error', 422);
         }
-        $data = Business::where('token','=',$token)->first();
+        $data = Keyword::where('token','=',$token)->first();
 
         if (count($data) >= 1) {
-            $data->c = request('c');
-            $data->r = request('r');
-            $data->u = request('u');
-            $data->d = request('d');
+            if (request('title') != '') {
+                $data->title = request('title');
+            }
             $data->save();
 
             if ($data) {
-                return $this->apiResponse(ResaultType::Success, $data, 'Content Updated', 200);
+                return $this->apiResponse(ResaultType::Success, $data, 'Keyword Updated', 200);
             } else {
-                return $this->apiResponse(ResaultType::Error, null, 'Content not updated', 500);
+                return $this->apiResponse(ResaultType::Error, null, 'Keyword not updated', 500);
             }
         } else {
             return $this->apiResponse(ResaultType::Warning, null, 'Data not found', 404);
@@ -112,10 +95,10 @@ class AuthorityController extends ApiController
 
     public function destroy($id)
     {
-        $data = Authority::where('id','=',$id)->first();
+        $data = Keyword::find($id);
         if (count($data) >= 1) {
             $data->delete();
-            return $this->apiResponse(ResaultType::Success, $data, 'Authority Deleted', 200);
+            return $this->apiResponse(ResaultType::Success, $data, 'Keyword Deleted', 200);
         } else {
             return $this->apiResponse(ResaultType::Error, $data, 'Deleted Error', 500);
         }

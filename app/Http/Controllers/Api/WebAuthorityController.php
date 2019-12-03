@@ -2,21 +2,21 @@
 
 namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
-use App\Authority;
-use App\Business;
+use App\WebAuthority;
+use App\Website;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Validator;
 
-class AuthorityController extends ApiController
+class WebAuthorityController extends ApiController
 {
     public function index(Request $request)
     {
         $offset = $request->offset ? $request->offset : 0;
         $limit = $request->limit ? $request->limit : 99999999999999;
-        $query = Authority::query();
+        $query = WebAuthority::query();
 
         if ($request->has('search'))
             $query->where('title', 'like', '%' . $request->query('search') . '%');
@@ -42,7 +42,7 @@ class AuthorityController extends ApiController
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'business' => 'required',
+            'website' => 'required',
             'user' => 'required',
             'work' => 'required|integer',
             'c' => 'required|integer',
@@ -53,8 +53,8 @@ class AuthorityController extends ApiController
         if ($validator->fails()) {
             return $this->apiResponse(ResaultType::Error, $validator->errors(), 'Validation Error', 422);
         }
-        $data = new Authority();
-        $data->business = request('business');
+        $data = new WebAuthority();
+        $data->website = request('website');
         $data->user = request('user');
         $data->work = request('work');
         $data->c = request('c');
@@ -71,7 +71,7 @@ class AuthorityController extends ApiController
 
     public function show($id)
     {
-        $data = Authority::find($id);
+        $data = WebAuthority::find($id);
         $data->each->setAppends(['authorityStatus']);
         if (count($data) >= 1) {
             return $this->apiResponse(ResaultType::Success, $data, 'Authority Detail', 201);
@@ -91,7 +91,7 @@ class AuthorityController extends ApiController
         if ($validator->fails()) {
             return $this->apiResponse(ResaultType::Error, $validator->errors(), 'Validation Error', 422);
         }
-        $data = Business::where('token','=',$token)->first();
+        $data = Website::where('token','=',$token)->first();
 
         if (count($data) >= 1) {
             $data->c = request('c');
@@ -112,7 +112,7 @@ class AuthorityController extends ApiController
 
     public function destroy($id)
     {
-        $data = Authority::where('id','=',$id)->first();
+        $data = WebAuthority::where('id','=',$id)->first();
         if (count($data) >= 1) {
             $data->delete();
             return $this->apiResponse(ResaultType::Success, $data, 'Authority Deleted', 200);

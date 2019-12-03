@@ -37,7 +37,7 @@ class Business extends Model
         } else {
             $bcClass = 'bg-success';
         }
-        return '<span class="'.$bcClass.' d-inline-block w-75 mx-auto text-light rounded-sm py-1">'.$this->balance.'</span>';
+        return '<span class="'.$bcClass.' d-block mx-auto text-light rounded-sm py-1">'.$this->balance.'</span>';
     }
 
     public function getBalanceTitleAttribute() {
