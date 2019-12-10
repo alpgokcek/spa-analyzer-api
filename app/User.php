@@ -18,6 +18,10 @@ class User extends Authenticatable
         'password', 'remember_token',
     ];
 
+    public function getCompanyUser() {
+        return $this->belongsTo('App\Company','company');
+    }
+
     protected $casts = [
         'email_verified_at' => 'datetime',
         'created_at' => 'date:d-m-Y',

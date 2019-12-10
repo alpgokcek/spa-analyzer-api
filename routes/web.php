@@ -3,7 +3,7 @@
 Route::get('/', function () {
   return view('welcome');
 });
-    Route::resource('business', 'BusinessController');
+    Route::resource('customer', 'CustomerController');
 
 Auth::routes();
 Route::get('/home', 'HomeController@index')->name('home');

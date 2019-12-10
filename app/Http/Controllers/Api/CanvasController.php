@@ -5,6 +5,7 @@ use App\Http\Controllers\Controller;
 use App\Canvas;
 use App\User;
 use App\Website;
+use App\Content;
 use Illuminate\Http\Request;
 use Validator;
 use Illuminate\Support\Str;
@@ -15,23 +16,31 @@ class CanvasController extends ApiController
     {
         $offset = $request->offset ? $request->offset : 0;
         $limit = $request->limit ? $request->limit : 99999999999999;
-        $token = $request->token ? $request->token : null;
+        $type = $request->type ? $request->type : null;
         $query = Canvas::query();
-        if ($request->has('token')){
-            $canvas = Canvas::where('token','=',$token)->first();
-            $length = count($query->where('canvas', '=', $canvas->id)->get());
-            $query->where('canvas', '=', $canvas->id);
+        $length = 1;
+        $canvas = Canvas::all();
+        if ($request->has('type')){
+            switch ($type) {
+                case 'content':
+                    $query->join('content', 'content.canvas', '=', 'canvas.id');
+                    $query->select('canvas.website as canvasWebsite','canvas.type as canvasType','canvas.user as canvasUser','canvas.title as canvasTitle','canvas.summary as canvasSummary','canvas.photo as canvasPhoto','canvas.slug as canvasSlug','content.*');
+                    break;
+                case 'product':
+                    $query->join('product', 'product.canvas', '=', 'canvas.id');
+                    $query->select('canvas.website as canvasWebsite','canvas.type as canvasType','canvas.user as canvasUser','canvas.title as canvasTitle','canvas.summary as canvasSummary','canvas.photo as canvasPhoto','canvas.slug as canvasSlug','product.*');
+                    break;
+
+                default:
+                    # code...
+                    break;
+            }
         } else {
             $length = count($query->get());
         }
         if ($request->has('sortBy'))
             $query->orderBy($request->query('sortBy'), $request->query('sort', 'DESC'));
-        if ($request->has('select')) {
-            $selects = explode(',', $request->query('select'));
-            $query->select($selects);
-        } else {
-            $query->select('canvas.*');
-        }
+
 
         if ($request->has('start')) {
             $start = $request->query('start');

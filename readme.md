@@ -11,7 +11,7 @@ You can http://xxx.com/model?page=1,2,3
 ```sh
     $offset = $request->offset ? $request->offset : 0;
     $limit = $request->limit ? $request->limit : 10;
-    $data = Business::offset($offset)->limit($limit)->get();
+    $data = Customer::offset($offset)->limit($limit)->get();
 ```
 
 ##### Sorting

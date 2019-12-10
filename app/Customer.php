@@ -4,19 +4,19 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Business extends Model
+class Customer extends Model
 {
-    protected $table = 'business';
+    protected $table = 'customer';
     // kullanılabilecek kolonlar
     protected $fillable = [
     ];
     // kullanılamayacak kolonlar (örn: 'password')
     // protected $guarded = [];
 
-    public function allBusinessUsers() {
+    public function allCustomerUsers() {
         return $this->belongsToMany('App\User', 'users');
     }
-    public function getBusinessUser() {
+    public function getCustomerUser() {
         return $this->belongsTo('App\User','users');
     }
 

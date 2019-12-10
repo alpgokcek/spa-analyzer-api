@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Authority;
-use App\Business;
+use App\Customer;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -42,19 +42,19 @@ class AuthorityController extends ApiController
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'business' => 'required',
+            'customer' => 'required',
             'user' => 'required',
-            'work' => 'required|integer',
-            'c' => 'required|integer',
-            'r' => 'required|integer',
-            'u' => 'required|integer',
-            'd' => 'required|integer',
+            'work' => 'required',
+            'c' => 'required',
+            'r' => 'required',
+            'u' => 'required',
+            'd' => 'required',
             ]);
         if ($validator->fails()) {
             return $this->apiResponse(ResaultType::Error, $validator->errors(), 'Validation Error', 422);
         }
         $data = new Authority();
-        $data->business = request('business');
+        $data->customer = request('customer');
         $data->user = request('user');
         $data->work = request('work');
         $data->c = request('c');
@@ -91,7 +91,7 @@ class AuthorityController extends ApiController
         if ($validator->fails()) {
             return $this->apiResponse(ResaultType::Error, $validator->errors(), 'Validation Error', 422);
         }
-        $data = Business::where('token','=',$token)->first();
+        $data = Customer::where('token','=',$token)->first();
 
         if (count($data) >= 1) {
             $data->c = request('c');

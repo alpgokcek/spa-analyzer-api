@@ -2,20 +2,20 @@
 
 namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
-use App\Business;
+use App\Customer;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Validator;
 
-class BusinessController extends ApiController
+class CustomerController extends ApiController
 {
     public function index(Request $request)
     {
         $offset = $request->offset ? $request->offset : 0;
         $limit = $request->limit ? $request->limit : 99999999999999;
-        $query = Business::query();
+        $query = Customer::query();
 
         if ($request->has('search'))
             $query->where('title', 'like', '%' . $request->query('search') . '%');
@@ -58,12 +58,12 @@ class BusinessController extends ApiController
             'credit' => 'nullable',
             'disclaimer' => 'nullable',
             'discount' => 'nullable',
-            'token' => 'unique:business,token'
+            'token' => 'unique:customer,token'
             ]);
         if ($validator->fails()) {
             return $this->apiResponse(ResaultType::Error, $validator->errors(), 'Validation Error', 422);
         }
-        $data = new Business();
+        $data = new Customer();
         $data->company = request('company');
         $data->code = request('code');
         $data->title = request('title');
@@ -85,7 +85,7 @@ class BusinessController extends ApiController
         $data->token = str_random(64);
         $data->save();
         if ($data) {
-            return $this->apiResponse(ResaultType::Success, $data, 'Business Created', 201);
+            return $this->apiResponse(ResaultType::Success, $data, 'Customer Created', 201);
         } else {
             return $this->apiResponse(ResaultType::Error, null, 'Content not saved', 500);
         }
@@ -93,7 +93,7 @@ class BusinessController extends ApiController
 
     public function show($token)
     {
-        $data = Business::where('token','=',$token)->get();
+        $data = Customer::where('token','=',$token)->get();
         $data->each->setAppends(['balanceCredit','balanceTitle','salesStatus']);
         if (count($data) >= 1) {
             return $this->apiResponse(ResaultType::Success, $data, 'Content Detail', 201);
@@ -126,7 +126,7 @@ class BusinessController extends ApiController
         if ($validator->fails()) {
             return $this->apiResponse(ResaultType::Error, $validator->errors(), 'Validation Error', 422);
         }
-        $data = Business::where('token','=',$token)->first();
+        $data = Customer::where('token','=',$token)->first();
 
         if (count($data) >= 1) {
             if (request('code') != '') {
@@ -194,7 +194,7 @@ class BusinessController extends ApiController
 
     public function destroy($token)
     {
-        $data = Business::where('token','=',$token)->first();
+        $data = Customer::where('token','=',$token)->first();
         if (count($data) >= 1) {
             $data->delete();
             return $this->apiResponse(ResaultType::Success, $data, 'Content Deleted', 200);

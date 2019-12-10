@@ -19,7 +19,7 @@ Route::middleware('api-token')->group(function() {
 */
     Route::apiResource('/company', 'Api\CompanyController');
     Route::apiResource('/website', 'Api\WebsiteController');
-    Route::apiResource('/business', 'Api\BusinessController');
+    Route::apiResource('/customer', 'Api\CustomerController');
     Route::apiResource('/balance', 'Api\BalanceController');
     Route::apiResource('/user', 'Api\UserController');
     Route::apiResource('/canvas', 'Api\CanvasController');

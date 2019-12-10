@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Balance;
 use App\User;
-use App\Business;
+use App\Customer;
 use Illuminate\Http\Request;
 use Validator;
 
@@ -17,20 +17,20 @@ class BalanceController extends ApiController
         $token = $request->token ? $request->token : null;
         $query = Balance::query();
         if ($request->has('token')){
-            $business = Business::where('token','=',$token)->first();
-            $length = count($query->where('business', '=', $business->id)->get());
-            $query->where('business', '=', $business->id);
+            $customer = Customer::where('token','=',$token)->first();
+            $length = count($query->where('customer', '=', $customer->id)->get());
+            $query->where('customer', '=', $customer->id);
         } else {
             $length = count($query->get());
         }
         if ($request->has('sortBy'))
-            $query->orderBy($request->query('sortBy'), $request->query('sort', 'DESC'));
-            $query->join('business', 'business.id', '=', 'balance.business');
+            $query->orderBy($request->query('sortBy'), $request->query('id', 'DESC'));
+            $query->join('customer', 'customer.id', '=', 'balance.customer');
         if ($request->has('select')) {
             $selects = explode(',', $request->query('select'));
-            $query->select($selects,'business.title as businessTitle', 'business.code as businessCode', 'business.token');
+            $query->select($selects,'customer.title as customerTitle', 'customer.code as customerCode', 'customer.token');
         } else {
-            $query->select('balance.*','business.title as businessTitle', 'business.code as businessCode', 'business.token');
+            $query->select('balance.*','customer.title as customerTitle', 'customer.code as customerCode', 'customer.token');
         }
 
         if ($request->has('start')) {
@@ -53,7 +53,7 @@ class BalanceController extends ApiController
     {
         $validator = Validator::make($request->all(), [
             'user' => 'required',
-            'business' => 'required|integer',
+            'customer' => 'required|integer',
             'recharge' => 'nullable|string',
             'type' => 'required|integer',
             'bank' => 'nullable|integer',
@@ -68,7 +68,7 @@ class BalanceController extends ApiController
         $user = User::where('api_token','=',request('user'))->first();
         if ((count($user) >= 1) && ($user->level == 1)) {
             $data = new Balance();
-            $data->business = request('business');
+            $data->customer = request('customer');
             $data->recharge = request('recharge');
             $data->type = request('type');
             $data->bank = request('bank');
@@ -77,7 +77,7 @@ class BalanceController extends ApiController
             $data->status = request('status');
             $data->save();
             if ($data) {
-                $bsn = Business::find($data->business);
+                $bsn = Customer::find($data->customer);
                 if ($data->type == 3) {
                     $bsn->credit = $bsn->credit + $data->recharge;
                 } else {
@@ -101,9 +101,9 @@ class BalanceController extends ApiController
 
     public function show($id)
     {
-        $business = Business::where('token','=',$token)->first();
-        if (count($business) >= 1) {
-            $data = Balance::where('business','=',$business->id)->get();
+        $customer = Customer::where('token','=',$token)->first();
+        if (count($customer) >= 1) {
+            $data = Balance::where('customer','=',$customer->id)->get();
             // join bank info
             return $this->apiResponse(ResaultType::Success, $data, 'Content Detail', 201);
         } else {
@@ -140,9 +140,9 @@ class BalanceController extends ApiController
             $data->status = request('status');
             $data->save();
             if ($data) {
-                return $this->apiResponse(ResaultType::Success, $data, 'Content Updated', 200);
+                return $this->apiResponse(ResaultType::Success, $data, 'kkkContent Updated', 200);
             } else {
-                return $this->apiResponse(ResaultType::Error, null, 'Content not updated', 500);
+                return $this->apiResponse(ResaultType::Error, null, 'kkkContent not updated', 500);
             }
         } else {
             return $this->apiResponse(ResaultType::Error, null, 'User not found', 500);

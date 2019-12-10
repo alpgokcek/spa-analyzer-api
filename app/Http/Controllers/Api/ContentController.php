@@ -25,11 +25,15 @@ class ContentController extends ApiController
 
         if ($request->has('select')) {
             $selects = explode(',', $request->query('select'));
-            $query->select($selects);
+            $query->select($selects,'canvas.title as canvasTitle', 'canvas.url as canvasUrl');
+        } else {
+            $query->select('balance.*','customer.title as customerTitle', 'customer.code as customerCode', 'customer.token');
         }
+
+
         $length = count($query->get());
         $data = $query->offset($offset)->limit($limit)->get();
-
+        $query->join('canvas', 'canvas.id', '=', 'content.canvas');
         if (count($data) >= 1) {
             return $this->apiResponse(ResaultType::Success, $data, 'Listing: '.$offset.'-'.$limit, $length, 200);
         } else {

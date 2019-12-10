@@ -57,7 +57,7 @@ class AuthController extends Controller
         $data = new User();
         $data->name = request('name');
         $data->company = 1;
-        $data->business = 1;
+        $data->customer = 1;
         $data->email = request('email');
         $data->password = Hash::make(request('password'));
         $data->level = 9;

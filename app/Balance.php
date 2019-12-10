@@ -10,8 +10,8 @@ class Balance extends Model
     protected $fillable = [];
     // protected $guarded = [];
 
-    public function getBalanceBusiness() {
-        return $this->belongsTo('App\Business','business');
+    public function getBalanceCustomer() {
+        return $this->belongsTo('App\Customer','customer');
     }
 
     public function getBankNameAttribute() {

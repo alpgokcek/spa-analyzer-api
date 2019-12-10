@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
-use App\Business;
+use App\Customer;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -16,19 +16,23 @@ class UserController extends ApiController
     {
         $offset = $request->offset ? $request->offset : 0;
         $limit = $request->limit ? $request->limit : 10;
-        $token = $request->token ? $request->token : null;
+        $company = $request->company ? $request->company : null;
         $query = User::query();
-        if ($request->has('token')){
-            $business = Business::where('token','=',$token)->first();
-            $query->where('business', '=', $business->id);
+        if ($request->has('company')){
+            $query->where('company', '=', $company);
         }
         if ($request->has('sortBy'))
             $query->orderBy($request->query('sortBy'), $request->query('sort', 'DESC'));
 
+        if ($request->has('select')) {
+            $selects = explode(',', $request->query('select'));
+            $query->select($selects);
+        }
+        $length = count($query->get());
         $data = $query->offset($offset)->limit($limit)->get();
 
         if (count($data) >= 1) {
-            return $this->apiResponse(ResaultType::Success, $data, 'Listing: '.$offset.'-'.$limit, 200);
+            return $this->apiResponse(ResaultType::Success, $data, 'Listing: '.$offset.'-'.$limit, $length, 200);
         } else {
             return $this->apiResponse(ResaultType::Error, null, 'Content Not Found', 404);
         }
