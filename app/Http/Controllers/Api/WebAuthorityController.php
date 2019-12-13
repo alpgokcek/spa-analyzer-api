@@ -42,19 +42,19 @@ class WebAuthorityController extends ApiController
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'website' => 'required',
+            'web' => 'required',
             'user' => 'required',
-            'work' => 'required|integer',
-            'c' => 'required|integer',
-            'r' => 'required|integer',
-            'u' => 'required|integer',
-            'd' => 'required|integer',
+            'work' => 'required',
+            'c' => 'required',
+            'r' => 'required',
+            'u' => 'required',
+            'd' => 'required',
             ]);
         if ($validator->fails()) {
             return $this->apiResponse(ResaultType::Error, $validator->errors(), 'Validation Error', 422);
         }
         $data = new WebAuthority();
-        $data->website = request('website');
+        $data->web = request('web');
         $data->user = request('user');
         $data->work = request('work');
         $data->c = request('c');

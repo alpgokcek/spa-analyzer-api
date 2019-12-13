@@ -28,6 +28,10 @@ class WebsiteController extends ApiController
             $selects = explode(',', $request->query('select'));
             $query->select($selects);
         }
+
+        if ($request->has('company'))
+            $query->where('company', $request->query('company'));
+
         $length = count($query->get());
         $data = $query->offset($offset)->limit($limit)->get();
 
@@ -44,8 +48,7 @@ class WebsiteController extends ApiController
         /* user emaili gönderilecek! email kayıtlıysa id tabloya eklenecek. */
         $validator = Validator::make($request->all(), [
             'company' => 'required',
-            'code' => 'nullable',
-            'url' => 'required',
+            'url' => 'unique:website,url',
             'title' => 'required|string',
             'description' => 'nullable',
             'keywords' => 'nullable',
@@ -61,7 +64,6 @@ class WebsiteController extends ApiController
         }
         $data = new Website();
         $data->company = request('company');
-        $data->code = request('code');
         $data->url = request('url');
         $data->title = request('title');
         $data->description = request('description');
@@ -94,7 +96,6 @@ class WebsiteController extends ApiController
     {
         $validator = Validator::make($request->all(), [
             'company' => 'nullable',
-            'code' => 'nullable',
             'url' => 'nullable',
             'title' => 'nullable',
             'description' => 'nullable',
@@ -113,9 +114,6 @@ class WebsiteController extends ApiController
         if (count($data) >= 1) {
             if (request('company') != '') {
                 $data->company = request('company');
-            }
-            if (request('code') != '') {
-                $data->code = request('code');
             }
             if (request('url') != '') {
                 $data->url = request('url');

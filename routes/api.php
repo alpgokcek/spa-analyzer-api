@@ -29,4 +29,8 @@ Route::middleware('api-token')->group(function() {
     Route::apiResource('/authority', 'Api\AuthorityController');
     Route::apiResource('/webauthority', 'Api\WebAuthorityController');
     Route::apiResource('/bank', 'Api\BankController');
+    Route::post('/upload', 'Api\UploadController@upload');
+    Route::post('/storage', 'Api\UploadController@storage');
+    Route::post('/s3', 'Api\UploadController@s3');
+    Route::post('/removeS3', 'Api\UploadController@removeS3');
 });

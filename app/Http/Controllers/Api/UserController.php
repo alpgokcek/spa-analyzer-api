@@ -15,7 +15,7 @@ class UserController extends ApiController
     public function index(Request $request)
     {
         $offset = $request->offset ? $request->offset : 0;
-        $limit = $request->limit ? $request->limit : 10;
+        $limit = $request->limit ? $request->limit : 99999999999999;
         $company = $request->company ? $request->company : null;
         $query = User::query();
         if ($request->has('company')){

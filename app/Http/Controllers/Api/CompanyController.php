@@ -38,27 +38,26 @@ class CompanyController extends ApiController
 
     public function store(Request $request)
     {
-        /* burası çok karışık oldu!!!! */
-        /* user emaili gönderilecek! email kayıtlıysa id tabloya eklenecek. */
         $validator = Validator::make($request->all(), [
-            'main' => 'nullable|integer',
-            'name' => 'required|string',
-            'email' => 'required|email',
+            'main' => 'nullable',
+            'name' => 'required',
+            'email' => 'required',
             'tel' => 'nullable',
             'city' => 'nullable',
+            'district' => 'nullable',
             'address' => 'nullable',
-            'level' => 'nullable|integer',
+            'level' => 'nullable',
             'logo' => 'nullable',
-            'status' => 'required|integer',
+            'status' => 'required',
         ]);
         if ($validator->fails()) {
             return $this->apiResponse(ResaultType::Error, $validator->errors(), 'Validation Error', 422);
         }
         $data = new Company();
         $data->main = request('main');
-        $data->name = request('nam');
-        $data->email = request('emai');
-        $data->tel = request('te');
+        $data->name = request('name');
+        $data->email = request('email');
+        $data->tel = request('tel');
         $data->city = request('city');
         $data->district = request('district');
         $data->address = request('address');

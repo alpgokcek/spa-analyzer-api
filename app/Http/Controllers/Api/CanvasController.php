@@ -21,20 +21,21 @@ class CanvasController extends ApiController
         $length = 1;
         $canvas = Canvas::all();
         if ($request->has('type')){
-            switch ($type) {
-                case 'content':
-                    $query->join('content', 'content.canvas', '=', 'canvas.id');
-                    $query->select('canvas.website as canvasWebsite','canvas.type as canvasType','canvas.user as canvasUser','canvas.title as canvasTitle','canvas.summary as canvasSummary','canvas.photo as canvasPhoto','canvas.slug as canvasSlug','content.*');
-                    break;
-                case 'product':
-                    $query->join('product', 'product.canvas', '=', 'canvas.id');
-                    $query->select('canvas.website as canvasWebsite','canvas.type as canvasType','canvas.user as canvasUser','canvas.title as canvasTitle','canvas.summary as canvasSummary','canvas.photo as canvasPhoto','canvas.slug as canvasSlug','product.*');
-                    break;
+            $query->where('type', $request->query('type'));
+            // switch ($type) {
+            //     case 'content':
+            //         $query->join('content', 'content.canvas', '=', 'canvas.id');
+            //         $query->select('canvas.website as canvasWebsite','canvas.type as canvasType','canvas.user as canvasUser','canvas.title as canvasTitle','canvas.summary as canvasSummary','canvas.photo as canvasPhoto','canvas.slug as canvasSlug','content.*');
+            //         break;
+            //     case 'product':
+            //         $query->join('product', 'product.canvas', '=', 'canvas.id');
+            //         $query->select('canvas.website as canvasWebsite','canvas.type as canvasType','canvas.user as canvasUser','canvas.title as canvasTitle','canvas.summary as canvasSummary','canvas.photo as canvasPhoto','canvas.slug as canvasSlug','product.*');
+            //         break;
 
-                default:
-                    # code...
-                    break;
-            }
+            //     default:
+            //         # code...
+            //         break;
+            // }
         } else {
             $length = count($query->get());
         }
@@ -48,12 +49,18 @@ class CanvasController extends ApiController
             $query->whereBetween('created_at',[$start,$end]);
         }
 
+        if ($request->has('website'))
+            $query->where('website', $request->query('website'));
+
+        if ($request->has('slug'))
+            $query->where('slug', $request->query('slug'));
+
         $data = $query->offset($offset)->limit($limit)->get();
 
         if (count($data) >= 1) {
             return $this->apiResponse(ResaultType::Success, $data, 'Listing: '.$offset.'-'.$limit, $length, 200);
         } else {
-            return $this->apiResponse(ResaultType::Error, null, 'Content Not Found', 0, 404);
+            return $this->apiResponse(ResaultType::Success, null, 'Content Not Found', 0, 202);
         }
     }
 
@@ -84,7 +91,16 @@ class CanvasController extends ApiController
             $data->slug = Str::slug(request('slug'), '-');
             $data->save();
             if ($data) {
-                return $this->apiResponse(ResaultType::Success, $data, 'Canvas Added', 201);
+                $content = new Content();
+                $content->canvas = $data->id;
+                $content->lang = request('lang');
+                $content->user = request('user');
+                $content->title = request('title');
+                $content->summary = request('summary');
+                $content->photo = request('photo');
+                $content->status = 2;
+                $content->save();
+                return $this->apiResponse(ResaultType::Success, $content->id, 'Canvas Added', 201);
             } else {
                 return $this->apiResponse(ResaultType::Error, null, 'Canvas not Added', 500);
             }

@@ -33,11 +33,11 @@ class AuthController extends Controller
             }
             return response()->json([
                 'message' => 'Invalid Password'
-            ]);
+            ], 401);
         }
         return response()->json([
             'message' => 'User Not Found'
-        ]);
+        ], 403);
     }
     public function register(Request $request)
     {

@@ -43,7 +43,7 @@ class CustomerController extends ApiController
         $validator = Validator::make($request->all(), [
             'company' => 'required',
             'code' => 'nullable',
-            'title' => 'required|string',
+            'title' => 'required',
             'address' => 'nullable',
             'city' => 'nullable',
             'postal_code' => 'nullable',
@@ -58,6 +58,7 @@ class CustomerController extends ApiController
             'credit' => 'nullable',
             'disclaimer' => 'nullable',
             'discount' => 'nullable',
+            'status' => 'required',
             'token' => 'unique:customer,token'
             ]);
         if ($validator->fails()) {
@@ -81,7 +82,7 @@ class CustomerController extends ApiController
         $data->credit = request('credit');
         $data->disclaimer = request('disclaimer');
         $data->discount = request('discount');
-        $data->status = 1;
+        $data->status = request('status');
         $data->token = str_random(64);
         $data->save();
         if ($data) {
