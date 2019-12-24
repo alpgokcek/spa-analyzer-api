@@ -8,7 +8,6 @@ class Balance extends Model
 {
     protected $table = 'balance';
     protected $fillable = [];
-    // protected $guarded = [];
 
     public function getBalanceCustomer() {
         return $this->belongsTo('App\Customer','customer');

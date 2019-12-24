@@ -7,11 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Product extends Model
 {
     protected $table = 'product';
-    // kullanılabilecek kolonlar
-    protected $fillable = [
-    ];
-    // kullanılamayacak kolonlar (örn: 'password')
-    // protected $guarded = [];
+    protected $fillable = [];
 
     public function allProductUsers() {
         return $this->belongsToMany('App\User', 'users');

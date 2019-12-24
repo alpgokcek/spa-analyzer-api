@@ -7,11 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Website extends Model
 {
     protected $table = 'website';
-    // kullanılabilecek kolonlar
-    protected $fillable = [
-    ];
-    // kullanılamayacak kolonlar (örn: 'password')
-    // protected $guarded = [];
+    protected $fillable = [];
 
     public function allWebsiteUsers() {
         return $this->belongsToMany('App\User', 'users');

@@ -3,12 +3,19 @@
 namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Canvas;
+use App\CanvasInfo;
+use App\CanvasInfoLabel;
+
+use App\Http\Resources\CanvasResource;
+
 use App\User;
 use App\Website;
 use App\Content;
 use Illuminate\Http\Request;
 use Validator;
+
 use Illuminate\Support\Str;
+use Illuminate\Support\Collection;
 
 class CanvasController extends ApiController
 {
@@ -111,8 +118,9 @@ class CanvasController extends ApiController
 
     public function show($id)
     {
-        $data = Canvas::find($id);
-        if (count($data) >= 1) {
+        $canvas = Canvas::find($id);
+        if (count($canvas) >= 1) {
+            $data = new CanvasResource($canvas);
             return $this->apiResponse(ResaultType::Success, $data, 'Canvas Detail', 201);
         } else {
             return $this->apiResponse(ResaultType::Error, null, 'Content Not Found', 404);

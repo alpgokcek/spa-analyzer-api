@@ -7,17 +7,21 @@ use Illuminate\Database\Eloquent\Model;
 class Canvas extends Model
 {
     protected $table = 'canvas';
-    // kullanılabilecek kolonlar
-    protected $fillable = [
-    ];
-    // kullanılamayacak kolonlar (örn: 'password')
-    // protected $guarded = [];
+    protected $fillable = [];
+
+    public function infos() {
+        return $this->morphMany('App\CanvasInfo', 'canvas');
+    }
 
     public function getCanvasSite() {
         return $this->belongsTo('App\Website', 'website');
     }
     public function getCanvasUser() {
         return $this->belongsTo('App\User','user');
+    }
+
+    public function canvasInfos() {
+        return $this->hasMany('App\CanvasInfo','canvas');
     }
 
     protected $casts = [

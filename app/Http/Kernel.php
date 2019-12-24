@@ -26,6 +26,8 @@ class Kernel extends HttpKernel
         'api' => [
             'throttle:60,1',
             'bindings',
+            \App\Http\Middleware\ApiLogger::class,
+            \App\Http\Middleware\HttpHeader::class
         ],
     ];
     protected $routeMiddleware = [
