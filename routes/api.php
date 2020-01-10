@@ -23,8 +23,13 @@ Route::middleware('api-token')->group(function() {
     Route::apiResource('/balance', 'Api\BalanceController');
     Route::apiResource('/user', 'Api\UserController');
     Route::apiResource('/canvas', 'Api\CanvasController');
+    Route::apiResource('/canvastype', 'Api\CanvasTypeController');
+    Route::apiResource('/canvassetting', 'Api\CanvasSettingController');
+    Route::apiResource('/canvassettingjson', 'Api\CanvasSettingJsonController');
     Route::apiResource('/content', 'Api\ContentController');
     Route::apiResource('/product', 'Api\ProductController');
+    Route::apiResource('/pins', 'Api\PinsController');
+    Route::apiResource('/pincode', 'Api\PinCodeController');
     Route::apiResource('/keyword', 'Api\KeywordController');
     Route::apiResource('/authority', 'Api\AuthorityController');
     Route::apiResource('/webauthority', 'Api\WebAuthorityController');

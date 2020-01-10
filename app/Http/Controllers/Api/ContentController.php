@@ -44,7 +44,7 @@ class ContentController extends ApiController
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-
+            'website' => 'required',
             'canvas' => 'required',
             'lang' => 'required',
             'user' => 'required',
@@ -74,6 +74,7 @@ class ContentController extends ApiController
             return $this->apiResponse(ResaultType::Error, $validator->errors(), 'Validation Error', 422);
         }
         $data = new Content();
+        $data->website = request('website');
         $data->canvas = request('canvas');
         $data->lang = request('lang');
         $data->user = request('user');
@@ -108,7 +109,7 @@ class ContentController extends ApiController
     public function show($id)
     {
         $data = Content::find($id);
-        if (count($data) >= 1) {
+        if ($data) {
             return $this->apiResponse(ResaultType::Success, $data, 'Content Detail', 201);
         } else {
             return $this->apiResponse(ResaultType::Error, null, 'Content Not Found', 404);
@@ -224,7 +225,7 @@ class ContentController extends ApiController
     public function destroy($id)
     {
         $data = Content::find($id);
-        if (count($data) >= 1) {
+        if ($data) {
             $data->delete();
             return $this->apiResponse(ResaultType::Success, $data, 'Content Deleted', 200);
         } else {

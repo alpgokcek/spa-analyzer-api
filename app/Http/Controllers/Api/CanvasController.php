@@ -11,6 +11,8 @@ use App\Http\Resources\CanvasResource;
 use App\User;
 use App\Website;
 use App\Content;
+use App\Product;
+use App\Pins;
 use Illuminate\Http\Request;
 use Validator;
 
@@ -29,20 +31,24 @@ class CanvasController extends ApiController
         $canvas = Canvas::all();
         if ($request->has('type')){
             $query->where('type', $request->query('type'));
-            // switch ($type) {
-            //     case 'content':
-            //         $query->join('content', 'content.canvas', '=', 'canvas.id');
-            //         $query->select('canvas.website as canvasWebsite','canvas.type as canvasType','canvas.user as canvasUser','canvas.title as canvasTitle','canvas.summary as canvasSummary','canvas.photo as canvasPhoto','canvas.slug as canvasSlug','content.*');
-            //         break;
-            //     case 'product':
-            //         $query->join('product', 'product.canvas', '=', 'canvas.id');
-            //         $query->select('canvas.website as canvasWebsite','canvas.type as canvasType','canvas.user as canvasUser','canvas.title as canvasTitle','canvas.summary as canvasSummary','canvas.photo as canvasPhoto','canvas.slug as canvasSlug','product.*');
-            //         break;
+            switch ($request->query('type')) {
+                case 'pin':
+                    $query->join('pins', 'pins.canvas', '=', 'canvas.id');
+                    $query->select('pins.*');
+                    break;
+                // case 'content':
+                //     $query->join('content', 'content.canvas', '=', 'canvas.id');
+                //     $query->select('canvas.website as canvasWebsite','canvas.type as canvasType','canvas.user as canvasUser','canvas.title as canvasTitle','canvas.summary as canvasSummary','canvas.photo as canvasPhoto','canvas.slug as canvasSlug','content.*');
+                //     break;
+                // case 'product':
+                //     $query->join('product', 'product.canvas', '=', 'canvas.id');
+                //     $query->select('canvas.website as canvasWebsite','canvas.type as canvasType','canvas.user as canvasUser','canvas.title as canvasTitle','canvas.summary as canvasSummary','canvas.photo as canvasPhoto','canvas.slug as canvasSlug','product.*');
+                //     break;
 
-            //     default:
-            //         # code...
-            //         break;
-            // }
+                default:
+                    # code...
+                    break;
+            }
         } else {
             $length = count($query->get());
         }
@@ -75,9 +81,9 @@ class CanvasController extends ApiController
     {
         $validator = Validator::make($request->all(), [
             'api_token' => 'required',
-            'website' => 'required|integer',
+            'website' => 'required',
             'type' => 'required',
-            'user' => 'required|integer',
+            'user' => 'required',
             'title' => 'required',
             'summary' => 'nullable',
             'photo' => 'nullable',
@@ -87,7 +93,7 @@ class CanvasController extends ApiController
             return $this->apiResponse(ResaultType::Error, $validator->errors(), 'Validation Error', 422);
         }
         $user = User::where('api_token','=',request('api_token'))->first();
-        if ((count($user) >= 1) && ($user->level == 1)) {
+        if ($user && ($user->level == 1)) {
             $data = new Canvas();
             $data->website = request('website');
             $data->type = request('type');
@@ -98,8 +104,20 @@ class CanvasController extends ApiController
             $data->slug = Str::slug(request('slug'), '-');
             $data->save();
             if ($data) {
-                $content = new Content();
+                switch ($data->type) {
+                    case 'content':
+                        $content = new Content();
+                        break;
+                    case 'product':
+                        $content = new Product();
+                        break;
+                    case 'pins':
+                        $content = new Pins();
+                        break;
+                }
                 $content->canvas = $data->id;
+                $content->website = request('website');
+                $content->type = request('type');
                 $content->lang = request('lang');
                 $content->user = request('user');
                 $content->title = request('title');
