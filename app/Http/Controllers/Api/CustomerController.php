@@ -96,7 +96,7 @@ class CustomerController extends ApiController
     {
         $data = Customer::where('token','=',$token)->get();
         $data->each->setAppends(['balanceCredit','balanceTitle','salesStatus']);
-        if (count($data) >= 1) {
+        if ($data) {
             return $this->apiResponse(ResaultType::Success, $data, 'Content Detail', 201);
         } else {
             return $this->apiResponse(ResaultType::Error, null, 'Content Not Found', 404);
@@ -129,7 +129,7 @@ class CustomerController extends ApiController
         }
         $data = Customer::where('token','=',$token)->first();
 
-        if (count($data) >= 1) {
+        if ($data) {
             if (request('code') != '') {
                 $data->code = request('code');
             }
@@ -196,7 +196,7 @@ class CustomerController extends ApiController
     public function destroy($token)
     {
         $data = Customer::where('token','=',$token)->first();
-        if (count($data) >= 1) {
+        if ($data) {
             $data->delete();
             return $this->apiResponse(ResaultType::Success, $data, 'Content Deleted', 200);
         } else {

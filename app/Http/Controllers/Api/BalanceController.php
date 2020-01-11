@@ -42,7 +42,7 @@ class BalanceController extends ApiController
         $data = $query->offset($offset)->limit($limit)->get();
         $data->each->setAppends(['bankName']);
 
-        if (count($data) >= 1) {
+        if ($data) {
             return $this->apiResponse(ResaultType::Success, $data, 'Listing: '.$offset.'-'.$limit, $length, 200);
         } else {
             return $this->apiResponse(ResaultType::Error, null, 'Content Not Found', 0, 404);
@@ -66,7 +66,7 @@ class BalanceController extends ApiController
             return $this->apiResponse(ResaultType::Error, $validator->errors(), 'Validation Error', 422);
         }
         $user = User::where('api_token','=',request('user'))->first();
-        if ((count($user) >= 1) && ($user->level == 1)) {
+        if ($user && ($user->level == 1)) {
             $data = new Balance();
             $data->customer = request('customer');
             $data->recharge = request('recharge');
@@ -124,7 +124,7 @@ class BalanceController extends ApiController
             return $this->apiResponse(ResaultType::Error, $validator->errors(), 'Validation Error', 422);
         }
         $user = User::where('api_token','=',request('user'))->first();
-        if ((count($user) >= 1) && ($user->level == 1)) {
+        if (($user) && ($user->level == 1)) {
             $data = Balance::find($token);
             if (request('bank')) {
                 $data->bank = request('bank');

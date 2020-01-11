@@ -34,15 +34,23 @@ class PinCodeController extends ApiController
     {
         $validator = Validator::make($request->all(), [
             'pin' => 'required',
+            'title' => 'required',
+            'serino' => 'required',
             'code' => 'required',
-            'status' => 'nullable',
+            'price' => 'required',
+            'ended_at' => 'required',
+            'status' => 'required',
             ]);
         if ($validator->fails()) {
             return $this->apiResponse(ResaultType::Error, $validator->errors(), 'Validation Error', 422);
         }
         $data = new PinCode();
         $data->pin = request('pin');
+        $data->title = request('title');
+        $data->serino = request('serino');
         $data->code = request('code');
+        $data->price = request('price');
+        $data->ended_at = request('ended_at');
         $data->status = request('status');
         $data->save();
         if ($data) {
@@ -65,8 +73,6 @@ class PinCodeController extends ApiController
     public function update(Request $request, $id)
     {
         $validator = Validator::make($request->all(), [
-            'pin' => 'nullable',
-            'code' => 'nullable',
             'status' => 'nullable',
             ]);
         if ($validator->fails()) {
@@ -75,15 +81,7 @@ class PinCodeController extends ApiController
         $data = PinCode::find($id);
 
         if ($data) {
-            if (request('pin') != '') {
-                $data->pin = request('pin');
-            }
-            if (request('code') != '') {
-                $data->code = request('code');
-            }
-            if (request('status') != '') {
-                $data->status = request('status');
-            }
+            $data->status = request('status');
             $data->save();
 
             if ($data) {

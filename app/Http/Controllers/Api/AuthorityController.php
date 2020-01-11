@@ -18,21 +18,19 @@ class AuthorityController extends ApiController
         $limit = $request->limit ? $request->limit : 99999999999999;
         $query = Authority::query();
 
-        if ($request->has('search'))
-            $query->where('title', 'like', '%' . $request->query('search') . '%');
-
-        if ($request->has('sortBy'))
-            $query->orderBy($request->query('sortBy'), $request->query('sort', 'DESC'));
-
-        if ($request->has('select')) {
-            $selects = explode(',', $request->query('select'));
-            $query->select($selects);
+        if ($request->has('token')) {
+            $customer = Customer::where('token','=', $request->query('token'))->first();
+            $query->where('customer', '=', $customer->id)
+            ->join('users','users.id','authority.user')
+            ->select('authority.*','users.name as userName')
+            ->get();
         }
+
         $length = count($query->get());
         $data = $query->offset($offset)->limit($limit)->get();
         $data->each->setAppends(['authorityStatus']);
 
-        if (count($data) >= 1) {
+        if ($data) {
             return $this->apiResponse(ResaultType::Success, $data, 'Listing: '.$offset.'-'.$limit, $length, 200);
         } else {
             return $this->apiResponse(ResaultType::Error, null, 'Content Not Found', 0, 404);
@@ -73,7 +71,7 @@ class AuthorityController extends ApiController
     {
         $data = Authority::find($id);
         $data->each->setAppends(['authorityStatus']);
-        if (count($data) >= 1) {
+        if ($data) {
             return $this->apiResponse(ResaultType::Success, $data, 'Authority Detail', 201);
         } else {
             return $this->apiResponse(ResaultType::Error, null, 'Authority Not Found', 404);
@@ -93,7 +91,7 @@ class AuthorityController extends ApiController
         }
         $data = Customer::where('token','=',$token)->first();
 
-        if (count($data) >= 1) {
+        if ($data) {
             $data->c = request('c');
             $data->r = request('r');
             $data->u = request('u');

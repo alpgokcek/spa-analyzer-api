@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Pins;
+use App\PinCode;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -47,12 +48,11 @@ class PinsController extends ApiController
     {
         $validator = Validator::make($request->all(), [
             'website' => 'required',
-            'canvas' => 'required',
+            'operator' => 'required',
             'lang' => 'required',
             'user' => 'required',
             'type' => 'nullable',
             'title' => 'required',
-            'summary' => 'nullable',
             'content' => 'nullable',
             'status' => 'nullable',
             'vat' => 'nullable',
@@ -63,18 +63,20 @@ class PinsController extends ApiController
             'CustomerService' => 'nullable',
             'photo' => 'nullable',
             'slug' => 'required',
+            'pincodes' => 'nullable'
             ]);
+
         if ($validator->fails()) {
             return $this->apiResponse(ResaultType::Error, $validator->errors(), 'Validation Error', 422);
         }
+        $user = User::where('api_token','=',request('user'))->first();
         $data = new Pins();
         $data->website = request('website');
-        $data->canvas = request('canvas');
+        $data->operator = request('operator');
         $data->lang = request('lang');
-        $data->user = request('user');
+        $data->user = 1;
         $data->type = request('type');
         $data->title = request('title');
-        $data->summary = request('summary');
         $data->content = request('content');
         $data->status = request('status');
         $data->vat = request('vat');
@@ -87,10 +89,22 @@ class PinsController extends ApiController
         $data->slug = request('slug');
         $data->save();
         if ($data) {
-            return $this->apiResponse(ResaultType::Success, $data, 'Pins Created', 201);
+            $submitPins = request('pincodes');
+            foreach ($submitPins as $key) {
+                $pincode = new PinCode();
+                $pincode->pin = $data->id;
+                $pincode->serino = $key['serialno'];
+                $pincode->code = $key['pincode'];
+                $pincode->price = $key['price'];
+                // $pin->ended_at = $key['date'];
+                $pincode->status = 1;
+                $pincode->save();
+            }
+            return $this->apiResponse(ResaultType::Success, $data, 'Pin and codes Created', 201);
         } else {
-            return $this->apiResponse(ResaultType::Error, null, 'Pins not saved', 500);
+            return $this->apiResponse(ResaultType::Error, null, 'Pin Code not saved', 500);
         }
+
     }
 
     public function show($id)
@@ -106,13 +120,9 @@ class PinsController extends ApiController
     public function update(Request $request, $id)
     {
         $validator = Validator::make($request->all(), [
-            'website' => 'nullable',
-            'canvas' => 'nullable',
             'lang' => 'nullable',
-            'user' => 'nullable',
             'type' => 'nullable',
             'title' => 'nullable',
-            'summary' => 'nullable',
             'content' => 'nullable',
             'status' => 'nullable',
             'vat' => 'nullable',
@@ -129,26 +139,14 @@ class PinsController extends ApiController
         $data = Pins::find($id);
 
         if ($data) {
-            if (request('website') != '') {
-                $data->website = request('website');
-            }
-            if (request('canvas') != '') {
-                $data->canvas = request('canvas');
-            }
             if (request('lang') != '') {
                 $data->lang = request('lang');
-            }
-            if (request('user') != '') {
-                $data->user = request('user');
             }
             if (request('type') != '') {
                 $data->type = request('type');
             }
             if (request('title') != '') {
                 $data->title = request('title');
-            }
-            if (request('summary') != '') {
-                $data->summary = request('summary');
             }
             if (request('content') != '') {
                 $data->content = request('content');

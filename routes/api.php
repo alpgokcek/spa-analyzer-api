@@ -22,6 +22,8 @@ Route::middleware('api-token')->group(function() {
     Route::apiResource('/customer', 'Api\CustomerController');
     Route::apiResource('/balance', 'Api\BalanceController');
     Route::apiResource('/user', 'Api\UserController');
+    Route::apiResource('/log', 'Api\LogController');
+    Route::apiResource('/dashboard', 'Api\DashboardController');
     Route::apiResource('/canvas', 'Api\CanvasController');
     Route::apiResource('/canvastype', 'Api\CanvasTypeController');
     Route::apiResource('/canvassetting', 'Api\CanvasSettingController');
