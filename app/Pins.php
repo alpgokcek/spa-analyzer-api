@@ -16,6 +16,10 @@ class Pins extends Model
         return $this->belongsTo('App\User','users');
     }
 
+    public function getPinsListAttribute() {
+        return $this->title.' - %'.$this->discount. ' - €'.$this->price;
+    }
+
     protected $casts = [
         'created_at' => 'date:d-m-Y',
         'updated_at' => 'date:d-m-Y'

@@ -24,10 +24,12 @@ class UserController extends ApiController
         if ($request->has('sortBy'))
             $query->orderBy($request->query('sortBy'), $request->query('sort', 'DESC'));
 
+        $query->join('company','company.id','users.company');
         if ($request->has('select')) {
             $selects = explode(',', $request->query('select'));
-            $query->select($selects);
+            $query->select($selects, 'company.name as companyTitle');
         }
+        $query->select('users.*', 'company.name as companyTitle');
         $length = count($query->get());
         $data = $query->offset($offset)->limit($limit)->get();
 
@@ -47,12 +49,15 @@ class UserController extends ApiController
             'password' => 'required',
             'level' => 'required|integer',
             'phone' => 'required',
+            'title' => 'nullable',
+            'phone2' => 'nullable',
+            'title2' => 'nullable',
         ]);
         if ($validator->fails()) {
             return $this->apiResponse(ResaultType::Error, $validator->errors(), 'Validation Error', 422);
         }
-        $control = count(User::where('email','=',request('email'))->first());
-        if ($control >= 1) {
+        $control = User::where('email','=',request('email'))->first();
+        if (isset($control)) {
             return $this->apiResponse(ResaultType::Error, $control->email, 'User Already Registered', 500);
         } else {
             $data = new User();
@@ -62,6 +67,9 @@ class UserController extends ApiController
             $data->password = Hash::make(request('password'));
             $data->level = request('level');
             $data->phone = request('phone');
+            $data->title = request('ptitle');
+            $data->phone2 = request('phone2');
+            $data->title2 = request('ptitle2');
             $data->api_token = Str::random(64);
             $data->save();
             if ($data) {
@@ -85,10 +93,13 @@ class UserController extends ApiController
     public function update(Request $request, $token)
     {
         $validator = Validator::make($request->all(), [
-            'name' => 'nullable|string',
-            'email' => 'nullable|string',
-            'level' => 'nullable|string',
-            'userPhone' => 'nullable|string',
+            'name' => 'nullable',
+            'email' => 'nullable',
+            'level' => 'nullable',
+            'phone' => 'nullable',
+            'title' => 'nullable',
+            'phone2' => 'nullable',
+            'title2' => 'nullable'
         ]);
         if ($validator->fails()) {
             return $this->apiResponse(ResaultType::Error, $validator->errors(), 'Validation Error', 422);
@@ -97,7 +108,10 @@ class UserController extends ApiController
         $data->name = request('name');
         $data->email = request('email');
         $data->level = request('level');
-        $data->userPhone = request('userPhone');
+        $data->phone = request('phone');
+        $data->title = request('title');
+        $data->phone2 = request('phone2');
+        $data->title2 = request('title2');
         $data->save();
         if ($data) {
             return $this->apiResponse(ResaultType::Success, $data, 'User Updated', 200);

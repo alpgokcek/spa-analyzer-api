@@ -59,11 +59,12 @@ class UploadController extends ApiController
             $auth = $request->header('Authorization');
             $token = str_replace('Bearer ', '', $auth);
             $user = User::where('api_token', $token)->select('id')->first();
-            $canvas = $request->canvas;
+            $website = $request->website;
             $file = $request->uploadFile;
             $fileExtension = $request->uploadFile->extension();
             $fileParams = Str::slug($request->params, '-');
-            $fileNewName = $canvas.'-'.$user->id.'-'.$fileParams . '-' . time() . '.' . $fileExtension;
+
+            $fileNewName = $website.'-'.$user->id.'-'.$fileParams . '-' . time() . '.' . $fileExtension;
             $fileName = $request->uploadFile->getClientOriginalName();
             $small = Image::make($file)->resize(468, 468, function($constraint) { $constraint->aspectRatio(); })->encode($fileExtension);
             $normal = Image::make($file)->resize(768, 768, function($constraint) { $constraint->aspectRatio(); })->encode($fileExtension);
@@ -77,11 +78,10 @@ class UploadController extends ApiController
             Storage::disk('s3')->put($imgmd, (string)$medium, 'public');
             Storage::disk('s3')->put($imgsm, (string)$small, 'public');
             Storage::disk('s3')->put($imglg, (string)$large, 'public');
-
             $data = new Gallery();
-            $data->canvas = $canvas;
+            $data->website = $website;
             $data->user = $user->id;
-            $data->title = $fileName;
+            $data->title = $fileParams;
             $data->order = 1;
             $data->photo = $fileNewName;
             $data->store = env('AWS_URL').'/uploads/';

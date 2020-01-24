@@ -27,8 +27,6 @@ class GalleryController extends ApiController
             $end = $request->query('end');
             $query->whereBetween('created_at',[$start,$end]);
         }
-        if ($request->has('canvas'))
-            $query->where('canvas', $request->query('canvas'));
         if ($request->has('user'))
             $query->where('user', $request->query('user'));
         $data = $query->offset($offset)->limit($limit)->get();
@@ -44,7 +42,7 @@ class GalleryController extends ApiController
     {
         $validator = Validator::make($request->all(), [
             'api_token' => 'required',
-            'canvas' => 'nullable',
+            'website' => 'nullable',
             'title' => 'nullable',
             'order' => 'nullable',
             'photo' => 'required',
@@ -56,7 +54,7 @@ class GalleryController extends ApiController
         $user = User::where('api_token','=',request('api_token'))->first();
         if ((count($user) >= 1) && ($user->level == 1)) {
             $data = new Gallery();
-            $data->canvas = request('canvas');
+            $data->website = request('website');
             $data->user = $user->id;
             $data->title = request('title');
             $data->order = request('order');
@@ -75,8 +73,8 @@ class GalleryController extends ApiController
 
     public function show($id)
     {
-        $data = Gallery::where('canvas','=',$id)->get();
-        if (count($data) >= 1) {
+        $data = Gallery::where('website','=',$id)->get();
+        if ($data) {
             return $this->apiResponse(ResaultType::Success, $data, 'Gallery Detail', 201);
         } else {
             return $this->apiResponse(ResaultType::Error, null, 'Content Not Found', 404);

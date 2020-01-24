@@ -5,6 +5,8 @@ use App\Http\Controllers\Controller;
 use App\Balance;
 use App\User;
 use App\Customer;
+use App\Log;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Validator;
 
@@ -25,12 +27,14 @@ class BalanceController extends ApiController
         }
         if ($request->has('sortBy'))
             $query->orderBy($request->query('sortBy'), $request->query('id', 'DESC'));
-            $query->join('customer', 'customer.id', '=', 'balance.customer');
+
+        $query->join('customer', 'customer.id', '=', 'balance.customer');
+        $query->join('bank', 'bank.id', '=', 'balance.bank');
         if ($request->has('select')) {
             $selects = explode(',', $request->query('select'));
-            $query->select($selects,'customer.title as customerTitle', 'customer.code as customerCode', 'customer.token');
+            $query->select($selects,'customer.title as customerTitle', 'customer.code as customerCode', 'customer.token', 'bank.title as bankName', 'customer.before as beforeCredit');
         } else {
-            $query->select('balance.*','customer.title as customerTitle', 'customer.code as customerCode', 'customer.token');
+            $query->select('balance.*','customer.title as customerTitle', 'customer.code as customerCode', 'customer.token', 'bank.title as bankName', 'customer.before as beforeCredit');
         }
 
         if ($request->has('start')) {
@@ -40,7 +44,7 @@ class BalanceController extends ApiController
         }
 
         $data = $query->offset($offset)->limit($limit)->get();
-        $data->each->setAppends(['bankName']);
+
 
         if ($data) {
             return $this->apiResponse(ResaultType::Success, $data, 'Listing: '.$offset.'-'.$limit, $length, 200);
@@ -71,14 +75,16 @@ class BalanceController extends ApiController
             $data->customer = request('customer');
             $data->recharge = request('recharge');
             $data->type = request('type');
-            $data->bank = request('bank');
+
             $data->remark = request('remark');
             $data->arrival_date = request('arrival_date');
             $data->status = request('status');
+            $data->bank = request('bank');
             $data->save();
             if ($data) {
                 $bsn = Customer::find($data->customer);
-                if ($data->type == 3) {
+                if ($data->type == 5) {
+                    $bsn->before = $bsn->balance;
                     $bsn->credit = $bsn->credit + $data->recharge;
                 } else {
                     if ($data->recharge) {
@@ -90,6 +96,14 @@ class BalanceController extends ApiController
                     }
                 }
                 $bsn->save();
+                $log = new Log();
+                $log->area = 'balance';
+                $log->areaid = $data->id;
+                $log->user = Auth::id();
+                $log->ip = \Request::ip();
+                $log->type = 1;
+                $log->info = 'Balance '.$data->id.' Created';
+                $log->save();
                 return $this->apiResponse(ResaultType::Success, $data, 'Balance Added', 201);
             } else {
                 return $this->apiResponse(ResaultType::Error, null, 'Balance not Added', 500);
@@ -114,45 +128,52 @@ class BalanceController extends ApiController
     public function update(Request $request, $token)
     {
         $validator = Validator::make($request->all(), [
-            'user' => 'required',
-            'bank' => 'nullable|integer',
+            'bank' => 'nullable',
             'paid_date' => 'nullable',
             'comment' => 'nullable',
-            'status' => 'required'
+            'status' => 'nullable'
             ]);
         if ($validator->fails()) {
             return $this->apiResponse(ResaultType::Error, $validator->errors(), 'Validation Error', 422);
         }
-        $user = User::where('api_token','=',request('user'))->first();
-        if (($user) && ($user->level == 1)) {
-            $data = Balance::find($token);
-            if (request('bank')) {
-                $data->bank = request('bank');
-            }
-            $data->paid_date = request('paid_date');
-            if(request('status') == 1) {
-                $data->paid = $data->recharge;
-            }
-            if(request('status') == 0) {
-                $data->paid = 0;
-            }
-            $data->comment = request('comment');
-            $data->status = request('status');
-            $data->save();
-            if ($data) {
-                return $this->apiResponse(ResaultType::Success, $data, 'kkkContent Updated', 200);
-            } else {
-                return $this->apiResponse(ResaultType::Error, null, 'kkkContent not updated', 500);
-            }
+        $data = Balance::find($token);
+        $data->status = request('status');
+        $data->comment = request('comment');
+        $data->bank = request('bank');
+        $data->paid_date = request('paid_date');
+
+        // if(request('status') == 1)
+        //     $data->paid = $data->recharge;
+        // else
+        //     $data->paid = 0;
+
+        $data->save();
+        if ($data) {
+            $log = new Log();
+            $log->area = 'balance';
+            $log->areaid = $id;
+            $log->user = Auth::id();
+            $log->ip = \Request::ip();
+            $log->type = 2;
+            $log->info = 'Balance '.$id.' Updated';
+            $log->save();
+
+            return $this->apiResponse(ResaultType::Success, $data, 'Content Updated', 200);
         } else {
-            return $this->apiResponse(ResaultType::Error, null, 'User not found', 500);
+            return $this->apiResponse(ResaultType::Error, null, 'Content not updated', 500);
         }
     }
 
-    public function destroy($token)
+    public function destroy($id)
     {
-        $data = Balance::where('token','=',$token)->first();
-        if (count($data) >= 1) {
+        $data = Balance::find($id);
+        if ($data) {
+            $customer = Customer::find($data->customer);
+            if ($data->type === 5)
+                $customer->credit = $customer->credit - $data->recharge;
+            else
+                $customer->balance = $customer->balance - $data->recharge;
+            $customer->save();
             $data->delete();
             return $this->apiResponse(ResaultType::Success, $data, 'Content Deleted', 200);
         } else {

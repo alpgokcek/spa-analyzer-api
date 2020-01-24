@@ -2,61 +2,61 @@
 
 namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
-use App\PinCode;
+use App\Discount;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Validator;
 
-class PinCodeController extends ApiController
+class DiscountController extends ApiController
 {
     public function index(Request $request)
     {
         $offset = $request->offset ? $request->offset : 0;
         $limit = $request->limit ? $request->limit : 99999999999999;
-        $query = PinCode::query();
+        $query = Discount::query();
 
-        if ($request->has('search'))
-            $query->where('pin', '=', $request->query('search') );
+        if ($request->has('customer'))
+            $query->where('customer', '=', $request->query('customer') );
 
+        $query->join('pins','pins.id','=','discount.pin');
+        $query->select('discount.*','pins.title as pinTitle','pins.price as pinPrice', 'pins.discount as pinDiscount');
         $length = count($query->get());
         $data = $query->offset($offset)->limit($limit)->get();
 
-        if (count($data) >= 1) {
+
+        if ($data) {
             return $this->apiResponse(ResaultType::Success, $data, 'Listing: '.$offset.'-'.$limit, $length, 200);
         } else {
-            return $this->apiResponse(ResaultType::Error, null, 'PinCode Not Found', 0, 404);
+            return $this->apiResponse(ResaultType::Error, null, 'Discount Not Found', 0, 404);
         }
     }
 
     public function store(Request $request)
     {
-        $submitPins = request('pincodes');
-        foreach ($submitPins as $key) {
-            $data = new PinCode();
+        $discount = request('data');
+        foreach ($discount as $key) {
+            $data = new Discount();
+            $data->customer = $key['customer'];
             $data->pin = $key['pin'];
-            $data->serino = $key['serialno'];
-            $data->code = $key['pincode'];
-            // $pin->ended_at = $key['date'].' 00:00:00.000000';
-            $data->status = 1;
+            $data->discount = $key['discount'];
             $data->save();
         }
         if ($data) {
-            return $this->apiResponse(ResaultType::Success, $data, 'PinCode Created', 201);
+            return $this->apiResponse(ResaultType::Success, $data, 'Discount Created', 201);
         } else {
-            return $this->apiResponse(ResaultType::Error, null, 'PinCode not saved', 500);
+            return $this->apiResponse(ResaultType::Error, null, 'Discount not saved', 500);
         }
     }
 
     public function show($id)
     {
-        $data = PinCode::find($id);
-
+        $data = Discount::find($id);
         if ($data) {
-            return $this->apiResponse(ResaultType::Success, $data, 'PinCode Detail', 201);
+            return $this->apiResponse(ResaultType::Success, $data, 'Discount Detail', 201);
         } else {
-            return $this->apiResponse(ResaultType::Error, null, 'PinCode Not Found', 404);
+            return $this->apiResponse(ResaultType::Error, null, 'Discount Not Found', 404);
         }
     }
 
@@ -68,16 +68,16 @@ class PinCodeController extends ApiController
         if ($validator->fails()) {
             return $this->apiResponse(ResaultType::Error, $validator->errors(), 'Validation Error', 422);
         }
-        $data = PinCode::find($id);
+        $data = Discount::find($id);
 
         if ($data) {
             $data->status = request('status');
             $data->save();
 
             if ($data) {
-                return $this->apiResponse(ResaultType::Success, $data, 'PinCode Updated', 200);
+                return $this->apiResponse(ResaultType::Success, $data, 'Discount Updated', 200);
             } else {
-                return $this->apiResponse(ResaultType::Error, null, 'PinCode not updated', 500);
+                return $this->apiResponse(ResaultType::Error, null, 'Discount not updated', 500);
             }
         } else {
             return $this->apiResponse(ResaultType::Warning, null, 'Data not found', 404);
@@ -86,10 +86,10 @@ class PinCodeController extends ApiController
 
     public function destroy($id)
     {
-        $data = PinCode::find($id);
+        $data = Discount::find($id);
         if (count($data) >= 1) {
             $data->delete();
-            return $this->apiResponse(ResaultType::Success, $data, 'PinCode Deleted', 200);
+            return $this->apiResponse(ResaultType::Success, $data, 'Discount Deleted', 200);
         } else {
             return $this->apiResponse(ResaultType::Error, $data, 'Deleted Error', 500);
         }

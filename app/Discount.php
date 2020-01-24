@@ -4,11 +4,11 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Canvas extends Model
+class Discount extends Model
 {
-    protected $table = 'canvas';
-    protected $fillable = [
-    ];
+    protected $table = 'discount';
+    protected $fillable = [];
+
     protected $casts = [
         'created_at' => 'date:d-m-Y',
         'updated_at' => 'date:d-m-Y'

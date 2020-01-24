@@ -4,16 +4,14 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Bank extends Model
+class CardType extends Model
 {
-    protected $table = 'bank';
+    protected $table = 'card_type';
     protected $fillable = [
     ];
     protected $casts = [
         'created_at' => 'date:d-m-Y',
         'updated_at' => 'date:d-m-Y'
     ];
-    public function getBankCodeAttribute() {
-        return $this->title.' - '.$this->code;
-    }
+
 }

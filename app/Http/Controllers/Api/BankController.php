@@ -29,7 +29,9 @@ class BankController extends ApiController
         $length = count($query->get());
         $data = $query->offset($offset)->limit($limit)->get();
 
-        if (count($data) >= 1) {
+        $data->each->setAppends(['bankCode']);
+
+        if ($data) {
             return $this->apiResponse(ResaultType::Success, $data, 'Listing: '.$offset.'-'.$limit, $length, 200);
         } else {
             return $this->apiResponse(ResaultType::Error, null, 'Content Not Found', 0, 404);
@@ -69,14 +71,14 @@ class BankController extends ApiController
     public function show($id)
     {
         $data = Bank::find($id);
-        if (count($data) >= 1) {
+        if ($data) {
             return $this->apiResponse(ResaultType::Success, $data, 'Bank Detail', 201);
         } else {
             return $this->apiResponse(ResaultType::Error, null, 'Bank Not Found', 404);
         }
     }
 
-    public function update(Request $request, $token)
+    public function update(Request $request, $id)
     {
         $validator = Validator::make($request->all(), [
             'title' => 'nullable',
@@ -89,9 +91,9 @@ class BankController extends ApiController
         if ($validator->fails()) {
             return $this->apiResponse(ResaultType::Error, $validator->errors(), 'Validation Error', 422);
         }
-        $data = Website::where('token','=',$token)->first();
+        $data = Bank::find($id);
 
-        if (count($data) >= 1) {
+        if ($data) {
             $data->title = request('title');
             $data->holder = request('holder');
             $data->number = request('number');

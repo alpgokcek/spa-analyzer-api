@@ -29,13 +29,17 @@ class PinsController extends ApiController
 
         if ($request->has('slug'))
             $query->where('slug', $request->query('slug'));
-
+        $query->join('operator','operator.id','pins.operator');
+        $query->join('card_type','card_type.id','pins.type');
         if ($request->has('select')) {
             $selects = explode(',', $request->query('select'));
-            $query->select($selects);
+            $query->select($selects, 'operator.title as operatorTitle', 'card_type.title as cardType');
+        } else {
+            $query->select('pins.*', 'operator.title as operatorTitle', 'card_type.title as cardType');
         }
         $length = count($query->get());
         $data = $query->offset($offset)->limit($limit)->get();
+        $data->each->setAppends(['pinsList']);
 
         if ($data) {
             return $this->apiResponse(ResaultType::Success, $data, 'Listing: '.$offset.'-'.$limit, $length, 200);
@@ -55,6 +59,8 @@ class PinsController extends ApiController
             'title' => 'required',
             'content' => 'nullable',
             'status' => 'nullable',
+            'price' => 'nullable',
+            'discount' => 'nullable',
             'vat' => 'nullable',
             'FreeAccessNumber' => 'nullable',
             'MobileAccessNumber' => 'nullable',
@@ -79,6 +85,8 @@ class PinsController extends ApiController
         $data->title = request('title');
         $data->content = request('content');
         $data->status = request('status');
+        $data->price = request('price');
+        $data->discount = request('discount');
         $data->vat = request('vat');
         $data->FreeAccessNumber = request('FreeAccessNumber');
         $data->MobileAccessNumber = request('MobileAccessNumber');
@@ -95,8 +103,7 @@ class PinsController extends ApiController
                 $pincode->pin = $data->id;
                 $pincode->serino = $key['serialno'];
                 $pincode->code = $key['pincode'];
-                $pincode->price = $key['price'];
-                // $pin->ended_at = $key['date'];
+                // $pin->ended_at = $key['date'].' 00:00:00.000000';
                 $pincode->status = 1;
                 $pincode->save();
             }
@@ -125,6 +132,7 @@ class PinsController extends ApiController
             'title' => 'nullable',
             'content' => 'nullable',
             'status' => 'nullable',
+            'discount' => 'nullable',
             'vat' => 'nullable',
             'FreeAccessNumber' => 'nullable',
             'MobileAccessNumber' => 'nullable',
@@ -153,6 +161,9 @@ class PinsController extends ApiController
             }
             if (request('status') != '') {
                 $data->status = request('status');
+            }
+            if (request('discount') != '') {
+                $data->discount = request('discount');
             }
             if (request('vat') != '') {
                 $data->vat = request('vat');

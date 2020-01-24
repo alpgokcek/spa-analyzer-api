@@ -13,10 +13,6 @@ class Balance extends Model
         return $this->belongsTo('App\Customer','customer');
     }
 
-    public function getBankNameAttribute() {
-        return $this->bank . ' bank';
-    }
-
     protected $casts = [
         'created_at' => 'date:d-m-Y',
         'updated_at' => 'date:d-m-Y',
