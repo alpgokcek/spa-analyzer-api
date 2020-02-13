@@ -29,7 +29,6 @@ class ApiLogger
         $log .= '['. $request->ip() .']';
         $log .= '['. $request->method() .']';
         $log .= '['. $request->fullUrl() .']';
-
         // Log::info($log);
 
         $fileName = 'apiLogger_' . date('Y-m-d') . '.log';

@@ -20,6 +20,18 @@ class DashboardController extends ApiController
         $companyall = Company::count();
         $companyactive = Company::where('status','=',1)->count();
         $companypassive = Company::where('status','=',0)->count();
+        $projectall = Project::count();
+        $projectactive = Project::where('status','=',1)->count();
+        $projectpassive = Project::where('status','=',0)->count();
+        $projectcomplete = Project::where('status','=',2)->count();
+        $sectionall = Section::count();
+        $sectionactive = Section::where('status','=',1)->count();
+        $sectionpassive = Section::where('status','=',0)->count();
+        $devicesall = Devices::count();
+        $devicesactive = Devices::where('status','=',1)->count();
+        $devicespassive = Devices::where('status','=',0)->count();
+
+        $devicessleeped = Devices::where('last_data_at', '>=', 30)->count();
 
         // $response = [];
         // $response['success'] = true;
@@ -47,8 +59,28 @@ class DashboardController extends ApiController
             $company['companyactive'] = $companyactive;
             $company['companypassive'] = $companypassive;
             $company['series'] = [$companyactive,$companypassive];
+        $project = [];
+            $project['project'] = $projectall;
+            $project['projectactive'] = $projectactive;
+            $project['projectpassive'] = $projectpassive;
+            $project['projectcomplete'] = $projectcomplete;
+            $project['series'] = [$projectactive,$projectpassive,$projectcomplete];
+        $section = [];
+            $section['section'] = $sectionall;
+            $section['sectionactive'] = $sectionactive;
+            $section['sectionpassive'] = $sectionpassive;
+            $section['series'] = [$sectionactive,$sectionpassive];
+        $devices = [];
+            $devices['devices'] = $devicesall;
+            $devices['devicesactive'] = $devicesactive;
+            $devices['devicespassive'] = $devicespassive;
+            $devices['devicessleeped'] = $devicessleeped;
+            $devices['series'] = [$devicesactive,$devicespassive,$devicessleeped];
         $params = [];
             $params['company'] = $company;
+            $params['project'] = $project;
+            $params['section'] = $section;
+            $params['devices'] = $devices;
         $response['data'] = $params;
 
         return response()->json($response, 200);

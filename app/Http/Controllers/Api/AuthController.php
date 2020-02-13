@@ -27,6 +27,7 @@ class AuthController extends Controller
                 $user->update(['api_token' => $newToken]);
                 return response()->json([
                     'name' => $user->name,
+                    'photo' => $user->photo,
                     'access_token' => $newToken,
                     'time' => time()
                 ]);
@@ -45,7 +46,7 @@ class AuthController extends Controller
             'name' => 'required',
             'email' => 'required|unique:users,email|email',
             'password' => 'required',
-            'userPhone' => 'required',
+            'phone' => 'required',
         ]);
         if ($validator->fails()) {
             return response()->json([
@@ -57,11 +58,10 @@ class AuthController extends Controller
         $data = new User();
         $data->name = request('name');
         $data->company = 1;
-        $data->customer = 1;
         $data->email = request('email');
         $data->password = Hash::make(request('password'));
         $data->level = 9;
-        $data->userPhone = request('userPhone');
+        $data->phone = request('phone');
         $data->api_token = Str::random(64);
         $data->save();
         if ($data) {

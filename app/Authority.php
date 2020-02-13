@@ -13,8 +13,8 @@ class Authority extends Model
     public function getAuthorityUser() {
         return $this->belongsTo('App\User','user');
     }
-    public function getAuthorityCustomer() {
-        return $this->belongsTo('App\Customer','customer');
+    public function getAuthorityProject() {
+        return $this->belongsTo('App\Project','project');
     }
 
     protected $casts = [

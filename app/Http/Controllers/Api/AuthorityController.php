@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Authority;
-use App\Customer;
+use App\Project;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -18,19 +18,21 @@ class AuthorityController extends ApiController
         $limit = $request->limit ? $request->limit : 99999999999999;
         $query = Authority::query();
 
-        if ($request->has('token')) {
-            $customer = Customer::where('token','=', $request->query('token'))->first();
-            $query->where('customer', '=', $customer->id)
-            ->join('users','users.id','authority.user')
-            ->select('authority.*','users.name as userName')
-            ->get();
-        }
+        if ($request->has('search'))
+            $query->where('title', 'like', '%' . $request->query('search') . '%');
 
+        if ($request->has('sortBy'))
+            $query->orderBy($request->query('sortBy'), $request->query('sort', 'DESC'));
+
+        if ($request->has('select')) {
+            $selects = explode(',', $request->query('select'));
+            $query->select($selects);
+        }
         $length = count($query->get());
         $data = $query->offset($offset)->limit($limit)->get();
         $data->each->setAppends(['authorityStatus']);
 
-        if ($data) {
+        if (count($data) >= 1) {
             return $this->apiResponse(ResaultType::Success, $data, 'Listing: '.$offset.'-'.$limit, $length, 200);
         } else {
             return $this->apiResponse(ResaultType::Error, null, 'Content Not Found', 0, 404);
@@ -40,7 +42,8 @@ class AuthorityController extends ApiController
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'customer' => 'required',
+            'type' => 'required',
+            'area' => 'required',
             'user' => 'required',
             'work' => 'required',
             'c' => 'required',
@@ -52,7 +55,8 @@ class AuthorityController extends ApiController
             return $this->apiResponse(ResaultType::Error, $validator->errors(), 'Validation Error', 422);
         }
         $data = new Authority();
-        $data->customer = request('customer');
+        $data->type = request('type');
+        $data->area = request('area');
         $data->user = request('user');
         $data->work = request('work');
         $data->c = request('c');
@@ -71,7 +75,7 @@ class AuthorityController extends ApiController
     {
         $data = Authority::find($id);
         $data->each->setAppends(['authorityStatus']);
-        if ($data) {
+        if (count($data) >= 1) {
             return $this->apiResponse(ResaultType::Success, $data, 'Authority Detail', 201);
         } else {
             return $this->apiResponse(ResaultType::Error, null, 'Authority Not Found', 404);
@@ -89,9 +93,9 @@ class AuthorityController extends ApiController
         if ($validator->fails()) {
             return $this->apiResponse(ResaultType::Error, $validator->errors(), 'Validation Error', 422);
         }
-        $data = Customer::where('token','=',$token)->first();
+        $data = Project::where('token','=',$token)->first();
 
-        if ($data) {
+        if (count($data) >= 1) {
             $data->c = request('c');
             $data->r = request('r');
             $data->u = request('u');

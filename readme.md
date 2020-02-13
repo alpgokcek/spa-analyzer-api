@@ -32,9 +32,9 @@ if not
         $data->integer = 2;
         $data->save();
         if ($data) {
-            return $this->apiResponse(ResaultType::Success, $data, 'Content Created', 201);
+            return $this->apiResponse(ResultType::Success, $data, 'Content Created', 201);
         } else {
-            return $this->apiResponse(ResaultType::Error, null, 'Content not saved', 500);
+            return $this->apiResponse(ResultType::Error, null, 'Content not saved', 500);
         }
 ```
 # API CONTROLLER
@@ -44,8 +44,8 @@ controllerın yorumunu Controller yerine ApiController üzerinden çağırıp
 class DATAController extends ApiController
 ```
 ```sh
-    return $this->apiResponse(ResaultType::Success, $data, null, 201);
-    return $this->apiResponse(ResaultType::Error, null, null, 500);
+    return $this->apiResponse(ResultType::Success, $data, null, 201);
+    return $this->apiResponse(ResultType::Error, null, null, 500);
 ```
 
 
