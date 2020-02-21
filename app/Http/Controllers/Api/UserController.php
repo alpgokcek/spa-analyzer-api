@@ -16,18 +16,11 @@ class UserController extends ApiController
     {
         $offset = $request->offset ? $request->offset : 0;
         $limit = $request->limit ? $request->limit : 99999999999999;
-        $company = $request->company ? $request->company : null;
         $query = User::query();
-        if ($request->has('company')){
-            $query->where('company', '=', $company);
-        }
-        if ($request->has('sortBy'))
-            $query->orderBy($request->query('sortBy'), $request->query('sort', 'DESC'));
 
-        if ($request->has('select')) {
-            $selects = explode(',', $request->query('select'));
-            $query->select($selects);
-        }
+        if ($request->has('university'))
+            $query->where('university', '=', $request->query('university'));
+
         $length = count($query->get());
         $data = $query->offset($offset)->limit($limit)->get();
 
@@ -85,15 +78,15 @@ class UserController extends ApiController
     public function update(Request $request, $token)
     {
         $validator = Validator::make($request->all(), [
-            'name' => 'nullable|string',
-            'email' => 'nullable|string',
-            'level' => 'nullable|string',
-            'userPhone' => 'nullable|string',
+            'name' => 'nullable',
+            'email' => 'nullable',
+            'level' => 'nullable',
+            'phone' => 'nullable',
         ]);
         if ($validator->fails()) {
             return $this->apiResponse(ResaultType::Error, $validator->errors(), 'Validation Error', 422);
         }
-        $data = User::find($token);
+        $data = User::where('api_token','=',$token)->first();
         $data->name = request('name');
         $data->email = request('email');
         $data->level = request('level');
@@ -104,21 +97,19 @@ class UserController extends ApiController
         } else {
             return $this->apiResponse(ResaultType::Error, null, 'User Not Updated', 500);
         }
-
     }
 
     public function destroy($token)
     {
-        /*$data = User::where('token','=',$token)->first();
-        if (count($data) >= 1) {
-            $data->delete();
-            return response([
-                'message'=> 'Content Deleted'
-            ], 200);
-        } else {
-            return response()->json(['error' => 'Content Not Found'], 404);
-        }*/
-
+        $data = User::where('api_token','=',$token)->first();
+        if ($data) {
+            $data->status = 0;
+            $data->save;
+            if ($data)
+                return response(['message'=> 'User Passived'], 200);
+            else
+                return response(['message'=> 'Error'], 500);
+        }
 
     }
 }

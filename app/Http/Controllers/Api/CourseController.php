@@ -23,31 +23,14 @@ class CourseController extends ApiController
         $query->join('faculty','faculty.id','=','department.faculty');
         $query->join('university','university.id','=','faculty.university');
 
-        if ($request->has('search'))
-            $query->where('title', 'like', '%' . $request->query('search') . '%');
-
-        if ($request->has('sortBy'))
-            $query->orderBy($request->query('sortBy'), $request->query('sort', 'DESC'));
-
-        if ($request->has('select')) {
-            $selects = explode(',', $request->query('select'));
-            $query->select($selects,'department.title as departmentTitle', 'faculty.title as facultyTitle', 'university.name as universityName');
-        } else {
-            $query->select('course.*','department.title as departmentTitle', 'faculty.title as facultyTitle', 'university.name as universityName');
-        }
-
-        if ($request->has('department')) {
+        if ($request->has('department'))
             $query->where('department', $request->query('department'));
-        }
 
-        if ($request->has('status')) {
-            $query->where('status', $request->query('status'));
-        }
-
+        if ($request->has('code'))
+            $query->where('code', $request->query('code'));
 
             $length = count($query->get());
             $data = $query->offset($offset)->limit($limit)->get();
-            $data->each->setAppends(['lastData']);
         if ($data) {
             return $this->apiResponse(ResaultType::Success, $data, 'Listing: '.$offset.'-'.$limit, $length, 200);
         } else {
@@ -96,7 +79,7 @@ class CourseController extends ApiController
 
     public function show($id)
     {
-        $data = Course::where('course.deveui','=',$id)
+        $data = Course::find($id)
         ->join('department','department.id','=','course.department')
         ->join('faculty','faculty.id','=','department.faculty')
         ->join('university','university.id','=','faculty.university')
@@ -123,7 +106,7 @@ class CourseController extends ApiController
         if ($validator->fails()) {
             return $this->apiResponse(ResaultType::Error, $validator->errors(), 'Validation Error', 422);
         }
-        $data = Course::where('deveui','=',$id)->first();
+        $data = Course::find($id);
 
         if ($data) {
             if (request('code') != '') {

@@ -16,7 +16,7 @@ class UsersStudentController extends ApiController
     {
         $offset = $request->offset ? $request->offset : 0;
         $limit = $request->limit ? $request->limit : 99999999999999;
-        $query = Section::query();
+        $query = UsersStudent::query();
 
         $length = count($query->get());
         $data = $query->offset($offset)->limit($limit)->get();
@@ -24,7 +24,7 @@ class UsersStudentController extends ApiController
         if ($data) {
             return $this->apiResponse(ResaultType::Success, $data, 'Listing: '.$offset.'-'.$limit, $length, 200);
         } else {
-            return $this->apiResponse(ResaultType::Error, null, 'Section Not Found', 0, 404);
+            return $this->apiResponse(ResaultType::Error, null, 'Student Not Found', 0, 404);
         }
     }
 
@@ -32,12 +32,14 @@ class UsersStudentController extends ApiController
     {
         $validator = Validator::make($request->all(), [
             'user' => 'required',
-            'status' => 'required'
+            'advisor' => 'required',
+            'department' => 'required',
+            'is_major' => 'required',
             ]);
         if ($validator->fails()) {
             return $this->apiResponse(ResaultType::Error, $validator->errors(), 'Validation Error', 422);
         }
-        $data = new Section();
+        $data = new UserStudent();
         $data->user = request('user');
         $data->status = request('status');
         $data->save();
@@ -48,43 +50,46 @@ class UsersStudentController extends ApiController
             $log->user = Auth::id();
             $log->ip = \Request::ip();
             $log->type = 1;
-            $log->info = 'Section '.$data->id.' Created for the University '.$data->university;
+            $log->info = 'Student '.$data->id.' Created for the University '.$data->university;
             $log->save();
-            return $this->apiResponse(ResaultType::Success, $data, 'Section Created', 201);
+            return $this->apiResponse(ResaultType::Success, $data, 'Student Created', 201);
         } else {
-            return $this->apiResponse(ResaultType::Error, null, 'Section not saved', 500);
+            return $this->apiResponse(ResaultType::Error, null, 'Student not saved', 500);
         }
     }
 
     public function show($id)
     {
-        $data = Section::find($id);
+        $data = UsersStudent::find($id);
         if ($data) {
-            return $this->apiResponse(ResaultType::Success, $data, 'Section Detail', 201);
+            return $this->apiResponse(ResaultType::Success, $data, 'Student Detail', 201);
         } else {
-            return $this->apiResponse(ResaultType::Error, null, 'Section Not Found', 404);
+            return $this->apiResponse(ResaultType::Error, null, 'Student Not Found', 404);
         }
     }
 
     public function update(Request $request, $id)
     {
         $validator = Validator::make($request->all(), [
-            'user' => 'nullable',
-            'status' => 'nullable'
+            'advisor' => 'nullable',
+            'department' => 'nullable',
+            'is_major' => 'nullable',
         ]);
         if ($validator->fails()) {
             return $this->apiResponse(ResaultType::Error, $validator->errors(), 'Validation Error', 422);
         }
-        $data = Section::find($id);
+        $data = UsersStudent::find($id);
 
         if ($data) {
-            if (request('user') != '') {
-                $data->user = request('user');
+            if (request('advisor') != '') {
+                $data->advisor = request('advisor');
             }
-            if (request('status') != '') {
-                $data->status = request('status');
+            if (request('department') != '') {
+                $data->department = request('department');
             }
-            $data->status = request('status');
+            if (request('is_major') != '') {
+                $data->is_major = request('is_major');
+            }
             $data->save();
 
             if ($data) {
@@ -94,12 +99,12 @@ class UsersStudentController extends ApiController
                 $log->user = Auth::id();
                 $log->ip = \Request::ip();
                 $log->type = 2;
-                $log->info = 'Section '.$data->id.' Updated in University '.$data->university;
+                $log->info = 'Student '.$data->id;
                 $log->save();
 
-                return $this->apiResponse(ResaultType::Success, $data, 'Section Updated', 200);
+                return $this->apiResponse(ResaultType::Success, $data, 'Student Updated', 200);
             } else {
-                return $this->apiResponse(ResaultType::Error, null, 'Section not updated', 500);
+                return $this->apiResponse(ResaultType::Error, null, 'Student not updated', 500);
             }
         } else {
             return $this->apiResponse(ResaultType::Warning, null, 'Data not found', 404);
@@ -108,10 +113,10 @@ class UsersStudentController extends ApiController
 
     public function destroy($id)
     {
-        $data = Section::find($id);
+        $data = UsersStudent::find($id);
         if ($data) {
             $data->delete();
-            return $this->apiResponse(ResaultType::Success, $data, 'Section Deleted', 200);
+            return $this->apiResponse(ResaultType::Success, $data, 'Student Deleted', 200);
         } else {
             return $this->apiResponse(ResaultType::Error, $data, 'Deleted Error', 500);
         }

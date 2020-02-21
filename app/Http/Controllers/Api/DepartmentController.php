@@ -23,21 +23,14 @@ class DepartmentController extends ApiController
         $limit = $request->limit ? $request->limit : 99999999999999;
         $type = $request->type ? $request->type : null;
         $query = Department::query();
-        $length = 1;
-        if ($request->has('sortBy'))
-            $query->orderBy($request->query('sortBy'), $request->query('sort', 'DESC'));
 
-        if ($request->has('status'))
-            $query->where('department.status', '=', $request->query('status'));
+        if ($request->has('faculty'))
+            $query->where('department.faculty', '=', $request->query('faculty'));
 
-
-        if ($request->has('faculty')) {
-            $faculty = Faculty::where('faculty.token','=',$request->query('faculty'))->first();
-            $query->where('department.faculty', $faculty->id);
-        }
         $query->join('faculty','faculty.id','=','department.faculty');
         $query->join('university','university.id','=','faculty.university');
-        $query->select('department.*','faculty.title as facultyName','faculty.token','university.name as universityName', 'university.id as university');
+        $query->select('department.*','faculty.title as facultyName','faculty.id as faculty','university.name as universityName', 'university.id as university');
+        $length = count($query->get());
         $data = $query->offset($offset)->limit($limit)->get();
 
         if ($data) {

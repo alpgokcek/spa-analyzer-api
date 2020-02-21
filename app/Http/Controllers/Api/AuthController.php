@@ -44,8 +44,11 @@ class AuthController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'name' => 'required',
+            'university' => 'required',
             'email' => 'required|unique:users,email|email',
             'password' => 'required',
+            'level' => 'required',
+            'status' => 'required',
             'phone' => 'required',
         ]);
         if ($validator->fails()) {
@@ -57,10 +60,11 @@ class AuthController extends Controller
         }
         $data = new User();
         $data->name = request('name');
-        $data->company = 1;
+        $data->university = request('university');
         $data->email = request('email');
         $data->password = Hash::make(request('password'));
-        $data->level = 9;
+        $data->level = request('email');
+        $data->status = request('status');
         $data->phone = request('phone');
         $data->api_token = Str::random(64);
         $data->save();

@@ -18,25 +18,9 @@ class FacultyController extends ApiController
         $limit = $request->limit ? $request->limit : 99999999999999;
         $query = Faculty::query();
 
-        // 0: passive, 1: active, 2: complete
         $query->join('university','university.id','=','faculty.university');
-        if ($request->has('search'))
-            $query->where('title', 'like', '%' . $request->query('search') . '%');
-        if ($request->has('university'))
-            $query->where('university', '=', $request->query('university'));
-        if ($request->has('status'))
-            $query->where('faculty.status', '=', $request->query('status'));
 
-        if ($request->has('sortBy'))
-            $query->orderBy($request->query('sortBy'), $request->query('sort', 'DESC'));
-
-        if ($request->has('select')) {
-            $selects = explode(',', $request->query('select'));
-            $query->select($selects, 'university.name as universityName');
-        } else {
-            $query->select('faculty.*','university.name as universityName');
-        }
-
+        $query->select('faculty.*','university.name as universityName');
         $length = count($query->get());
         $data = $query->offset($offset)->limit($limit)->get();
 
@@ -50,11 +34,9 @@ class FacultyController extends ApiController
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-
             'university' => 'required',
             'title' => 'required',
-            'status' => 'required',
-            'token' => 'unique:faculty,token'
+            'status' => 'required'
             ]);
         if ($validator->fails()) {
             return $this->apiResponse(ResaultType::Error, $validator->errors(), 'Validation Error', 422);
@@ -63,7 +45,6 @@ class FacultyController extends ApiController
         $data->university = request('university');
         $data->title = request('title');
         $data->status = request('status');
-        $data->token = str_random(64);
         $data->save();
         if ($data) {
             $log = new Log();
@@ -80,9 +61,9 @@ class FacultyController extends ApiController
         }
     }
 
-    public function show($token)
+    public function show($id)
     {
-        $data = Faculty::where('token','=',$token)->first();
+        $data = Faculty::find($id);
         if ($data) {
             return $this->apiResponse(ResaultType::Success, $data, 'Faculty Detail', 201);
         } else {
@@ -90,7 +71,7 @@ class FacultyController extends ApiController
         }
     }
 
-    public function update(Request $request, $token)
+    public function update(Request $request, $id)
     {
         $validator = Validator::make($request->all(), [
             'title' => 'nullable',
@@ -99,7 +80,7 @@ class FacultyController extends ApiController
         if ($validator->fails()) {
             return $this->apiResponse(ResaultType::Error, $validator->errors(), 'Validation Error', 422);
         }
-        $data = Faculty::where('token','=',$token)->first();
+        $data = Faculty::find($id);
 
         if ($data) {
             if (request('title') != '') {
@@ -108,7 +89,6 @@ class FacultyController extends ApiController
             if (request('status') != '') {
                 $data->status = request('status');
             }
-            $data->status = request('status');
             $data->save();
 
             if ($data) {
@@ -118,7 +98,7 @@ class FacultyController extends ApiController
                 $log->user = Auth::id();
                 $log->ip = \Request::ip();
                 $log->type = 2;
-                $log->info = 'Faculty '.$data->id.' Updated in University '.$data->university;
+                $log->info = 'Faculty '.$data->id;
                 $log->save();
 
                 return $this->apiResponse(ResaultType::Success, $data, 'Faculty Updated', 200);
@@ -130,9 +110,9 @@ class FacultyController extends ApiController
         }
     }
 
-    public function destroy($token)
+    public function destroy($id)
     {
-        $data = Faculty::where('token','=',$token)->first();
+        $data = Faculty::find($id);
         if ($data) {
             $data->delete();
             return $this->apiResponse(ResaultType::Success, $data, 'Faculty Deleted', 200);

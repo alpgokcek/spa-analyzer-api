@@ -18,18 +18,11 @@ class UniversityController extends ApiController
         $limit = $request->limit ? $request->limit : 99999999999999;
         $query = University::query();
 
-        if ($request->has('search'))
-            $query->where('name', 'like', '%' . $request->query('search') . '%');
+        if ($request->has('name'))
+            $query->where('name', 'like', '%' . $request->query('name') . '%');
 
-        if ($request->has('select')) {
-            $selects = explode(',', $request->query('select'));
-            $query->select($selects);
-        }
         $length = count($query->get());
-        $query->whereNotIn('status', [9]);
-
         $data = $query->offset($offset)->limit($limit)->get();
-
         if ($data) {
             return $this->apiResponse(ResaultType::Success, $data, 'Listing: '.$offset.'-'.$limit, $length, 200);
         } else {

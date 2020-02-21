@@ -9,7 +9,6 @@ Route::apiResources([
 */
 
 
-Route::post('/uplink', 'Api\UplinkController@store');
 Route::post('/auth/login', 'Api\AuthController@login');
 Route::post('/auth/register', 'Api\AuthController@register');
 
@@ -19,17 +18,31 @@ Route::middleware('api-token')->group(function() {
     şifre kontrolü yapılacak ekranları buraya yerleştiriyoruz.
 */
 
-
-    Route::apiResource('/university', 'Api\UniversityController');
-    Route::apiResource('/faculty', 'Api\FacultyController');
-    Route::apiResource('/department', 'Api\DepartmentController');
+    Route::apiResource('/authority', 'Api\AuthorityController');
     Route::apiResource('/course', 'Api\CourseController');
+    Route::apiResource('/course-outcome', 'Api\CourseOutcomeController');
+    Route::apiResource('/assessment', 'Api\AssessmentController');
+    Route::apiResource('/dashboard', 'Api\DashboardController');
+    Route::apiResource('/department', 'Api\DepartmentController');
+    Route::apiResource('/departments-has-instructors', 'Api\DepartmentsHasInstructorsController');
+    Route::apiResource('/faculty', 'Api\FacultyController');
+    Route::apiResource('/grading-tool', 'Api\GradingToolController');
+    Route::apiResource('/gtcco', 'Api\GradingToolCoversCourseOutcomeController');
+    Route::apiResource('/instructors-gives-sections', 'Api\InstructorsGivesSectionsController');
+    Route::apiResource('/log', 'Api\LogController');
+    Route::apiResource('/program-outcome', 'Api\ProgramOutcomeController');
+    Route::apiResource('/popco', 'Api\ProgramOutcomesProvidesCourseOutcomesController');
     Route::apiResource('/section', 'Api\SectionController');
+    Route::apiResource('/sagt', 'Api\StudentAnswersGradingToolController');
+    Route::apiResource('/sgmgco', 'Api\StudentGetsMeasuredGradeCourseOutcomeController');
+    Route::apiResource('/sgmgpo', 'Api\StudentGetsMeasuredGradeProgramOutcomeController');
+    Route::apiResource('/sts', 'Api\StudentsTakesSectionsController');
+    Route::apiResource('/university', 'Api\UniversityController');
     Route::apiResource('/user', 'Api\UserController');
     Route::apiResource('/users-admin', 'Api\UsersAdminController');
     Route::apiResource('/users-student', 'Api\UsersStudentController');
     Route::apiResource('/users-instructor', 'Api\UsersInstructorController');
-    Route::apiResource('/authority', 'Api\AuthorityController');
-    Route::apiResource('/dashboard', 'Api\DashboardController');
-    Route::apiResource('/log', 'Api\LogController');
+
+    Route::post('/excelUpload', 'Api\UploadController@uploadExcel');
+    Route::post('/sts/uploadedFile', 'Api\StudentsTakesSectionsController@uploadedFile');
 });

@@ -43,6 +43,8 @@ return [
         App\Providers\RouteServiceProvider::class,
 
         Barryvdh\Cors\ServiceProvider::class,
+        Maatwebsite\Excel\ExcelServiceProvider::class,
+
     ],
 
     'aliases' => [
@@ -82,5 +84,7 @@ return [
         'Validator' => Illuminate\Support\Facades\Validator::class,
         'View' => Illuminate\Support\Facades\View::class,
         'Image' => Intervention\Image\Facades\Image::class,
+        'Excel' => Maatwebsite\Excel\Facades\Excel::class,
+
     ],
 ];
