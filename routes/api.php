@@ -44,5 +44,5 @@ Route::middleware('api-token')->group(function() {
     Route::apiResource('/users-instructor', 'Api\UsersInstructorController');
 
     Route::post('/excelUpload', 'Api\UploadController@uploadExcel');
-    Route::post('/sts/uploadedFile', 'Api\StudentsTakesSectionsController@uploadedFile');
+    Route::post('/sts/uploadFile', 'Api\StudentsTakesSectionsController@uploadFile');
 });

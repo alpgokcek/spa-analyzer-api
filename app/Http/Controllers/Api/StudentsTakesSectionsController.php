@@ -17,7 +17,7 @@ class StudentsTakesSectionsController extends ApiController
 {
     
 
-    public function uploadedFile(Request $request)
+    public function uploadFile(Request $request)
     {
         /*
         $address = url('/storage/Book2.xlsx');

@@ -21,8 +21,8 @@ class StudentsTakesSectionsImport implements ToModel,SkipsOnFailure, SkipsOnErro
     {
         try{
             $import = new StudentsTakesSections([
-                'student_code' => $row[0],
-                'section_code' => $row[1],
+                'student_id' => $row[0],
+                'section_id' => $row[1],
                 'letter_grade' => $row[2],
                 'average' => $row[3]]);
         }
