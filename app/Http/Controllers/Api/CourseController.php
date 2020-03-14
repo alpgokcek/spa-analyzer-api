@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Course;
+use App\Imports\CourseImport;
 use App\Log;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -10,9 +11,23 @@ use Illuminate\Support\Str;
 use Validator;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Maatwebsite\Excel\Facades\Excel;
+
 
 class CourseController extends ApiController
 {
+    public function uploadFile(Request $request)
+    {
+        echo "hereeee";
+        $data = Excel::import(new CourseImport, $request->fileUrl);
+        
+        if ($data) {
+            return response()->json('success', 201);
+            
+        } 
+        else { return response()->json('error', 500);}
+
+    }
     public function index(Request $request)
     {
         $offset = $request->offset ? $request->offset : 0;

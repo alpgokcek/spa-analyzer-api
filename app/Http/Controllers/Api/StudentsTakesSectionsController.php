@@ -19,47 +19,6 @@ class StudentsTakesSectionsController extends ApiController
 
     public function uploadFile(Request $request)
     {
-        /*
-        $address = url('/storage/Book2.xlsx');
-        
-        Excel::load($address, function($reader) {
-            $results = $reader->get();
-            dd($results);
-        });
-
-
-        foreach ($split as $key) {
-            $user = UserStudent::where('id','=', request('student_id'))->first();
-            if ($user){
-                $section = Section::where('id','=', request('section_id'))->first();
-                if ($section) {
-                    $data = new StudentsTakesSections();
-                    $data->student_id = request('student_id');
-                    $data->section_id = request('section_id');
-                    $data->letter_grade = request('letter_grade');
-                    $data->average = request('average');
-                    $data->save();
-                    if ($data) {
-                        $log = new Log();
-                        $log->area = 'StudentsTakesSections';
-                        $log->areaid = $data->id;
-                        $log->user = Auth::id();
-                        $log->ip = \Request::ip();
-                        $log->type = 1;
-                        $log->info = 'StudentsTakesSections '.$data->id.' Created for the University '.$data->university;
-                        $log->save();
-                        return $this->apiResponse(ResaultType::Success, $data, 'StudentsTakesSections Created', 201);
-                    } else {
-                        return $this->apiResponse(ResaultType::Error, null, 'StudentsTakesSections not saved', 500);
-                    }
-                } else {
-                    return $this->apiResponse(ResaultType::Error, null, 'Section not found', 404);
-                }
-            } else {
-                return $this->apiResponse(ResaultType::Error, null, 'User not found', 404);
-            }
-
-        */
         $data = Excel::import(new StudentsTakesSectionsImport, $request->fileUrl);
         
         if ($data) {
