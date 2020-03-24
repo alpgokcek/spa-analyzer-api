@@ -13,31 +13,38 @@ use Maatwebsite\Excel\Concerns\SkipsFailures;
 use Maatwebsite\Excel\Concerns\SkipsOnError;
 use Maatwebsite\Excel\Concerns\WithValidation;
 use Maatwebsite\Excel\Concerns\SkipsErrors;
+use Maatwebsite\Excel\Concerns\WithBatchInserts;
+use Maatwebsite\Excel\Concerns\WithStartRow;
 
-class StudentsTakesSectionsImport implements ToModel,SkipsOnFailure, SkipsOnError
+class StudentsTakesSectionsImport implements ToModel,SkipsOnFailure, SkipsOnError, WithBatchInserts
 {
     use Importable, SkipsErrors, SkipsFailures;
+
+    private $rowNum = 1;
+    private $err = array();
+
+
+    public function startRow():int{
+        return 2;
+    }
+
     public function model(array $row)
     {
-        try{
-            $import = new StudentsTakesSections([
-                'student_id' => $row[0],
-                'section_id' => $row[1],
-                'letter_grade' => $row[2],
-                'average' => $row[3]]);
-        }
-        catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
-            $failures = $e->failures();
-            foreach ($failures as $failure) {
-                $failure->row(); // row that went wrong
-                $failure->attribute(); // either heading key (if using heading row concern) or column index
-                $failure->errors(); // Actual error messages from Laravel validator
-                $failure->values(); // The values of the row that has failed.
-                dd($failure);
-            }
-        }
-       
-        return $import;
-            
+        ++$this->rowNum;
+        return new StudentsTakesSections([
+            'student_id' => $row[0],
+            'section_id' => $row[1],
+            'letter_grade' => $row[2],
+            'average' => $row[3]]
+        );       
+    }
+
+    public function onError(\Throwable $e){
+        $this->err = array_add($this->err, $this->row, $e);
+    }
+
+
+    public function batchSize(): int{
+        return 1000;
     }
 }

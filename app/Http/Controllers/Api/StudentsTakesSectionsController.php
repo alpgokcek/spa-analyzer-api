@@ -15,18 +15,13 @@ use Validator;
 
 class StudentsTakesSectionsController extends ApiController
 {
-    
-
-    public function uploadFile(Request $request)
+    public function uploadedFile(Request $request)
     {
-        $data = Excel::import(new StudentsTakesSectionsImport, $request->fileUrl);
+        $import = new StudentsTakesSectionsImport();
+        $import->import(storage_path($request->fileUrl));
         
-        if ($data) {
-            return response()->json('success', 201);
-            
-        } 
-        else { return response()->json('error', 500);}
-
+        return $this->apiResponse(ResultType::Error, $import->err, 'hatalar',403);
+       
     }
 
     public function index(Request $request)
