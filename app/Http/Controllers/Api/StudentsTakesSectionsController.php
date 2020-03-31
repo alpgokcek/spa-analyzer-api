@@ -2,25 +2,97 @@
 
 namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
-use App\StudentsTakesSections;
-use App\Imports\StudentsTakesSectionsImport;
 use App\Log;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
-use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
+
+use App\StudentsTakesSections;
+use App\Imports\StudentsTakesSectionsImport;
+
+use Maatwebsite\Excel\Concerns\ToModel;
+use Maatwebsite\Excel\Concerns\Importable;
+
+use Maatwebsite\Excel\Validators\ValidationException;
+use Maatwebsite\Excel\Validators\Failure;
+use Maatwebsite\Excel\Concerns\SkipsOnFailure;
+use Maatwebsite\Excel\Concerns\SkipsFailures;
+use Maatwebsite\Excel\Concerns\SkipsOnError;
+use Maatwebsite\Excel\Concerns\SkipsErrors;
+use Maatwebsite\Excel\Concerns\WithValidation;
+
+use Maatwebsite\Excel\Concerns\WithStartRow;
+
+
+use Maatwebsite\Excel\Facades\Excel;
 use Validator;
 
 
-class StudentsTakesSectionsController extends ApiController
+class StudentsTakesSectionsController extends ApiController implements ToModel,SkipsOnFailure, SkipsOnError,WithStartRow
 {
+    use Importable, SkipsErrors, SkipsFailures;
+
+    public function startRow():int{
+        return 2;
+    }
+
+    public function model(array $row)
+    {       
+        return new StudentsTakesSections([
+            'student_id' => $row[0],
+            'section_id' => $row[1],
+            'letter_grade' => $row[2],
+            'average' => $row[3]]
+        );       
+    }
+
     public function uploadedFile(Request $request)
     {
-        $import = new StudentsTakesSectionsImport();
-        $import->import(storage_path($request->fileUrl));
+       
+        //try{
+            //Excel::import(new StudentsTakesSectionsController, $request->fileUrl);
         
-        return $this->apiResponse(ResultType::Error, $import->err, 'hatalar',403);
+        $import = new StudentsTakesSectionsController();
+        $import->import($request->fileUrl);
+        echo "başladı";
+        foreach($import->errors() as $x){
+            echo "1**************************************************1";
+            echo "$x";
+        }
+
+        /*
+        catch(\Throwable $e){
+            $failures = $e->failures();
+            foreach ($failures as $failure) {
+                $failure->row(); // row that went wrong
+                $failure->attribute(); // either heading key (if using heading row concern) or column index
+                $failure->errors(); // Actual error messages from Laravel validator
+                $failure->values(); // The values of the row that has failed.
+                echo $failure; 
+            }   
+        }*/
+        
+        
+       
+
+
+        //$import = Excel::import(new StudentsTakesSectionsImport, $request->fileUrl);
+        //$import = new StudentsTakesSectionsImport();
+        //$import->import($request->fileUrl);
+        
+        // return($import->err);
+
+        /*foreach ($import->failures() as $failure) {
+            $failure->row(); // row that went wrong
+            $failure->attribute(); // either heading key (if using heading row concern) or column index
+            $failure->errors(); // Actual error messages from Laravel validator
+            $failure->values(); // The values of the row that has failed.
+            array_push($failureArray,$failure);  
+        }*/
+
+        //return $this->apiResponse(ResaultType::Error,null ,$import->failures(), 'hatalar', 403);
        
     }
 
@@ -43,6 +115,7 @@ class StudentsTakesSectionsController extends ApiController
             return $this->apiResponse(ResaultType::Error, null, 'StudentsTakesSections Not Found', 0, 404);
         }
     }
+    
 
     public function store(Request $request)
     {
