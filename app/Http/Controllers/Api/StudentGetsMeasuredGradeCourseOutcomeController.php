@@ -3,11 +3,13 @@
 namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\StudentGetsMeasuredGradeCourseOutcome;
+use App\CourseOutcome;
 use App\Log;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Validator;
 
 class StudentGetsMeasuredGradeCourseOutcomeController extends ApiController
@@ -17,20 +19,25 @@ class StudentGetsMeasuredGradeCourseOutcomeController extends ApiController
         $offset = $request->offset ? $request->offset : 0;
         $limit = $request->limit ? $request->limit : 99999999999999;
         $query = StudentGetsMeasuredGradeCourseOutcome::query();
+        if($request->has('course')){
+            $testQuery = DB::table('course_outcome')->join('student_gets_measured_grade_course_outcome', 'course_outcome.id', '=', 'course_outcome_id')->where('course_outcome.course_id', $request->query('course'));
 
-        if ($request->has('student'))
-            $query->where('student_id', '=', $request->query('student'));
-        if ($request->has('courseOutcome'))
-            $query->where('course_outcome_id', '=', $request->query('courseOutcome'));
-        if ($request->has('grade'))
-            $query->where('grade', '=', $request->query('grade'));
+            if ($request->has('student'))
+                $testQuery->where('student_id', '=', $request->query('student'));
+            if ($request->has('courseOutcome'))
+                $testQuery->where('course_outcome_id', '=', $request->query('courseOutcome'));
+            if ($request->has('grade'))
+                $testQuery->where('grade', '=', $request->query('grade'));
 
-        $length = count($query->get());
-        $data = $query->offset($offset)->limit($limit)->get();
-        if ($data) {
-            return $this->apiResponse(ResaultType::Success, $data, 'Listing: '.$offset.'-'.$limit, $length, 200);
-        } else {
-            return $this->apiResponse(ResaultType::Error, null, 'StudentGetsMeasuredGradeCourseOutcome Not Found', 0, 404);
+            $length = count($testQuery->get());//->get());
+            $data = $testQuery->offset($offset)->limit($limit)->get();
+            if ($data) {
+                return $this->apiResponse(ResaultType::Success, $data, 'Listing: '.$offset.'-'.$limit, $length, 200);
+            } else {
+                return $this->apiResponse(ResaultType::Error, null, 'StudentGetsMeasuredGradeCourseOutcome Not Found', 0, 404);
+            }
+        } else{
+            return $this->apiResponse(ResaultType::Error, null, 'Course ID is needed for this operation', 0, 400);
         }
     }
 

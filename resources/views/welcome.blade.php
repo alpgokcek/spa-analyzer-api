@@ -80,11 +80,27 @@
             @endif
 
             <div class="content">
+            @if (Route::has('login'))
                 <div class="title m-b-md">
-                    ...
+                @auth
+                    <div class="container" id="app">
+                        <line-chart-component/>
+                    </div>
+                    
+                @else
+                    <p>Giriş yap</p>
+                @endauth
                 </div>
+            @endif
 
             </div>
         </div>
+        <script>
+        window.Laravel = <?php echo json_encode([
+            '_token' => csrf_token(),
+        ]); ?>
+    </script>
+        <script src="{{ asset('js/app.js') }}" type="text/javascript"></script>
+
     </body>
 </html>
