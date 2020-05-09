@@ -1959,7 +1959,7 @@ __webpack_require__.r(__webpack_exports__);
           case 0:
             this.loaded = false;
             _context.prev = 1;
-            uri = 'http://localhost:8000/api/sgmgco';
+            uri = 'https://spa-analyzer.herokuapp.com/api/sgmgco';
             Years = new Array();
             Labels = new Array();
             Prices = new Array();
@@ -1969,7 +1969,7 @@ __webpack_require__.r(__webpack_exports__);
               "course": "22"
             }, {
               headers: {
-                Authorization: "Bearer yGcA6L1vrvXkqBDafTNE3OJogMAr17g9ejLM8GVXYpTlxlrFvVtXLsSiWzmgW10C"
+                Authorization: localStorage.getItem('user-token') || ''
               }
             }).then(function (response) {
               var data = response.data;
@@ -2033,13 +2033,13 @@ __webpack_require__.r(__webpack_exports__);
   mounted: function mounted() {
     var _this = this;
 
-    var uri = 'http://127.0.0.1:8000/api/sgmgco?student=41401002&course=22';
+    var uri = 'https://spa-analyzer.herokuapp.com/api/sgmgco?student=41401002&course=22';
     var Codes = new Array();
     var Labels = new Array();
     var Grades = new Array();
     this.axios.get(uri, {
       headers: {
-        Authorization: "Bearer yGcA6L1vrvXkqBDafTNE3OJogMAr17g9ejLM8GVXYpTlxlrFvVtXLsSiWzmgW10C"
+        Authorization: localStorage.getItem('user-token') || ''
       }
     }).then(function (response) {
       var data = response.data;
@@ -72252,7 +72252,7 @@ var render = function() {
           })
         : _vm._e(),
       _vm._v(" "),
-      _c("p", [_vm._v("yarrak")])
+      _c("p", [_vm._v("test")])
     ],
     1
   )
@@ -84459,7 +84459,6 @@ Vue.use(vue_axios__WEBPACK_IMPORTED_MODULE_0___default.a, axios__WEBPACK_IMPORTE
 
 Vue.component('example-component', __webpack_require__(/*! ./components/ExampleComponent.vue */ "./resources/js/components/ExampleComponent.vue")["default"]);
 Vue.component('line-chart-component', __webpack_require__(/*! ./components/LineChartComponent.vue */ "./resources/js/components/LineChartComponent.vue")["default"]);
-console.log("ananı sikim");
 /**
  * Next, we will create a fresh Vue application instance and attach it to
  * the page. Then, you may begin adding components to this application
@@ -84686,8 +84685,8 @@ __webpack_require__.r(__webpack_exports__);
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(/*! /Users/alpgokcek/Desktop/github-backup-spa/spa-analyzer-api/resources/js/app.js */"./resources/js/app.js");
-module.exports = __webpack_require__(/*! /Users/alpgokcek/Desktop/github-backup-spa/spa-analyzer-api/resources/sass/app.scss */"./resources/sass/app.scss");
+__webpack_require__(/*! /Users/alpgokcek/Desktop/spa-analyzer-api/resources/js/app.js */"./resources/js/app.js");
+module.exports = __webpack_require__(/*! /Users/alpgokcek/Desktop/spa-analyzer-api/resources/sass/app.scss */"./resources/sass/app.scss");
 
 
 /***/ })

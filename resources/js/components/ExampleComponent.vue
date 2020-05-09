@@ -4,7 +4,7 @@
       v-if="loaded"
       :chartdata="chartdata"
       :options="options"/>
-      <p>yarrak</p>
+      <p>test</p>
   </div>
 </template>
 
@@ -22,11 +22,11 @@ export default {
   async mounted () {
     this.loaded = false
     try {
-      let uri = 'http://localhost:8000/api/sgmgco';
+      let uri = 'https://spa-analyzer.herokuapp.com/api/sgmgco';
       let Years = new Array();
       let Labels = new Array();
       let Prices = new Array();
-      await this.axios.get(uri, {"student":"41401002", "course": "22"}, {headers: {Authorization: "Bearer yGcA6L1vrvXkqBDafTNE3OJogMAr17g9ejLM8GVXYpTlxlrFvVtXLsSiWzmgW10C"}})
+      await this.axios.get(uri, {"student":"41401002", "course": "22"}, {headers: {Authorization: localStorage.getItem('user-token') || ''}})
       .then((response) => {
             let data = response.data;
             if(data) {

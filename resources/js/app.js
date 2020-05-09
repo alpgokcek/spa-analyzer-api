@@ -24,7 +24,6 @@ Vue.use(VueAxios, axios);
 
 Vue.component('example-component', require('./components/ExampleComponent.vue').default);
 Vue.component('line-chart-component', require('./components/LineChartComponent.vue').default);
-console.log("ananı sikim")
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to
