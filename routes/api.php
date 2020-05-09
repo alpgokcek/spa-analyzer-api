@@ -42,6 +42,7 @@ Route::middleware('api-token')->group(function() {
     Route::apiResource('/users-admin', 'Api\UsersAdminController');
     Route::apiResource('/users-student', 'Api\UsersStudentController');
     Route::apiResource('/users-instructor', 'Api\UsersInstructorController');
+    Route::apiResource('/check-auth', 'Api\CheckAuth');
 
     Route::post('/excelUpload', 'Api\UploadController@uploadExcel');
     Route::post('/sts/uploadedFile', 'Api\StudentsTakesSectionsController@uploadedFile');
