@@ -16,9 +16,48 @@ class StudentGetsMeasuredGradeCourseOutcomeController extends ApiController
 {
     public function index(Request $request)
     {
+        $user = User::find(Auth::id());
         $offset = $request->offset ? $request->offset : 0;
         $limit = $request->limit ? $request->limit : 99999999999999;
         $query = StudentGetsMeasuredGradeCourseOutcome::query();
+
+        switch ($user->level) {
+            case 3:
+                $query->join('department','department.id','=','users_student.department_id');
+                $query->join('users_student','users_student.id','=','student_gets_measured_grade_course_outcome.student_id');
+
+                $query->where('department.faculty','=',$user->faculty_id);
+                $query->where('users.level','=','6');
+
+                $query->select('student_gets_measured_grade_program_outcome.*');
+            break;
+
+            case 4:
+                $query->join('users_student','users_student.id','=','student_gets_measured_grade_course_outcome.student_id');
+
+                $query->where('users_student.department_id','=',$user->department_id);
+                $query->where('users.level','=','6');
+
+                $query->select('student_gets_measured_grade_program_outcome.*');
+            break;
+
+			case 5:
+                $query->join('instructors_gives_sections','instructors_gives_sections.section_id','=','students_takes_sections.section_id');
+                $query->join('students_takes_sections','students_takes_sections.section_id','=','student_gets_measured_grade_program_course.section_id');
+                $query->join('users_student','users_student.id','=','student_gets_measured_grade_course_outcome.student_id');
+
+                $query->where('instructors_gives_sections.instructor_id','=',$user->id);
+            break;
+          case 6:
+            // 6. seviyenin bu ekranda işi olmadığı için 403 verip gönderiyoruz.
+            // 403ün yönlendirme fonksiyonu vue tarafında gerçekleştirilecek.
+            return $this->apiResponse(ResaultType::Error, 403, 'Authorization Error', 0, 403);
+            break;
+          default:
+				// 1 ve 2. leveller kontrol edilmeyeceği için diğer sorguları default içine ekliyoruz
+				$query->where('student_gets_measured_grade_course_outcome.student_id','=',$user->id);
+          break;
+        }
         if($request->has('course')){
             $testQuery = DB::table('course_outcome')->join('student_gets_measured_grade_course_outcome', 'course_outcome.id', '=', 'course_outcome_id')->where('course_outcome.course_id', $request->query('course'));
 
