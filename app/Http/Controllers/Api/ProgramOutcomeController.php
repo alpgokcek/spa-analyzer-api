@@ -2,17 +2,33 @@
 
 namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
+
 use App\ProgramOutcome;
+use App\Imports\ProgramOutcomeImport;
+
 use App\Log;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Maatwebsite\Excel\Facades\Excel;
 use Validator;
 
 class ProgramOutcomeController extends ApiController
 {
+
+    public function uploadedFile(Request $request)
+    {
+
+        $import = new ProgramOutcomeImport();
+        $import->import($request->fileUrl);
+
+        return $this->apiResponse(ResaultType::Error, $import->err, 'hatalar', 403);
+    }
+
     public function index(Request $request)
     {
         $user = User::find(Auth::id());

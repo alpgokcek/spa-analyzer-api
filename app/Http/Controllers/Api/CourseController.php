@@ -1,13 +1,16 @@
 <?php
 namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
+
 use App\Course;
 use App\Imports\CourseImport;
+
 use App\User;
 use App\Log;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
@@ -22,7 +25,7 @@ class CourseController extends ApiController
     $import->import($request->fileUrl);
     return $this->apiResponse(ResaultType::Error, $import->err, 'hatalar', 403);
   }
-    
+
   public function index(Request $request)
   {
     $user = User::find(Auth::id()); // oturum açan kişinin bilgilerini buradan alıyoruz.
@@ -58,7 +61,7 @@ class CourseController extends ApiController
       case 6:
         return $this->apiResponse(ResaultType::Error, 403, 'Authorization Error', 0, 403);
         break;
-    default: 
+    default:
         $query->join('department','department.id','=','course.department_id');
       break;
     }
@@ -111,7 +114,7 @@ class CourseController extends ApiController
         } else {
           return $this->apiResponse(ResaultType::Error, null, 'Course not saved', 500);
         }
-      default: 
+      default:
         return $this->apiResponse(ResaultType::Error, 403, 'Authorization Error', 0, 403);
       break;
     }

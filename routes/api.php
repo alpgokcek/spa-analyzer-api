@@ -11,7 +11,6 @@ Route::apiResources([
 
 Route::post('/auth/login', 'Api\AuthController@login');
 Route::post('/auth/register', 'Api\AuthController@register');
-
 Route::middleware('api-token')->group(function() {
 /*
     apiToken middlewarei user tablosunda api_token sütununu sorguluyor.
@@ -51,6 +50,8 @@ Route::middleware('api-token')->group(function() {
     Route::post('/section/uploadedFile', 'Api\SectionController@uploadedFile');
     Route::post('/igs/uploadedFile', 'Api\InstructorsGivesSectionsController@uploadedFile');
     Route::post('/course/uploadedFile', 'Api\CourseController@uploadedFile');
-    Route::post('/program-outcome/uploadedFile', 'Api\ProgramOutcomeController@uploadedFile');
+		Route::post('/program-outcome/uploadedFile', 'Api\ProgramOutcomeController@uploadedFile');
+		Route::post('/user/uploadedFile', 'Api\UserController@uploadedFile');
+
 
 });

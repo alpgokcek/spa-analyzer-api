@@ -3,15 +3,31 @@
 namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Project;
+
 use App\User;
+use App\Imports\UserImport;
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
+use Maatwebsite\Excel\Facades\Excel;
 use Validator;
 
 class UserController extends ApiController
 {
+
+    public function uploadedFile(Request $request)
+    {
+
+        $import = new UserImport();
+        $import->import($request->fileUrl);
+
+        return $this->apiResponse(ResaultType::Error, $import->err, 'hatalar', 403);
+    }
+
     public function index(Request $request)
     {
         $offset = $request->offset ? $request->offset : 0;

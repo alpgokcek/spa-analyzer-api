@@ -9,9 +9,9 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 class User extends Authenticatable
 {
     use Notifiable;
-    
+
     protected $fillable = [
-        'name', 'email', 'password','api_token'
+		'name', 'email', 'password', 'university', 'faculty_id', 'department_id', 'student_id', 'level', 'phone', 'api_token'
     ];
 
     protected $hidden = [
