@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Section;
 use App\Imports\SectionImport;
-
+use App\User;
 use App\Log;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -28,25 +28,54 @@ class SectionController extends ApiController
 
     public function index(Request $request)
     {
-        $offset = $request->offset ? $request->offset : 0;
-        $limit = $request->limit ? $request->limit : 99999999999999;
-        $query = Section::query();
+      $user = User::find(Auth::id()); // oturum açan kişinin bilgilerini buradan alıyoruz.
+      $offset = $request->offset ? $request->offset : 0;
+      $limit = $request->limit ? $request->limit : 99999999999999;
+      $query = Section::query();
 
-        $query->join('course','course.id','=','section.course');
-
-        if ($request->has('course'))
-            $query->where('course', '=', $request->query('course'));
-
-        $query->select('section.*','course.name as courseName');
-        $length = count($query->get());
-        $data = $query->offset($offset)->limit($limit)->get();
-
-        if ($data) {
-            return $this->apiResponse(ResaultType::Success, $data, 'Listing: '.$offset.'-'.$limit, $length, 200);
-        } else {
-            return $this->apiResponse(ResaultType::Error, null, 'Section Not Found', 0, 404);
-        }
+      switch ($user->level) {
+        case 3:
+          $query->join('course', 'course.id', '=', 'section.course_id');
+          $query->join('department', 'department.id', '=', 'course.department_id');
+          $query->join('faculty', 'faculty.id', '=', 'department.faculty');
+          $query->join('users', 'users.faculty_id','=','faculty.id');
+          $query->where('users.id','=',$user->id);
+          break;
+        case 4:
+          $query->join('course', 'course.id', '=', 'section.course_id');
+          $query->join('department', 'department.id', '=', 'course.department_id');
+          $query->join('users', 'users.department_id','=','department.id');
+          $query->where('users.id','=',$user->id);
+        break;
+        case 5:
+          $query->join('instructors_gives_sections', 'instructors_gives_sections.section_id', '=', 'section.id');
+          $query->join('department', 'department.id', '=', 'course.department_id');
+          $query->join('faculty', 'faculty.id', '=', 'department.faculty');
+          $query->join('users', 'users.faculty_id','=','faculty.id');
+          $query->where('instructors_gives_sections.instructor_email','=',$user->email);
+          break;
+        case 6:
+          // 6. seviyenin bu ekranda işi olmadığı için 403 verip gönderiyoruz.
+          // 403ün yönlendirme fonksiyonu vue tarafında gerçekleştirilecek.
+          return $this->apiResponse(ResaultType::Error, 403, 'Authorization Error', 0, 403);
+          break;
+        default:
+          // 1 ve 2. leveller kontrol edilmeyeceği için diğer sorguları default içine ekliyoruz
+          $query->join('course', 'course.id', '=', 'section.course_id');
+        break;
+      }
+      // örnek olarak tüm assessment tablosunun yanında user.name değerini almak için
+      // 'assessment.*', 'users.name as userName'... 
+      $query->select('section.*');
+      // bu örnek üzerinden yeni değerler gönderebilirsiniz.
+      $length = count($query->get());
+      $data = $query->offset($offset)->limit($limit)->get();
+      if ($length >= 1) {
+        return $this->apiResponse(ResaultType::Success, $data, 'Listing: '.$offset.'-'.$limit, $length, 200);
+      } else {
+        return $this->apiResponse(ResaultType::Error, null, 'Section Not Found', 0, 404);
     }
+}
 
     public function store(Request $request)
     {
