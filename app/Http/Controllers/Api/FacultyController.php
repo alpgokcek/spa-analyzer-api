@@ -16,7 +16,6 @@ class FacultyController extends ApiController
 {
     public function index(Request $request)
     {
-
     $user = User::find(Auth::id()); // oturum açan kişinin bilgilerini buradan alıyoruz.
     $offset = $request->offset ? $request->offset : 0;
     $limit = $request->limit ? $request->limit : 99999999999999;
@@ -40,7 +39,7 @@ class FacultyController extends ApiController
         break;
       default:
           // 1 ve 2. leveller kontrol edilmeyeceği için diğer sorguları default içine ekliyoruz
-          $query->join('course', 'course.id', '=', 'faculty.course_id');
+          $query->select('faculty.*');
         break;
     }
     $query->select('faculty.*');
