@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Faculty;
 use App\Log;
+use App\User;
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -14,22 +16,42 @@ class FacultyController extends ApiController
 {
     public function index(Request $request)
     {
-        $offset = $request->offset ? $request->offset : 0;
-        $limit = $request->limit ? $request->limit : 99999999999999;
-        $query = Faculty::query();
 
-        $query->join('university','university.id','=','faculty.university');
+    $user = User::find(Auth::id()); // oturum açan kişinin bilgilerini buradan alıyoruz.
+    $offset = $request->offset ? $request->offset : 0;
+    $limit = $request->limit ? $request->limit : 99999999999999;
+    $query = Faculty::query();
 
-        $query->select('faculty.*','university.name as universityName');
-        $length = count($query->get());
-        $data = $query->offset($offset)->limit($limit)->get();
+    switch ($user->level) {
+      case 3:
+        return $this->apiResponse(ResaultType::Error, 403, 'Authorization Error', 0, 403);
+        break;
 
-        if ($data) {
-            return $this->apiResponse(ResaultType::Success, $data, 'Listing: '.$offset.'-'.$limit, $length, 200);
-        } else {
-            return $this->apiResponse(ResaultType::Error, null, 'Faculty Not Found', 0, 404);
-        }
+      case 4:
+        return $this->apiResponse(ResaultType::Error, 403, 'Authorization Error', 0, 403);
+        break;
+   
+      case 5:
+        return $this->apiResponse(ResaultType::Error, 403, 'Authorization Error', 0, 403);
+        break;
+     
+      case 6:
+        return $this->apiResponse(ResaultType::Error, 403, 'Authorization Error', 0, 403);
+        break;
+      default:
+          // 1 ve 2. leveller kontrol edilmeyeceği için diğer sorguları default içine ekliyoruz
+          $query->join('course', 'course.id', '=', 'faculty.course_id');
+        break;
     }
+    $query->select('faculty.*');
+    $length = count($query->get());
+    $data = $query->offset($offset)->limit($limit)->get();
+    if ($length >= 1) {
+      return $this->apiResponse(ResaultType::Success, $data, 'Listing: '.$offset.'-'.$limit, $length, 200);
+    } else {
+        return $this->apiResponse(ResaultType::Error, null, 'Faculty Not Found', 0, 404);
+    }
+}
 
     public function store(Request $request)
     {
