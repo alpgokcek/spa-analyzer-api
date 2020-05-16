@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\GradingTool;
 use App\Log;
+use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -14,9 +15,57 @@ class GradingToolController extends ApiController
 {
     public function index(Request $request)
     {
+				$user = User::find(Auth::id()); // oturum açan kişinin bilgilerini buradan alıyoruz.
         $offset = $request->offset ? $request->offset : 0;
         $limit = $request->limit ? $request->limit : 99999999999999;
-        $query = GradingTool::query();
+				$query = GradingTool::query();
+
+        switch ($user->level) {
+		    case 3:
+						$query->join('assessment','assessment.id','=','grading_tool.assessment_id');
+            $query->join('course', 'course.id', '=', 'assessment.course_id');
+            $query->join('department', 'department.id', '=', 'course.department_id');
+            //$query->join('faculty', 'faculty.id', '=', 'department.faculty');
+            //$query->join('users', 'users.faculty_id','=','faculty.id');
+            //where department.faculty= User::faculty()
+            //$query->where('users.id','=',$user->id);
+            $query->where('department.faculty','=',$user->faculty_id);
+			      $query->select('grading_tool.*');
+						$query->select('course.*');
+            break;
+				case 4:
+            $query->join('assessment', 'assessment.id', '=', 'grading_tool.assessment_id');
+            $query->join('course', 'course.id', '=', 'assessment.course_id');
+            $query->join('department', 'department.id', '=', 'course.department_id');
+
+						$query->where('department.id','=',$user->department_id);
+						$query->select('grading_tool.*');
+						$query->select('course.*');
+          break;
+					case 5:
+						$query->join('assessment','assessment.id','=','grading_tool.assessment_id');
+            $query->join('course', 'course.id', '=', 'assessment.course_id');
+            $query->join('section', 'section.course_id', '=', 'course.id');
+            $query->join('instructors_gives_sections', 'instructors_gives_sections.section_id', '=', 'section.id');
+            //$query->join('department', 'department.id', '=', 'course.department_id');
+
+						$query->where('instructors_gives_sections.instructor_email','=',$user->email);
+						$query->select('grading_tool.*');
+						$query->select('course.*');
+            break;
+          case 6:
+            // 6. seviyenin bu ekranda işi olmadığı için 403 verip gönderiyoruz.
+            // 403ün yönlendirme fonksiyonu vue tarafında gerçekleştirilecek.
+            return $this->apiResponse(ResaultType::Error, 403, 'Authorization Error', 0, 403);
+            break;
+          default:
+						// 1 ve 2. leveller kontrol edilmeyeceği için diğer sorguları default içine ekliyoruz
+						$query->join('assessment','assessment.id','=','grading_tool.assessment_id');
+						$query->join('course', 'course.id', '=', 'assessment.course_id');
+						$query->select('grading_tool.*');
+						$query->select('course.*');
+          break;
+        }
 
         if ($request->has('assessment'))
             $query->where('assessment_id', '=', $request->query('assessment'));
@@ -32,6 +81,7 @@ class GradingToolController extends ApiController
 
     public function store(Request $request)
     {
+				$user = User::find(Auth::id()); // oturum açan kişinin bilgilerini buradan alıyoruz.
         $validator = Validator::make($request->all(), [
             'assessment_id' => 'required',
             'question_number' => 'required',
