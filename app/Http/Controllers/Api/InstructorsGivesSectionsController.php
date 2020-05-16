@@ -6,6 +6,7 @@ use App\InstructorsGivesSections;
 use App\Imports\InstructorsGivesSectionsImport;
 
 use App\Log;
+use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -18,10 +19,10 @@ class InstructorsGivesSectionsController extends ApiController
 {
     public function uploadedFile(Request $request)
     {
- 
+
         $import = new InstructorsGivesSectionsImport();
         $import->import($request->fileUrl);
-        
+
         return $this->apiResponse(ResaultType::Error, $import->err, 'hatalar', 403);
     }
 
@@ -29,9 +30,46 @@ class InstructorsGivesSectionsController extends ApiController
 
     public function index(Request $request)
     {
+        $user = User::find(Auth::id());
         $offset = $request->offset ? $request->offset : 0;
         $limit = $request->limit ? $request->limit : 99999999999999;
         $query = InstructorsGivesSections::query();
+
+        switch ($user->level) {
+            case 3:
+                $query->join('section','section.id','=','instructors_gives_sections.section_id');
+                $query->join('course','course.id','=','section.course');
+                $query->join('department','department.id','=','course.department_id');
+
+                $query->where('department.faculty','=',$user->faculty_id);
+
+                $query->select('instructors_gives_sections.*');
+            break;
+
+            case 4:
+                $query->join('section','section.id','=','instructors_gives_sections.section_id');
+                $query->join('course','course.id','=','section.course');
+                $query->join('department','department.id','=','course.department_id');
+
+                $query->where('course.department','=',$user->department_id);
+
+                $query->select('instructors_gives_sections.*');
+            break;
+
+            case 5:
+                $query->where('instructors_gives_sections.instructor_email','=',$user->email);
+
+                $query->select('instructors_gives_sections.*');
+            break;
+            case 6:
+                // 6. seviyenin bu ekranda işi olmadığı için 403 verip gönderiyoruz.
+                // 403ün yönlendirme fonksiyonu vue tarafında gerçekleştirilecek.
+                return $this->apiResponse(ResaultType::Error, 403, 'Authorization Error', 0, 403);
+            break;
+            default:
+                $query->select('instructors_gives_sections.*');
+            break;
+        }
 
         if ($request->has('instructor'))
             $query->where('instructor_id', '=', $request->query('instructor'));
@@ -49,30 +87,38 @@ class InstructorsGivesSectionsController extends ApiController
 
     public function store(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'instructor_id' => 'required',
-            'section_id' => 'required',
-            ]);
-        if ($validator->fails()) {
-            return $this->apiResponse(ResaultType::Error, $validator->errors(), 'Validation Error', 422);
-        }
-        $data = new InstructorsGivesSections();
-        $data->instructor_id = request('instructor_id');
-        $data->section_id = request('section_id');
-        $data->save();
-        if ($data) {
-            $log = new Log();
-            $log->area = 'InstructorsGivesSections';
-            $log->areaid = $data->id;
-            $log->user = Auth::id();
-            $log->ip = \Request::ip();
-            $log->type = 1;
-            $log->info = 'InstructorsGivesSections '.$data->id.' Created for the University '.$data->university;
-            $log->save();
-            return $this->apiResponse(ResaultType::Success, $data, 'InstructorsGivesSections Created', 201);
-        } else {
-            return $this->apiResponse(ResaultType::Error, null, 'InstructorsGivesSections not saved', 500);
-        }
+			$user = User::find(Auth::id()); // oturum açan kişinin bilgilerini buradan alıyoruz.
+			switch ($user->level) {
+				case 1:
+					$validator = Validator::make($request->all(), [
+							'instructor_id' => 'required',
+							'section_id' => 'required',
+							]);
+					if ($validator->fails()) {
+							return $this->apiResponse(ResaultType::Error, $validator->errors(), 'Validation Error', 422);
+					}
+					$data = new InstructorsGivesSections();
+					$data->instructor_id = request('instructor_id');
+					$data->section_id = request('section_id');
+					$data->save();
+					if ($data) {
+							$log = new Log();
+							$log->area = 'InstructorsGivesSections';
+							$log->areaid = $data->id;
+							$log->user = Auth::id();
+							$log->ip = \Request::ip();
+							$log->type = 1;
+							$log->info = 'InstructorsGivesSections '.$data->id.' Created for the University '.$data->university;
+							$log->save();
+							return $this->apiResponse(ResaultType::Success, $data, 'InstructorsGivesSections Created', 201);
+					} else {
+							return $this->apiResponse(ResaultType::Error, null, 'InstructorsGivesSections not saved', 500);
+					}
+					break;
+					default:
+          return $this->apiResponse(ResaultType::Error, 403, 'Authorization Error', 0, 403);
+        break;
+      }
     }
 
     public function show($id)

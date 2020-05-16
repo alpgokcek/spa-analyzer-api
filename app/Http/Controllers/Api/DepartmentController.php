@@ -5,6 +5,8 @@ use App\Http\Controllers\Controller;
 use App\Department;
 use App\Faculty;
 use App\Log;
+use App\User;
+use App\Course;
 use Illuminate\Support\Facades\Auth;
 
 use App\Http\Resources\DepartmentResource;
@@ -19,10 +21,33 @@ class DepartmentController extends ApiController
 {
     public function index(Request $request)
     {
+        $user = User::find(Auth::id());
         $offset = $request->offset ? $request->offset : 0;
         $limit = $request->limit ? $request->limit : 99999999999999;
         $type = $request->type ? $request->type : null;
         $query = Department::query();
+
+        switch ($user->level) {
+            case 3:
+                $query->where('department.faculty', '=', $user->faculty_id);
+                $query->select('department.*');
+            break;
+
+			case 4:
+                return $this->apiResponse(ResaultType::Error, 403, 'Authorization Error', 0, 403);
+            break;
+
+            case 5:
+                return $this->apiResponse(ResaultType::Error, 403, 'Authorization Error', 0, 403);
+            break;
+
+            case 6:
+                return $this->apiResponse(ResaultType::Error, 403, 'Authorization Error', 0, 403);
+            break;
+            default:
+                $query->select('department.*');
+            break;
+        }
 
         if ($request->has('faculty'))
             $query->where('department.faculty', '=', $request->query('faculty'));
@@ -42,33 +67,41 @@ class DepartmentController extends ApiController
 
     public function store(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'faculty' => 'required',
-            'title' => 'required',
-            'status' => 'required',
-        ]);
-        if ($validator->fails()) {
-            return $this->apiResponse(ResaultType::Error, $validator->errors(), 'Validation Error', 422);
-        }
-        $data = new Department();
-        $data->faculty = request('faculty');
-        $data->title = request('title');
-        $data->status = request('status');
-        $data->save();
-        if ($data) {
-            $log = new Log();
-            $log->area = 'department';
-            $log->areaid = $data->id;
-            $log->user = Auth::id();
-            $log->ip = \Request::ip();
-            $log->type = 1;
-            $log->info = 'Department '.$data->id.' Created for the Faculty '.$data->faculty;
-            $log->save();
+        $user = User::find(Auth::id()); // oturum açan kişinin bilgilerini buradan alıyoruz.
+				switch ($user->level) {
+					case 1:
+                        $validator = Validator::make($request->all(), [
+                            'faculty' => 'required',
+                            'title' => 'required',
+                            'status' => 'required',
+                        ]);
+                        if ($validator->fails()) {
+                            return $this->apiResponse(ResaultType::Error, $validator->errors(), 'Validation Error', 422);
+                        }
+                        $data = new Department();
+                        $data->faculty = request('faculty');
+                        $data->title = request('title');
+                        $data->status = request('status');
+                        $data->save();
+                        if ($data) {
+                            $log = new Log();
+                            $log->area = 'department';
+                            $log->areaid = $data->id;
+                            $log->user = Auth::id();
+                            $log->ip = \Request::ip();
+                            $log->type = 1;
+                            $log->info = 'Department '.$data->id.' Created for the Faculty '.$data->faculty;
+                            $log->save();
 
-            return $this->apiResponse(ResaultType::Success, $data, 'Department Added', 201);
-        } else {
-            return $this->apiResponse(ResaultType::Error, null, 'Department not Added', 500);
-        }
+                            return $this->apiResponse(ResaultType::Success, $data, 'Department Added', 201);
+                        }
+                        else {
+                            return $this->apiResponse(ResaultType::Error, null, 'Department not Added', 500);
+                        }
+                    default:
+                        return $this->apiResponse(ResaultType::Error, 403, 'Authorization Error', 0, 403);
+                    break;
+                    }
     }
 
     public function show($id)

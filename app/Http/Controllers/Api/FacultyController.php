@@ -29,11 +29,11 @@ class FacultyController extends ApiController
       case 4:
         return $this->apiResponse(ResaultType::Error, 403, 'Authorization Error', 0, 403);
         break;
-   
+
       case 5:
         return $this->apiResponse(ResaultType::Error, 403, 'Authorization Error', 0, 403);
         break;
-     
+
       case 6:
         return $this->apiResponse(ResaultType::Error, 403, 'Authorization Error', 0, 403);
         break;
@@ -54,32 +54,40 @@ class FacultyController extends ApiController
 
     public function store(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'university' => 'required',
-            'title' => 'required',
-            'status' => 'required'
-            ]);
-        if ($validator->fails()) {
-            return $this->apiResponse(ResaultType::Error, $validator->errors(), 'Validation Error', 422);
-        }
-        $data = new Faculty();
-        $data->university = request('university');
-        $data->title = request('title');
-        $data->status = request('status');
-        $data->save();
-        if ($data) {
-            $log = new Log();
-            $log->area = 'faculty';
-            $log->areaid = $data->id;
-            $log->user = Auth::id();
-            $log->ip = \Request::ip();
-            $log->type = 1;
-            $log->info = 'Faculty '.$data->id.' Created for the University '.$data->university;
-            $log->save();
-            return $this->apiResponse(ResaultType::Success, $data, 'Faculty Created', 201);
-        } else {
-            return $this->apiResponse(ResaultType::Error, null, 'Faculty not saved', 500);
-        }
+        $user = User::find(Auth::id()); // oturum açan kişinin bilgilerini buradan alıyoruz.
+				switch ($user->level) {
+					case 1:
+                        $validator = Validator::make($request->all(), [
+                            'university' => 'required',
+                            'title' => 'required',
+                            'status' => 'required'
+                            ]);
+                        if ($validator->fails()) {
+                            return $this->apiResponse(ResaultType::Error, $validator->errors(), 'Validation Error', 422);
+                        }
+                        $data = new Faculty();
+                        $data->university = request('university');
+                        $data->title = request('title');
+                        $data->status = request('status');
+                        $data->save();
+                        if ($data) {
+                            $log = new Log();
+                            $log->area = 'faculty';
+                            $log->areaid = $data->id;
+                            $log->user = Auth::id();
+                            $log->ip = \Request::ip();
+                            $log->type = 1;
+                            $log->info = 'Faculty '.$data->id.' Created for the University '.$data->university;
+                            $log->save();
+                            return $this->apiResponse(ResaultType::Success, $data, 'Faculty Created', 201);
+                        }
+                        else {
+                            return $this->apiResponse(ResaultType::Error, null, 'Faculty not saved', 500);
+                        }
+                        default:
+                            return $this->apiResponse(ResaultType::Error, 403, 'Authorization Error', 0, 403);
+                        break;
+                }
     }
 
     public function show($id)

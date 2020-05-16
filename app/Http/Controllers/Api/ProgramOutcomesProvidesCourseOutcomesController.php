@@ -5,6 +5,7 @@ use App\Http\Controllers\Controller;
 use App\ProgramOutcomesProvidesCourseOutcomes;
 use App\Log;
 use App\User;
+use App\Course;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -48,14 +49,14 @@ class ProgramOutcomesProvidesCourseOutcomesController extends ApiController
 
                 $query->select('program_outcomes_provides_course_outcomes.*');
             break;
-          case 6:
-            // 6. seviyenin bu ekranda işi olmadığı için 403 verip gönderiyoruz.
-            // 403ün yönlendirme fonksiyonu vue tarafında gerçekleştirilecek.
-            return $this->apiResponse(ResaultType::Error, 403, 'Authorization Error', 0, 403);
+            case 6:
+                // 6. seviyenin bu ekranda işi olmadığı için 403 verip gönderiyoruz.
+                // 403ün yönlendirme fonksiyonu vue tarafında gerçekleştirilecek.
+                return $this->apiResponse(ResaultType::Error, 403, 'Authorization Error', 0, 403);
             break;
-          default:
-          $query->select('program_outcomes_provides_course_outcomes.*');
-          break;
+            default:
+                $query->select('program_outcomes_provides_course_outcomes.*');
+            break;
         }
         if ($request->has('course'))
             $query->where('course_outcome_id', '=', $request->query('course'));
@@ -73,30 +74,48 @@ class ProgramOutcomesProvidesCourseOutcomesController extends ApiController
 
     public function store(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'course_outcome_id' => 'required',
-            'program_outcome_id' => 'required',
-            ]);
-        if ($validator->fails()) {
-            return $this->apiResponse(ResaultType::Error, $validator->errors(), 'Validation Error', 422);
-        }
-        $data = new ProgramOutcomesProvidesCourseOutcomes();
-        $data->course_outcome_id = request('course_outcome_id');
-        $data->program_outcome_id = request('program_outcome_id');
-        $data->save();
-        if ($data) {
-            $log = new Log();
-            $log->area = 'ProgramOutcomesProvidesCourseOutcomes';
-            $log->areaid = $data->id;
-            $log->user = Auth::id();
-            $log->ip = \Request::ip();
-            $log->type = 1;
-            $log->info = 'ProgramOutcomesProvidesCourseOutcomes '.$data->id.' Created for the University '.$data->university;
-            $log->save();
-            return $this->apiResponse(ResaultType::Success, $data, 'ProgramOutcomesProvidesCourseOutcomes Created', 201);
-        } else {
-            return $this->apiResponse(ResaultType::Error, null, 'ProgramOutcomesProvidesCourseOutcomes not saved', 500);
-        }
+			$user = User::find(Auth::id()); // oturum açan kişinin bilgilerini buradan alıyoruz.
+			switch ($user->level) {
+				case 5:
+					$query = Course::query();
+					$query->join('section','section.course_id','=','course.id');
+					$query->join('instructors_gives_sections','section.id','=','instructors_gives_sections.section_id');
+					$query->where('instructors_gives_sections.instructor_email','=',$user->email);
+					$query->where('course.id','=',request('course_id'));
+					$length = count($query->get());
+
+					if($length == 0){
+						return $this->apiResponse(ResaultType::Error, 403, 'Authorization Error', 0, 403);
+					}
+					$validator = Validator::make($request->all(), [
+							'course_outcome_id' => 'required',
+							'program_outcome_id' => 'required',
+							]);
+					if ($validator->fails()) {
+							return $this->apiResponse(ResaultType::Error, $validator->errors(), 'Validation Error', 422);
+					}
+					$data = new ProgramOutcomesProvidesCourseOutcomes();
+					$data->course_outcome_id = request('course_outcome_id');
+					$data->program_outcome_id = request('program_outcome_id');
+					$data->save();
+					if ($data) {
+							$log = new Log();
+							$log->area = 'ProgramOutcomesProvidesCourseOutcomes';
+							$log->areaid = $data->id;
+							$log->user = Auth::id();
+							$log->ip = \Request::ip();
+							$log->type = 1;
+							$log->info = 'ProgramOutcomesProvidesCourseOutcomes '.$data->id.' Created for the University '.$data->university;
+							$log->save();
+							return $this->apiResponse(ResaultType::Success, $data, 'ProgramOutcomesProvidesCourseOutcomes Created', 201);
+					} else {
+							return $this->apiResponse(ResaultType::Error, null, 'ProgramOutcomesProvidesCourseOutcomes not saved', 500);
+					}
+					break;
+					default:
+						return $this->apiResponse(ResaultType::Error, 403, 'Authorization Error', 0, 403);
+					break;
+				}
     }
 
     public function show($id)

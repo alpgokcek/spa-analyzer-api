@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\ProgramOutcome;
 use App\Log;
+use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -14,9 +15,40 @@ class ProgramOutcomeController extends ApiController
 {
     public function index(Request $request)
     {
+        $user = User::find(Auth::id());
         $offset = $request->offset ? $request->offset : 0;
         $limit = $request->limit ? $request->limit : 99999999999999;
         $query = ProgramOutcome::query();
+        switch ($user->level) {
+            case 3:
+                $query->join('department','department.id','=','program_outcome.department_id');
+
+                $query->where('department.faculty','=',$user->faculty_id);
+
+                $query->select('program_outcome.*');
+            break;
+
+			case 4:
+                $query->where('program_outcome.department_id', '=', $user->department_id);
+
+                $query->select('program_outcome.*');
+            break;
+
+            case 5:
+                $query->where('program_outcome.department_id','=',$user->department_id);
+
+                $query->select('program_outcome.*');
+            break;
+
+            case 6:
+                $query->where('program_outcome.department_id','=',$user->department_id);
+
+                $query->select('program_outcome.*');
+            break;
+            default:
+            $query->select('program_outcome.*');
+            break;
+        }
 
         if ($request->has('code'))
             $query->where('code', '=', $request->query('code'));
@@ -34,33 +66,42 @@ class ProgramOutcomeController extends ApiController
 
     public function store(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'explanation' => 'required',
-            'code' => 'required',
-            'department_id' => 'required',
-            ]);
-        if ($validator->fails()) {
-            return $this->apiResponse(ResaultType::Error, $validator->errors(), 'Validation Error', 422);
-        }
-        $data = new ProgramOutcome();
-        $data->explanation = request('explanation');
-        $data->code = request('code');
-        $data->department_id = request('department_id');
-        $data->save();
-        if ($data) {
-            $log = new Log();
-            $log->area = 'ProgramOutcome';
-            $log->areaid = $data->id;
-            $log->user = Auth::id();
-            $log->ip = \Request::ip();
-            $log->type = 1;
-            $log->info = 'ProgramOutcome '.$data->id.' Created for the University '.$data->university;
-            $log->save();
-            return $this->apiResponse(ResaultType::Success, $data, 'ProgramOutcome Created', 201);
-        } else {
-            return $this->apiResponse(ResaultType::Error, null, 'ProgramOutcome not saved', 500);
-        }
+			$user = User::find(Auth::id()); // oturum açan kişinin bilgilerini buradan alıyoruz.
+			switch ($user->level) {
+				case 1:
+					$validator = Validator::make($request->all(), [
+							'explanation' => 'required',
+							'code' => 'required',
+							'department_id' => 'required',
+							]);
+					if ($validator->fails()) {
+							return $this->apiResponse(ResaultType::Error, $validator->errors(), 'Validation Error', 422);
+					}
+					$data = new ProgramOutcome();
+					$data->explanation = request('explanation');
+					$data->code = request('code');
+					$data->department_id = request('department_id');
+					$data->save();
+					if ($data) {
+							$log = new Log();
+							$log->area = 'ProgramOutcome';
+							$log->areaid = $data->id;
+							$log->user = Auth::id();
+							$log->ip = \Request::ip();
+							$log->type = 1;
+							$log->info = 'ProgramOutcome '.$data->id.' Created for the University '.$data->university;
+							$log->save();
+							return $this->apiResponse(ResaultType::Success, $data, 'ProgramOutcome Created', 201);
+					} else {
+							return $this->apiResponse(ResaultType::Error, null, 'ProgramOutcome not saved', 500);
+					}
+					break;
+					default:
+						return $this->apiResponse(ResaultType::Error, 403, 'Authorization Error', 0, 403);
+					break;
+				}
     }
+
 
     public function show($id)
     {

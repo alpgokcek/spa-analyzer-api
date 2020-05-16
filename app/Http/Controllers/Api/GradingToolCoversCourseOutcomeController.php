@@ -5,6 +5,7 @@ use App\Http\Controllers\Controller;
 use App\GradingToolCoversCourseOutcome;
 use App\Log;
 use App\User;
+use App\Course;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -50,16 +51,16 @@ class GradingToolCoversCourseOutcomeController extends ApiController
 
                 $query->select('grading_tool_covers_course_outcome.*');
             break;
-          case 6:
-            // 6. seviyenin bu ekranda işi olmadığı için 403 verip gönderiyoruz.
-            // 403ün yönlendirme fonksiyonu vue tarafında gerçekleştirilecek.
-            return $this->apiResponse(ResaultType::Error, 403, 'Authorization Error', 0, 403);
+            case 6:
+                // 6. seviyenin bu ekranda işi olmadığı için 403 verip gönderiyoruz.
+                // 403ün yönlendirme fonksiyonu vue tarafında gerçekleştirilecek.
+                return $this->apiResponse(ResaultType::Error, 403, 'Authorization Error', 0, 403);
             break;
-          default:
+            default:
 				// 1 ve 2. leveller kontrol edilmeyeceği için diğer sorguları default içine ekliyoruz
                 //$query->where('student_gets_measured_grade_program_outcome.student_id','=',$user->id);
                 $query->select('grading_tool_covers_course_outcome.*');
-          break;
+            break;
         }
 
         if ($request->has('gradingTool'))
@@ -78,6 +79,19 @@ class GradingToolCoversCourseOutcomeController extends ApiController
 
     public function store(Request $request)
     {
+			$user = User::find(Auth::id()); // oturum açan kişinin bilgilerini buradan alıyoruz.
+			switch ($user->level) {
+				case 5:
+					$query = Course::query();
+					$query->join('section','section.course_id','=','course.id');
+					$query->join('instructors_gives_sections','section.id','=','instructors_gives_sections.section_id');
+					$query->where('instructors_gives_sections.instructor_email','=',$user->email);
+					$query->where('course.id','=',request('course_id'));
+					$length = count($query->get());
+
+					if($length == 0){
+						return $this->apiResponse(ResaultType::Error, 403, 'Authorization Error', 0, 403);
+					}
         $validator = Validator::make($request->all(), [
             'grading_tool_id' => 'required',
             'course_outcome_id' => 'required',
@@ -101,8 +115,13 @@ class GradingToolCoversCourseOutcomeController extends ApiController
             return $this->apiResponse(ResaultType::Success, $data, 'GradingToolCoversCourseOutcome Created', 201);
         } else {
             return $this->apiResponse(ResaultType::Error, null, 'GradingToolCoversCourseOutcome not saved', 500);
-        }
-    }
+				}
+				break;
+				default:
+					return $this->apiResponse(ResaultType::Error, 403, 'Authorization Error', 0, 403);
+				break;
+			}
+		}
 
     public function show($id)
     {

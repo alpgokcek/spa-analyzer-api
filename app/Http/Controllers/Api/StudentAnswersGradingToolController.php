@@ -5,6 +5,7 @@ use App\Http\Controllers\Controller;
 use App\StudentAnswersGradingTool;
 use App\Log;
 use App\User;
+use App\Course;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -75,32 +76,50 @@ class StudentAnswersGradingToolController extends ApiController
 
     public function store(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'student_id' => 'required',
-            'grading_tool_id' => 'required',
-            'grade' => 'required',
-            ]);
-        if ($validator->fails()) {
-            return $this->apiResponse(ResaultType::Error, $validator->errors(), 'Validation Error', 422);
-        }
-        $data = new StudentAnswersGradingTool();
-        $data->student_id = request('student_id');
-        $data->grading_tool_id = request('grading_tool_id');
-        $data->grade = request('grade');
-        $data->save();
-        if ($data) {
-            $log = new Log();
-            $log->area = 'StudentAnswersGradingTool';
-            $log->areaid = $data->id;
-            $log->user = Auth::id();
-            $log->ip = \Request::ip();
-            $log->type = 1;
-            $log->info = 'StudentAnswersGradingTool '.$data->id.' Created for the University '.$data->university;
-            $log->save();
-            return $this->apiResponse(ResaultType::Success, $data, 'StudentAnswersGradingTool Created', 201);
-        } else {
-            return $this->apiResponse(ResaultType::Error, null, 'StudentAnswersGradingTool not saved', 500);
-        }
+			$user = User::find(Auth::id()); // oturum açan kişinin bilgilerini buradan alıyoruz.
+			switch ($user->level) {
+				case 5:
+					$query = Course::query();
+					$query->join('section','section.course_id','=','course.id');
+					$query->join('instructors_gives_sections','section.id','=','instructors_gives_sections.section_id');
+					$query->where('instructors_gives_sections.instructor_email','=',$user->email);
+					$query->where('course.id','=',request('course_id'));
+					$length = count($query->get());
+
+					if($length == 0){
+						return $this->apiResponse(ResaultType::Error, 403, 'Authorization Error', 0, 403);
+					}
+					$validator = Validator::make($request->all(), [
+							'student_id' => 'required',
+							'grading_tool_id' => 'required',
+							'grade' => 'required',
+							]);
+					if ($validator->fails()) {
+							return $this->apiResponse(ResaultType::Error, $validator->errors(), 'Validation Error', 422);
+					}
+					$data = new StudentAnswersGradingTool();
+					$data->student_id = request('student_id');
+					$data->grading_tool_id = request('grading_tool_id');
+					$data->grade = request('grade');
+					$data->save();
+					if ($data) {
+							$log = new Log();
+							$log->area = 'StudentAnswersGradingTool';
+							$log->areaid = $data->id;
+							$log->user = Auth::id();
+							$log->ip = \Request::ip();
+							$log->type = 1;
+							$log->info = 'StudentAnswersGradingTool '.$data->id.' Created for the University '.$data->university;
+							$log->save();
+							return $this->apiResponse(ResaultType::Success, $data, 'StudentAnswersGradingTool Created', 201);
+					} else {
+							return $this->apiResponse(ResaultType::Error, null, 'StudentAnswersGradingTool not saved', 500);
+					}
+				break;
+        default:
+          return $this->apiResponse(ResaultType::Error, 403, 'Authorization Error', 0, 403);
+        break;
+      }
     }
 
     public function show($id)

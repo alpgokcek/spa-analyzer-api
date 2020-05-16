@@ -5,6 +5,7 @@ use App\Http\Controllers\Controller;
 use App\Assessment;
 use App\User;
 use App\Log;
+use App\Course;
 use App\InstructorsGivesSections;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -55,7 +56,7 @@ class AssessmentController extends ApiController
         break;
       }
       // örnek olarak tüm assessment tablosunun yanında user.name değerini almak için
-      // 'assessment.*', 'users.name as userName'... 
+      // 'assessment.*', 'users.name as userName'...
       $query->select('assessment.*');
       // bu örnek üzerinden yeni değerler gönderebilirsiniz.
       $length = count($query->get());
@@ -69,9 +70,19 @@ class AssessmentController extends ApiController
 
     public function store(Request $request)
     {
-      $user = User::find(Auth::id()); // oturum açan kişinin bilgilerini buradan alıyoruz.
-      switch ($user->level) {
-        case 5:
+			$user = User::find(Auth::id()); // oturum açan kişinin bilgilerini buradan alıyoruz.
+			switch ($user->level) {
+				case 5:
+					$query = Course::query();
+					$query->join('section','section.course_id','=','course.id');
+					$query->join('instructors_gives_sections','section.id','=','instructors_gives_sections.section_id');
+					$query->where('instructors_gives_sections.instructor_email','=',$user->email);
+					$query->where('course.id','=',request('course_id'));
+					$length = count($query->get());
+
+					if($length == 0){
+						return $this->apiResponse(ResaultType::Error, 403, 'Authorization Error', 0, 403);
+					}
           $validator = Validator::make($request->all(), [
             'name' => 'required',
             'percentage' => 'required',
@@ -99,7 +110,7 @@ class AssessmentController extends ApiController
             return $this->apiResponse(ResaultType::Error, null, 'Assessment not saved', 500);
           }
           break;
-        default: 
+        default:
           return $this->apiResponse(ResaultType::Error, 403, 'Authorization Error', 0, 403);
         break;
       }
