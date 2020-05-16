@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\ProgramOutcomesProvidesCourseOutcomes;
 use App\Log;
+use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -14,10 +15,48 @@ class ProgramOutcomesProvidesCourseOutcomesController extends ApiController
 {
     public function index(Request $request)
     {
+        $user = User::find(Auth::id());
         $offset = $request->offset ? $request->offset : 0;
         $limit = $request->limit ? $request->limit : 99999999999999;
         $query = ProgramOutcomesProvidesCourseOutcomes::query();
+        switch ($user->level) {
+            case 3:
+                $query->join('program_outcome','program_outcome.id','=','program_outcomes_provides_course_outcomes.program_outcome_id');
+                $query->join('department','department.id','=','program_outcome.department_id');
 
+                $query->where('department.faculty','=',$user->faculty_id);
+
+                $query->select('program_outcomes_provides_course_outcomes.*');
+            break;
+
+			case 4:
+                $query->join('program_outcome','program_outcome.id','=','program_outcomes_provides_course_outcomes.program_outcome_id');
+
+                $query->where('program_outcome.department_id', '=', $user->department_id);
+
+
+                $query->select('program_outcomes_provides_course_outcomes.*');
+            break;
+
+            case 5:
+                $query->join('course_outcome','course_outcome.id','=','program_outcomes_provides_course_outcomes.course_outcome_id');
+                $query->join('course','course.id','=','course_outcome.course_id');
+                $query->join('section','section.course_id','=','course.id');
+                $query->join('instructors_gives_sections','instructors_gives_sections.section_id','=','section.id');
+
+                $query->where('instructors_gives_sections.instructor_email','=',$user->email);
+
+                $query->select('program_outcomes_provides_course_outcomes.*');
+            break;
+          case 6:
+            // 6. seviyenin bu ekranda işi olmadığı için 403 verip gönderiyoruz.
+            // 403ün yönlendirme fonksiyonu vue tarafında gerçekleştirilecek.
+            return $this->apiResponse(ResaultType::Error, 403, 'Authorization Error', 0, 403);
+            break;
+          default:
+          $query->select('program_outcomes_provides_course_outcomes.*');
+          break;
+        }
         if ($request->has('course'))
             $query->where('course_outcome_id', '=', $request->query('course'));
         if ($request->has('program'))
