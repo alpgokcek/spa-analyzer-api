@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\StudentGetsMeasuredGradeProgramOutcome;
 use App\Log;
+use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -20,8 +21,9 @@ class StudentGetsMeasuredGradeProgramOutcomeController extends ApiController
         $query = StudentGetsMeasuredGradeProgramOutcome::query();
         switch ($user->level) {
             case 3:
-                $query->join('department','department.id','=','users_student.department_id');
                 $query->join('users_student','users_student.id','=','student_gets_measured_grade_program_outcome.student_id');
+                $query->join('department','department.id','=','users_student.department_id');
+                $query->join('users','users.id','=','users_student.user_id');
 
                 $query->where('department.faculty','=',$user->faculty_id);
                 $query->where('users.level','=','6');
@@ -31,6 +33,7 @@ class StudentGetsMeasuredGradeProgramOutcomeController extends ApiController
 
             case 4:
                 $query->join('users_student','users_student.id','=','student_gets_measured_grade_program_outcome.student_id');
+                $query->join('users','users.id','=','users_student.user_id');
 
                 $query->where('users_student.department_id','=',$user->department_id);
                 $query->where('users.level','=','6');
@@ -38,12 +41,14 @@ class StudentGetsMeasuredGradeProgramOutcomeController extends ApiController
                 $query->select('student_gets_measured_grade_program_outcome.*');
             break;
 
-			case 5:
+            case 5:
+                $query->join('students_takes_sections','students_takes_sections.student_id','=','student_gets_measured_grade_program_outcome.student_id');
                 $query->join('instructors_gives_sections','instructors_gives_sections.section_id','=','students_takes_sections.section_id');
-                $query->join('students_takes_sections','students_takes_sections.section_id','=','student_gets_measured_grade_program_outcome.section_id');
                 $query->join('users_student','users_student.id','=','student_gets_measured_grade_program_outcome.student_id');
 
-                $query->where('instructors_gives_sections.instructor_id','=',$user->id);
+                $query->where('instructors_gives_sections.instructor_email','=',$user->email);
+
+                $query->select('student_gets_measured_grade_program_outcome.*');
             break;
           case 6:
             // 6. seviyenin bu ekranda işi olmadığı için 403 verip gönderiyoruz.
@@ -52,7 +57,8 @@ class StudentGetsMeasuredGradeProgramOutcomeController extends ApiController
             break;
           default:
 				// 1 ve 2. leveller kontrol edilmeyeceği için diğer sorguları default içine ekliyoruz
-				$query->where('student_gets_measured_grade_program_outcome.student_id','=',$user->id);
+                //$query->where('student_gets_measured_grade_program_outcome.student_id','=',$user->id);
+                $query->select('student_gets_measured_grade_program_outcome.*');
           break;
         }
 

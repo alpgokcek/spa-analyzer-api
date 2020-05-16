@@ -5,6 +5,7 @@ use App\Http\Controllers\Controller;
 use App\StudentGetsMeasuredGradeCourseOutcome;
 use App\CourseOutcome;
 use App\Log;
+use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -23,30 +24,34 @@ class StudentGetsMeasuredGradeCourseOutcomeController extends ApiController
 
         switch ($user->level) {
             case 3:
-                $query->join('department','department.id','=','users_student.department_id');
                 $query->join('users_student','users_student.id','=','student_gets_measured_grade_course_outcome.student_id');
+                $query->join('department','department.id','=','users_student.department_id');
+                $query->join('users','users.id','=','users_student.user_id');
 
                 $query->where('department.faculty','=',$user->faculty_id);
                 $query->where('users.level','=','6');
 
-                $query->select('student_gets_measured_grade_program_outcome.*');
+                $query->select('student_gets_measured_grade_course_outcome.*');
             break;
 
             case 4:
                 $query->join('users_student','users_student.id','=','student_gets_measured_grade_course_outcome.student_id');
+                $query->join('users','users.id','=','users_student.user_id');
 
                 $query->where('users_student.department_id','=',$user->department_id);
                 $query->where('users.level','=','6');
 
-                $query->select('student_gets_measured_grade_program_outcome.*');
+                $query->select('student_gets_measured_grade_course_outcome.*');
             break;
 
-			case 5:
+            case 5:
+                $query->join('students_takes_sections','students_takes_sections.student_id','=','student_gets_measured_grade_course_outcome.student_id');
                 $query->join('instructors_gives_sections','instructors_gives_sections.section_id','=','students_takes_sections.section_id');
-                $query->join('students_takes_sections','students_takes_sections.section_id','=','student_gets_measured_grade_program_course.section_id');
                 $query->join('users_student','users_student.id','=','student_gets_measured_grade_course_outcome.student_id');
 
-                $query->where('instructors_gives_sections.instructor_id','=',$user->id);
+								$query->where('instructors_gives_sections.instructor_email','=',$user->email);
+								$query->select('student_gets_measured_grade_course_outcome.*');
+
             break;
           case 6:
             // 6. seviyenin bu ekranda işi olmadığı için 403 verip gönderiyoruz.
@@ -54,10 +59,12 @@ class StudentGetsMeasuredGradeCourseOutcomeController extends ApiController
             return $this->apiResponse(ResaultType::Error, 403, 'Authorization Error', 0, 403);
             break;
           default:
-				// 1 ve 2. leveller kontrol edilmeyeceği için diğer sorguları default içine ekliyoruz
-				$query->where('student_gets_measured_grade_course_outcome.student_id','=',$user->id);
+					// 1 ve 2. leveller kontrol edilmeyeceği için diğer sorguları default içine ekliyoruz
+                    //$query->where('student_gets_measured_grade_course_outcome.student_id','=',$user->id);
+            $query->select('student_gets_measured_grade_course_outcome.*');
           break;
-        }
+				}
+				/*
         if($request->has('course')){
             $testQuery = DB::table('course_outcome')->join('student_gets_measured_grade_course_outcome', 'course_outcome.id', '=', 'course_outcome_id')->where('course_outcome.course_id', $request->query('course'));
 
@@ -67,17 +74,14 @@ class StudentGetsMeasuredGradeCourseOutcomeController extends ApiController
                 $testQuery->where('course_outcome_id', '=', $request->query('courseOutcome'));
             if ($request->has('grade'))
                 $testQuery->where('grade', '=', $request->query('grade'));
-
-            $length = count($testQuery->get());//->get());
-            $data = $testQuery->offset($offset)->limit($limit)->get();
-            if ($data) {
-                return $this->apiResponse(ResaultType::Success, $data, 'Listing: '.$offset.'-'.$limit, $length, 200);
-            } else {
-                return $this->apiResponse(ResaultType::Error, null, 'StudentGetsMeasuredGradeCourseOutcome Not Found', 0, 404);
-            }
-        } else{
-            return $this->apiResponse(ResaultType::Error, null, 'Course ID is needed for this operation', 0, 400);
-        }
+					*/
+					$length = count($query->get());
+					$data = $query->offset($offset)->limit($limit)->get();
+					if ($data) {
+							return $this->apiResponse(ResaultType::Success, $data, 'Listing: '.$offset.'-'.$limit, $length, 200);
+					} else {
+							return $this->apiResponse(ResaultType::Error, null, 'StudentGetsMeasuredGradeProgramOutcome Not Found', 0, 404);
+					}
     }
 
     public function store(Request $request)
