@@ -48,8 +48,6 @@ class SectionController extends ApiController
           $query->where('users.id','=',$user->id);
         break;
         case 5:
-          $query->join('course', 'course.id', '=', 'assessment.course_id');
-          $query->join('section', 'section.course_id', '=', 'course.id');
           $query->join('instructors_gives_sections', 'instructors_gives_sections.section_id', '=', 'section.id');
           $query->join('department', 'department.id', '=', 'course.department_id');
           $query->join('faculty', 'faculty.id', '=', 'department.faculty');
