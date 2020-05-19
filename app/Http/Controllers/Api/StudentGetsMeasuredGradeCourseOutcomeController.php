@@ -65,17 +65,13 @@ class StudentGetsMeasuredGradeCourseOutcomeController extends ApiController
             $query->select('student_gets_measured_grade_course_outcome.*');
           break;
 				}
-				/*
-        if($request->has('course')){
-            $testQuery = DB::table('course_outcome')->join('student_gets_measured_grade_course_outcome', 'course_outcome.id', '=', 'course_outcome_id')->where('course_outcome.course_id', $request->query('course'));
 
-            if ($request->has('student'))
-                $testQuery->where('student_id', '=', $request->query('student'));
-            if ($request->has('courseOutcome'))
-                $testQuery->where('course_outcome_id', '=', $request->query('courseOutcome'));
-            if ($request->has('grade'))
-                $testQuery->where('grade', '=', $request->query('grade'));
-					*/
+          if ($request->has('student'))
+              $testQuery->where('student_id', '=', $request->query('student'));
+          if ($request->has('courseOutcome'))
+              $testQuery->where('course_outcome_id', '=', $request->query('courseOutcome'));
+          if ($request->has('grade'))
+              $testQuery->where('grade', '=', $request->query('grade'));
 					$length = count($query->get());
 					$data = $query->offset($offset)->limit($limit)->get();
 					if ($data) {

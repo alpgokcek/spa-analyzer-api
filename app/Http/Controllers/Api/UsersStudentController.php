@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\UsersStudent;
 use App\Imports\UsersStudentImport;
-
+use App\User;
 use App\Log;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -19,10 +19,10 @@ class UsersStudentController extends ApiController
 {
     public function uploadedFile(Request $request)
     {
- 
+			  $user = User::find(Auth::id());
         $import = new UsersStudentImport();
         $import->import($request->fileUrl);
-        
+
         // return($import->err);
         return $this->apiResponse(ResaultType::Error, $import->err, 'hatalar', 403);
     }
@@ -36,44 +36,46 @@ class UsersStudentController extends ApiController
         $length = count($query->get());
         $data = $query->offset($offset)->limit($limit)->get();
 
-        if ($data) {
-            return $this->apiResponse(ResaultType::Success, $data, 'Listing: '.$offset.'-'.$limit, $length, 200);
-        } else {
-            return $this->apiResponse(ResaultType::Error, null, 'Student Not Found', 0, 404);
-        }
-    }
-
-   
-
+        if ($user->level == 1 && $data) {
+					return $this->apiResponse(ResaultType::Success, $data, 'Listing: '.$offset.'-'.$limit, $length, 200);
+				} elseif ($user->level != 1) {
+					return $this->apiResponse(ResaultType::Error, 403, 'Authorization Error', 0, 403);
+				} else {
+						return $this->apiResponse(ResaultType::Error, null, 'Student Not Found', 0, 404);
+				}
+		}
 
     public function store(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'user_id' => 'required',
-            'advisor_user_id' => 'required',
-            'department_id' => 'required',
-            'is_major' => 'required',
-            ]);
-        if ($validator->fails()) {
-            return $this->apiResponse(ResaultType::Error, $validator->errors(), 'Validation Error', 422);
-        }
-        $data = new UsersStudent();
-        $data->user = request('user');
-        $data->status = request('status');
-        $data->save();
-        if ($data) {
-            $log = new Log();
-            $log->area = 'admin';
-            $log->areaid = $data->id;
-            $log->user = Auth::id();
-            $log->ip = \Request::ip();
-            $log->type = 1;
-            $log->info = 'Student '.$data->id.' Created for the University '.$data->university;
-            $log->save();
-            return $this->apiResponse(ResaultType::Success, $data, 'Student Created', 201);
-        } else {
-            return $this->apiResponse(ResaultType::Error, null, 'Student not saved', 500);
-        }
+				$user = User::find(Auth::id());
+				if ($user->level == 1){
+					$validator = Validator::make($request->all(), [
+							'user_id' => 'required',
+							'advisor_user_id' => 'required',
+							'department_id' => 'required',
+							'is_major' => 'required',
+							]);
+					if ($validator->fails()) {
+							return $this->apiResponse(ResaultType::Error, $validator->errors(), 'Validation Error', 422);
+					}
+					$data = new UsersStudent();
+					$data->user = request('user');
+					$data->status = request('status');
+					$data->save();
+					if ($data) {
+							$log = new Log();
+							$log->area = 'admin';
+							$log->areaid = $data->id;
+							$log->user = Auth::id();
+							$log->ip = \Request::ip();
+							$log->type = 1;
+							$log->info = 'Student '.$data->id.' Created for the University '.$data->university;
+							$log->save();
+							return $this->apiResponse(ResaultType::Success, $data, 'Student Created', 201);
+					} else {
+							return $this->apiResponse(ResaultType::Error, null, 'Student not saved', 500);
+					}
+			}
     }
 
     public function show($id)

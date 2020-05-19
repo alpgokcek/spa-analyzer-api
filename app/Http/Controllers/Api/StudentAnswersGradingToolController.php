@@ -55,9 +55,6 @@ class StudentAnswersGradingToolController extends ApiController
 						$query->select('student_answers_grading_tool.*');
           break;
         }
-
-
-
         if ($request->has('student'))
             $query->where('student_id', '=', $request->query('student'));
         if ($request->has('gradingTool'))

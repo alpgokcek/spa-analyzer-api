@@ -58,10 +58,10 @@ class ProgramOutcomesProvidesCourseOutcomesController extends ApiController
                 $query->select('program_outcomes_provides_course_outcomes.*');
             break;
         }
-        if ($request->has('course'))
-            $query->where('course_outcome_id', '=', $request->query('course'));
-        if ($request->has('program'))
-            $query->where('program_outcome_id', '=', $request->query('program'));
+        if ($request->has('courseOutcome'))
+            $query->where('course_outcome_id', '=', $request->query('courseOutcome'));
+        if ($request->has('programOutcome'))
+            $query->where('program_outcome_id', '=', $request->query('programOutcome'));
 
         $length = count($query->get());
         $data = $query->offset($offset)->limit($limit)->get();
