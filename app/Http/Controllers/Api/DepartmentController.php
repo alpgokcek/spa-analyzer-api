@@ -72,7 +72,7 @@ class DepartmentController extends ApiController
 					case 1:
                         $validator = Validator::make($request->all(), [
                             'faculty' => 'required',
-                            'title' => 'required',
+                            'name' => 'required',
                             'status' => 'required',
                         ]);
                         if ($validator->fails()) {
@@ -80,7 +80,7 @@ class DepartmentController extends ApiController
                         }
                         $data = new Department();
                         $data->faculty = request('faculty');
-                        $data->title = request('title');
+                        $data->name = request('name');
                         $data->status = request('status');
                         $data->save();
                         if ($data) {
@@ -117,15 +117,15 @@ class DepartmentController extends ApiController
     public function update(Request $request, $id)
     {
         $validator = Validator::make($request->all(), [
-            'title' => 'nullable',
+            'name' => 'nullable',
             'status' => 'nullable',
         ]);
         if ($validator->fails()) {
             return $this->apiResponse(ResaultType::Error, $validator->errors(), 'Validation Error', 422);
         }
         $data = Department::find($id);
-        if (request('title')) {
-            $data->title = request('title');
+        if (request('name')) {
+            $data->name = request('name');
         }
         $data->status = request('status');
         $data->save();

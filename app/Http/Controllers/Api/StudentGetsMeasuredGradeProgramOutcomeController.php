@@ -19,56 +19,65 @@ class StudentGetsMeasuredGradeProgramOutcomeController extends ApiController
         $user = User::find(Auth::id());
         $offset = $request->offset ? $request->offset : 0;
         $limit = $request->limit ? $request->limit : 99999999999999;
-        $query = StudentGetsMeasuredGradeProgramOutcome::query();
-        switch ($user->level) {
-            case 3:
-                $query->join('users_student','users_student.id','=','student_gets_measured_grade_program_outcome.student_id');
-                $query->join('department','department.id','=','users_student.department_id');
-                $query->join('users','users.id','=','users_student.user_id');
+				$query = StudentGetsMeasuredGradeProgramOutcome::query();
+				if(intval($request->query('type')) != 1){
+					switch ($user->level) {
+							case 3:
+									$query->join('users','users.student_id','=','student_gets_measured_grade_program_outcome.student_id');
+									$query->join('department','department.id','=','users.department_id');
 
-                $query->where('department.faculty','=',$user->faculty_id);
-                $query->where('users.level','=','6');
+									$query->where('department.faculty','=',$user->faculty_id);
+									$query->where('users.level','=','6');
 
-                $query->select('student_gets_measured_grade_program_outcome.*');
-            break;
+									$query->select('student_gets_measured_grade_program_outcome.*');
+							break;
 
-            case 4:
-                $query->join('users_student','users_student.id','=','student_gets_measured_grade_program_outcome.student_id');
-                $query->join('users','users.id','=','users_student.user_id');
+							case 4:
+									$query->join('users','users.student_id','=','student_gets_measured_grade_program_outcome.student_id');
 
-                $query->where('users_student.department_id','=',$user->department_id);
-                $query->where('users.level','=','6');
+									$query->where('users.department_id','=',$user->department_id);
+									$query->where('users.level','=','6');
 
-                $query->select('student_gets_measured_grade_program_outcome.*');
-            break;
+									$query->select('student_gets_measured_grade_program_outcome.*');
+							break;
 
-            case 5:
-                $query->join('students_takes_sections','students_takes_sections.student_id','=','student_gets_measured_grade_program_outcome.student_id');
-                $query->join('instructors_gives_sections','instructors_gives_sections.section_id','=','students_takes_sections.section_id');
-                $query->join('users_student','users_student.id','=','student_gets_measured_grade_program_outcome.student_id');
+							case 5:
+									$query->join('students_takes_sections','students_takes_sections.student_id','=','student_gets_measured_grade_program_outcome.student_id');
+									$query->join('instructors_gives_sections','instructors_gives_sections.section_id','=','students_takes_sections.section_id');
+									$query->join('users','users.student_id','=','student_gets_measured_grade_program_outcome.student_id');
 
-                $query->where('instructors_gives_sections.instructor_email','=',$user->email);
+									$query->where('instructors_gives_sections.instructor_email','=',$user->email);
 
-                $query->select('student_gets_measured_grade_program_outcome.*');
-            break;
-          case 6:
-            // 6. seviyenin bu ekranda işi olmadığı için 403 verip gönderiyoruz.
-            // 403ün yönlendirme fonksiyonu vue tarafında gerçekleştirilecek.
-            return $this->apiResponse(ResaultType::Error, 403, 'Authorization Error', 0, 403);
-            break;
-          default:
-				// 1 ve 2. leveller kontrol edilmeyeceği için diğer sorguları default içine ekliyoruz
-                //$query->where('student_gets_measured_grade_program_outcome.student_id','=',$user->id);
-                $query->select('student_gets_measured_grade_program_outcome.*');
-          break;
-        }
+									$query->select('student_gets_measured_grade_program_outcome.*');
+							break;
+						case 6:
+							// 6. seviyenin bu ekranda işi olmadığı için 403 verip gönderiyoruz.
+							// 403ün yönlendirme fonksiyonu vue tarafında gerçekleştirilecek.
+							return $this->apiResponse(ResaultType::Error, 403, 'Authorization Error', 0, 403);
+							break;
+						default:
+					// 1 ve 2. leveller kontrol edilmeyeceği için diğer sorguları default içine ekliyoruz
+									$query->select('student_gets_measured_grade_program_outcome.*');
+						break;
+				}
+			}
+        else{
+					switch ($user->level) {
+						case 6:
+							return $this->apiResponse(ResaultType::Error, 403, 'Authorization Error', 0, 403);
+							break;
+						default:
+							$query->join('program_outcome','program_outcome.id','=','student_gets_measured_grade_program_outcome.program_outcome_id');
+							$query->join('users','users.department_id','=','program_outcome.department_id');
+							//$query->where('users.student_id', '=', $request->query('student'));
+							$query->where('users.student_id', '=', intval($request->query('student')));
+							$query->where('program_outcome.id', '=', intval($request->query('code')));
+							$query->select('student_gets_measured_grade_program_outcome.*');
+							break;
+					}
+			}
 
-        if ($request->has('student'))
-            $query->where('student_id', '=', $request->query('student'));
-        if ($request->has('programOutcome'))
-            $query->where('program_outcome_id', '=', $request->query('programOutcome'));
-        if ($request->has('grade'))
-            $query->where('grade', '=', $request->query('grade'));
+
 
         $length = count($query->get());
         $data = $query->offset($offset)->limit($limit)->get();

@@ -65,7 +65,7 @@ class CourseController extends ApiController
         $query->join('department','department.id','=','course.department_id');
       break;
     }
-    $query->select('course.*');
+		$query->select('course.*', 'department.name');
     $length = count($query->get());
     $data = $query->offset($offset)->limit($limit)->get();
     if ($length >= 1) {
