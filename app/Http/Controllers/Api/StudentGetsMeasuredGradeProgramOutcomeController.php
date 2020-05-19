@@ -68,19 +68,24 @@ class StudentGetsMeasuredGradeProgramOutcomeController extends ApiController
 							break;
 						default:
 							$query->join('program_outcome','program_outcome.id','=','student_gets_measured_grade_program_outcome.program_outcome_id');
-							$query->join('users','users.department_id','=','program_outcome.department_id');
-							//$query->where('users.student_id', '=', $request->query('student'));
-							$query->where('users.student_id', '=', intval($request->query('student')));
-							$query->where('program_outcome.id', '=', intval($request->query('code')));
-							$query->select('student_gets_measured_grade_program_outcome.*');
+							$query->join('course','course.id','=','student_gets_measured_grade_program_outcome.course_id');
+							$query->join('users','users.student_id','=','student_gets_measured_grade_program_outcome.student_id');
+							if($request->has('student'))
+								$query->where('users.student_id', '=', intval($request->query('student')));
+							if($request->has('code'))
+								$query->where('program_outcome.id', '=', intval($request->query('code')));
+							$query->select('course.code','course.title','course.year_and_term','student_gets_measured_grade_program_outcome.*');
 							break;
 					}
 			}
 
 
 
-        $length = count($query->get());
-        $data = $query->offset($offset)->limit($limit)->get();
+				$length = count($query->get());
+				if(intval($request->query('type')) == 1)
+					$data = $query->offset($offset)->limit($limit)->orderBy('course.year_and_term', 'asc')->get();
+				else
+        	$data = $query->offset($offset)->limit($limit)->get();
         if ($data) {
             return $this->apiResponse(ResaultType::Success, $data, 'Listing: '.$offset.'-'.$limit, $length, 200);
         } else {
