@@ -77,6 +77,8 @@ class StudentsTakesSectionsController extends ApiController
             break;
 
             default:
+                $query->join('users','users.student_id','=','students_takes_sections.student_id');
+                $query->join('section','section.id','=','students_takes_sections.section_id');
                 $query->select('students_takes_sections.*', 'user.name as userName', 'section.title as sectionTitle');
             break;
         }
