@@ -47,7 +47,7 @@ class StudentsTakesSectionsController extends ApiController
 
                 $query->where('users.student_id','=',$user->id);
 
-                $query->select('users.*');
+                $query->select('users.*', 'user.name as userName', 'section.title as sectionTitle');
             break;
 
 			case 4:
@@ -77,7 +77,7 @@ class StudentsTakesSectionsController extends ApiController
             break;
 
             default:
-                $query->select('students_takes_sections.*');
+                $query->select('students_takes_sections.*', 'user.name as userName', 'section.title as sectionTitle');
             break;
         }
 
