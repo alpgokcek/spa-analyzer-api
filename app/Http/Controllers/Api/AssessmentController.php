@@ -54,7 +54,8 @@ class AssessmentController extends ApiController
           // 1 ve 2. leveller kontrol edilmeyeceği için diğer sorguları default içine ekliyoruz
           $query->join('course', 'course.id', '=', 'assessment.course_id');
         break;
-      }
+			}
+			$query->where('course.id','=',$request->course);
       // örnek olarak tüm assessment tablosunun yanında user.name değerini almak için
       // 'assessment.*', 'users.name as userName'...
       $query->select('assessment.*');

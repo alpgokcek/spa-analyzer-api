@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\UsersAdmin;
 use App\Log;
+use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -14,6 +15,7 @@ class UsersAdminController extends ApiController
 {
     public function index(Request $request)
     {
+				$user = User::find(Auth::id());
         $offset = $request->offset ? $request->offset : 0;
         $limit = $request->limit ? $request->limit : 99999999999999;
         $query = UsersAdmin::query();
@@ -21,15 +23,19 @@ class UsersAdminController extends ApiController
         $length = count($query->get());
         $data = $query->offset($offset)->limit($limit)->get();
 
-        if ($data) {
+        if ($user->level == 1 && $data) {
             return $this->apiResponse(ResaultType::Success, $data, 'Listing: '.$offset.'-'.$limit, $length, 200);
-        } else {
+				} elseif ($user->level != 1) {
+					return $this->apiResponse(ResaultType::Error, 403, 'Authorization Error', 0, 403);
+				} else {
             return $this->apiResponse(ResaultType::Error, null, 'Admin Not Found', 0, 404);
         }
     }
 
     public function store(Request $request)
     {
+				$user = User::find(Auth::id());
+				if ($user->level == 1){
         $validator = Validator::make($request->all(), [
             'user' => 'required'
             ]);
@@ -51,7 +57,8 @@ class UsersAdminController extends ApiController
             return $this->apiResponse(ResaultType::Success, $data, 'Admin Created', 201);
         } else {
             return $this->apiResponse(ResaultType::Error, null, 'Admin not saved', 500);
-        }
+				}
+			}
     }
 
     public function show($id)
