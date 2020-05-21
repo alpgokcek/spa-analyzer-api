@@ -66,7 +66,7 @@ class SectionController extends ApiController
       }
       // örnek olarak tüm assessment tablosunun yanında user.name değerini almak için
       // 'assessment.*', 'users.name as userName'...
-      $query->select('section.*');
+      $query->select('section.*', 'course.title as courseName');
       // bu örnek üzerinden yeni değerler gönderebilirsiniz.
       $length = count($query->get());
       $data = $query->offset($offset)->limit($limit)->get();
@@ -75,46 +75,46 @@ class SectionController extends ApiController
       } else {
         return $this->apiResponse(ResaultType::Error, null, 'Section Not Found', 0, 404);
     }
-}
+  }
 
-    public function store(Request $request)
-    {
-			$user = User::find(Auth::id()); // oturum açan kişinin bilgilerini buradan alıyoruz.
-			switch ($user->level) {
-				case 1:
-					$validator = Validator::make($request->all(), [
-							'course' => 'required',
-							'code' => 'required',
-							'title' => 'required',
-							'status' => 'required'
-							]);
-					if ($validator->fails()) {
-							return $this->apiResponse(ResaultType::Error, $validator->errors(), 'Validation Error', 422);
-					}
-					$data = new Section();
-					$data->course = request('course');
-					$data->code = request('code');
-					$data->title = request('title');
-					$data->status = request('status');
-					$data->save();
-					if ($data) {
-							$log = new Log();
-							$log->area = 'section';
-							$log->areaid = $data->id;
-							$log->user = Auth::id();
-							$log->ip = \Request::ip();
-							$log->type = 1;
-							$log->info = 'Section '.$data->id.' Created for the University '.$data->university;
-							$log->save();
-							return $this->apiResponse(ResaultType::Success, $data, 'Section Created', 201);
-					} else {
-							return $this->apiResponse(ResaultType::Error, null, 'Section not saved', 500);
-					}
-					break;
-				default:
-					return $this->apiResponse(ResaultType::Error, 403, 'Authorization Error', 0, 403);
-				break;
-			}
+  public function store(Request $request)
+  {
+    $user = User::find(Auth::id()); // oturum açan kişinin bilgilerini buradan alıyoruz.
+    switch ($user->level) {
+      case 1:
+        $validator = Validator::make($request->all(), [
+          'course' => 'required',
+          'code' => 'required',
+          'title' => 'required',
+          'status' => 'required'
+        ]);
+        if ($validator->fails()) {
+          return $this->apiResponse(ResaultType::Error, $validator->errors(), 'Validation Error', 422);
+        }
+        $data = new Section();
+        $data->course = request('course');
+        $data->code = request('code');
+        $data->title = request('title');
+        $data->status = request('status');
+        $data->save();
+        if ($data) {
+          $log = new Log();
+          $log->area = 'section';
+          $log->areaid = $data->id;
+          $log->user = Auth::id();
+          $log->ip = \Request::ip();
+          $log->type = 1;
+          $log->info = 'Section '.$data->id.' Created for the University '.$data->university;
+          $log->save();
+          return $this->apiResponse(ResaultType::Success, $data, 'Section Created', 201);
+        } else {
+          return $this->apiResponse(ResaultType::Error, null, 'Section not saved', 500);
+        }
+        break;
+      default:
+        return $this->apiResponse(ResaultType::Error, 403, 'Authorization Error', 0, 403);
+      break;
+    }
 	}
 
     public function show($id)

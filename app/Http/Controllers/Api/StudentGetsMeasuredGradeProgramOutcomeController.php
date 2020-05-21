@@ -14,42 +14,42 @@ use Validator;
 
 class StudentGetsMeasuredGradeProgramOutcomeController extends ApiController
 {
-    public function index(Request $request)
-    {
-        $user = User::find(Auth::id());
-        $offset = $request->offset ? $request->offset : 0;
-        $limit = $request->limit ? $request->limit : 99999999999999;
-				$query = StudentGetsMeasuredGradeProgramOutcome::query();
-				if(intval($request->query('type')) != 1){
-					switch ($user->level) {
-							case 3:
-									$query->join('users','users.student_id','=','student_gets_measured_grade_program_outcome.student_id');
-									$query->join('department','department.id','=','users.department_id');
+	public function index(Request $request)
+	{
+		$user = User::find(Auth::id());
+		$offset = $request->offset ? $request->offset : 0;
+		$limit = $request->limit ? $request->limit : 99999999999999;
+		$query = StudentGetsMeasuredGradeProgramOutcome::query();
+		if(intval($request->query('type')) != 1){
+			switch ($user->level) {
+				case 3:
+					$query->join('users','users.student_id','=','student_gets_measured_grade_program_outcome.student_id');
+					$query->join('department','department.id','=','users.department_id');
 
-									$query->where('department.faculty','=',$user->faculty_id);
-									$query->where('users.level','=','6');
+					$query->where('department.faculty','=',$user->faculty_id);
+					$query->where('users.level','=','6');
 
-									$query->select('student_gets_measured_grade_program_outcome.*');
-							break;
+					$query->select('student_gets_measured_grade_program_outcome.*');
+				break;
 
-							case 4:
-									$query->join('users','users.student_id','=','student_gets_measured_grade_program_outcome.student_id');
+				case 4:
+					$query->join('users','users.student_id','=','student_gets_measured_grade_program_outcome.student_id');
 
-									$query->where('users.department_id','=',$user->department_id);
-									$query->where('users.level','=','6');
+					$query->where('users.department_id','=',$user->department_id);
+					$query->where('users.level','=','6');
 
-									$query->select('student_gets_measured_grade_program_outcome.*');
-							break;
+					$query->select('student_gets_measured_grade_program_outcome.*');
+				break;
 
-							case 5:
-									$query->join('students_takes_sections','students_takes_sections.student_id','=','student_gets_measured_grade_program_outcome.student_id');
-									$query->join('instructors_gives_sections','instructors_gives_sections.section_id','=','students_takes_sections.section_id');
-									$query->join('users','users.student_id','=','student_gets_measured_grade_program_outcome.student_id');
+				case 5:
+					$query->join('students_takes_sections','students_takes_sections.student_id','=','student_gets_measured_grade_program_outcome.student_id');
+					$query->join('instructors_gives_sections','instructors_gives_sections.section_id','=','students_takes_sections.section_id');
+					$query->join('users','users.student_id','=','student_gets_measured_grade_program_outcome.student_id');
 
-									$query->where('instructors_gives_sections.instructor_email','=',$user->email);
+					$query->where('instructors_gives_sections.instructor_email','=',$user->email);
 
-									$query->select('student_gets_measured_grade_program_outcome.*');
-							break;
+					$query->select('student_gets_measured_grade_program_outcome.*');
+				break;
 						case 6:
 							// 6. seviyenin bu ekranda işi olmadığı için 403 verip gönderiyoruz.
 							// 403ün yönlendirme fonksiyonu vue tarafında gerçekleştirilecek.

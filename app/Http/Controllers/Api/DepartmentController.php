@@ -49,7 +49,7 @@ class DepartmentController extends ApiController
     }
 
     if ($request->has('faculty'))
-        $query->where('department.faculty', '=', $request->query('faculty'));
+      $query->where('department.faculty', '=', $request->query('faculty'));
 
     $query->join('faculty','faculty.id','=','department.faculty');
     $query->join('university','university.id','=','faculty.university');
