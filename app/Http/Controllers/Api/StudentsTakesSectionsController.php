@@ -19,82 +19,74 @@ use Validator;
 class StudentsTakesSectionsController extends ApiController
 {
 
-    public function uploadedFile(Request $request)
-    {
+  public function uploadedFile(Request $request)
+  {
+      $import = new StudentsTakesSectionsImport();
+      $import->import($request->fileUrl);
 
-        $import = new StudentsTakesSectionsImport();
-        $import->import($request->fileUrl);
+      // return($import->err);
+      return $this->apiResponse(ResaultType::Error, $import->err, 'hatalar', 403);
+  }
 
-        // return($import->err);
-        return $this->apiResponse(ResaultType::Error, $import->err, 'hatalar', 403);
-    }
+  public function index(Request $request)
+  {
+    $user = User::find(Auth::id());
+    $offset = $request->offset ? $request->offset : 0;
+    $limit = $request->limit ? $request->limit : 99999999999999;
+    $query = StudentsTakesSections::query();
 
+    switch ($user->level) {
+      case 3:
+        //********************************************* */
+        $query->join('users','users.student_id','=','students_takes_sections.student_id');
+        $query->join('section','section.id','=','students_takes_sections.section_id');
+        $query->join('course','course.id','=','section.course_id');
+        $query->join('department','department.id','=','course.department_id');
 
-    public function index(Request $request)
-    {
-        $user = User::find(Auth::id());
-        $offset = $request->offset ? $request->offset : 0;
-        $limit = $request->limit ? $request->limit : 99999999999999;
-        $query = StudentsTakesSections::query();
+        $query->where('users.student_id','=',$user->id);
 
-        switch ($user->level) {
-            case 3:
-                //********************************************* */
-                $query->join('users','users.student_id','=','students_takes_sections.student_id');
-                $query->join('section','section.id','=','students_takes_sections.section_id');
-                $query->join('course','course.id','=','section.course_id');
-                $query->join('department','department.id','=','course.department_id');
-
-                $query->where('users.student_id','=',$user->id);
-
-                $query->select('users.*', 'users.name as userName', 'section.title as sectionTitle');
-            break;
-
+        $query->select('users.*', 'users.name as userName', 'section.title as sectionTitle');
+      break;
 			case 4:
-                //********************************************* */
-                $query->join('users','users.student_id','=','students_takes_sections.student_id');
-                $query->join('section','section.id','=','students_takes_sections.section_id');
-                $query->join('course','course.id','=','section.course_id');
-                $query->join('faculty','faculty.id','=','course.faculty_id');
+        //********************************************* */
+        $query->join('users','users.student_id','=','students_takes_sections.student_id');
+        $query->join('section','section.id','=','students_takes_sections.section_id');
+        $query->join('course','course.id','=','section.course_id');
+        $query->join('faculty','faculty.id','=','course.faculty_id');
 
-                $query->where('users.student_id','=',$user->id);
+        $query->where('users.student_id','=',$user->id);
 
-                $query->select('users.*');
-            break;
+        $query->select('users.*');
+      break;
+      case 5:
+        $query->join('instructors_gives_sections','instructors_gives_sections.section_id','=','students_takes_sections.section_id');
 
-            case 5:
-                $query->join('instructors_gives_sections','instructors_gives_sections.section_id','=','students_takes_sections.section_id');
+        $query->where('instructors_gives_sections.instructor_id','=',$user->id);
 
-                $query->where('instructors_gives_sections.instructor_id','=',$user->id);
-
-                $query->select('students_takes_sections.*');
-            break;
-
-            case 6:
-                $query->where('students_takes_sections.student_id','=',$user->id);
-
-                $query->select('students_takes_sections.*');
-            break;
-
-            default:
-                $query->join('users','users.student_id','=','students_takes_sections.student_id');
-                $query->join('section','section.id','=','students_takes_sections.section_id');
-                $query->select('students_takes_sections.*', 'users.name as userName', 'section.title as sectionTitle');
-            break;
-        }
-
-        if ($request->has('student'))
-            $query->where('student_code', '=', $request->query('student'));
-        if ($request->has('section'))
-            $query->where('section_code', '=', $request->query('section'));
-
-        $length = count($query->get());
-        $data = $query->offset($offset)->limit($limit)->get();
-        if ($data) {
-            return $this->apiResponse(ResaultType::Success, $data, 'Listing: '.$offset.'-'.$limit, $length, 200);
-        } else {
-            return $this->apiResponse(ResaultType::Error, null, 'StudentsTakesSections Not Found', 0, 404);
-        }
+        $query->select('students_takes_sections.*');
+      break;
+      case 6:
+        $query->where('students_takes_sections.student_id','=',$user->id);
+        $query->select('students_takes_sections.*');
+      break;
+      default:
+        $query->join('users','users.student_id','=','students_takes_sections.student_id');
+        $query->join('section','section.id','=','students_takes_sections.section_id');
+        $query->select('students_takes_sections.*', 'users.name as userName', 'section.title as sectionTitle');
+      break;
+      }
+      if ($request->has('student'))
+        $query->where('student_code', '=', $request->query('student'));
+      if ($request->has('section'))
+        $query->where('section_code', '=', $request->query('section'));
+        
+      $length = count($query->get());
+      $data = $query->offset($offset)->limit($limit)->get();
+      if ($data) {
+        return $this->apiResponse(ResaultType::Success, $data, 'Listing: '.$offset.'-'.$limit, $length, 200);
+      } else {
+        return $this->apiResponse(ResaultType::Error, null, 'StudentsTakesSections Not Found', 0, 404);
+      }
     }
 
     public function store(Request $request)

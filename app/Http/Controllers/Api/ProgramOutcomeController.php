@@ -19,65 +19,60 @@ use Validator;
 
 class ProgramOutcomeController extends ApiController
 {
+  public function uploadedFile(Request $request)
+  {
+    $import = new ProgramOutcomeImport();
+    $import->import($request->fileUrl);
 
-    public function uploadedFile(Request $request)
-    {
-
-        $import = new ProgramOutcomeImport();
-        $import->import($request->fileUrl);
-
-        return $this->apiResponse(ResaultType::Error, $import->err, 'hatalar', 403);
-    }
+    return $this->apiResponse(ResaultType::Error, $import->err, 'hatalar', 403);
+  }
 
     public function index(Request $request)
     {
-        $user = User::find(Auth::id());
-        $offset = $request->offset ? $request->offset : 0;
-        $limit = $request->limit ? $request->limit : 99999999999999;
-        $query = ProgramOutcome::query();
-        switch ($user->level) {
-            case 3:
-                $query->join('department','department.id','=','program_outcome.department_id');
+      $user = User::find(Auth::id());
+      $offset = $request->offset ? $request->offset : 0;
+      $limit = $request->limit ? $request->limit : 99999999999999;
+      $query = ProgramOutcome::query();
+      switch ($user->level) {
+        case 3:
+          $query->join('department','department.id','=','program_outcome.department_id');
 
-                $query->where('department.faculty','=',$user->faculty_id);
+          $query->where('department.faculty','=',$user->faculty_id);
 
-                $query->select('program_outcome.*');
-            break;
+          $query->select('program_outcome.*');
+        break;
+  			case 4:
+          $query->where('program_outcome.department_id', '=', $user->department_id);
 
-			case 4:
-                $query->where('program_outcome.department_id', '=', $user->department_id);
+          $query->select('program_outcome.*');
+        break;
+        case 5:
+          $query->where('program_outcome.department_id','=',$user->department_id);
 
-                $query->select('program_outcome.*');
-            break;
+          $query->select('program_outcome.*');
+        break;
+        case 6:
+          $query->where('program_outcome.department_id','=',$user->department_id);
 
-            case 5:
-                $query->where('program_outcome.department_id','=',$user->department_id);
+          $query->select('program_outcome.*');
+        break;
+        default:
+          $query->select('program_outcome.*');
+        break;
+      }
 
-                $query->select('program_outcome.*');
-            break;
+      if ($request->has('code'))
+        $query->where('code', '=', $request->query('code'));
+      if ($request->has('department'))
+        $query->where('department_id', '=', $request->query('department'));
 
-            case 6:
-                $query->where('program_outcome.department_id','=',$user->department_id);
-
-                $query->select('program_outcome.*');
-            break;
-            default:
-            $query->select('program_outcome.*');
-            break;
-        }
-
-        if ($request->has('code'))
-            $query->where('code', '=', $request->query('code'));
-        if ($request->has('department'))
-            $query->where('department_id', '=', $request->query('department'));
-
-        $length = count($query->get());
-        $data = $query->offset($offset)->limit($limit)->get();
-        if ($data) {
-            return $this->apiResponse(ResaultType::Success, $data, 'Listing: '.$offset.'-'.$limit, $length, 200);
-        } else {
-            return $this->apiResponse(ResaultType::Error, null, 'ProgramOutcome Not Found', 0, 404);
-        }
+      $length = count($query->get());
+      $data = $query->offset($offset)->limit($limit)->get();
+      if ($data) {
+        return $this->apiResponse(ResaultType::Success, $data, 'Listing: '.$offset.'-'.$limit, $length, 200);
+      } else {
+        return $this->apiResponse(ResaultType::Error, null, 'ProgramOutcome Not Found', 0, 404);
+      }
     }
 
     public function store(Request $request)
@@ -86,10 +81,10 @@ class ProgramOutcomeController extends ApiController
 			switch ($user->level) {
 				case 1:
 					$validator = Validator::make($request->all(), [
-							'explanation' => 'required',
-							'code' => 'required',
-							'department_id' => 'required',
-							]);
+            'explanation' => 'required',
+            'code' => 'required',
+            'department_id' => 'required'
+          ]);
 					if ($validator->fails()) {
 							return $this->apiResponse(ResaultType::Error, $validator->errors(), 'Validation Error', 422);
 					}
