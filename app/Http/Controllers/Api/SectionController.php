@@ -52,7 +52,7 @@ class SectionController extends ApiController
         break;
         case 5:
           $query->join('instructors_gives_sections', 'instructors_gives_sections.section_id', '=', 'section.id');
-          $query->join('course', 'course.department', '=', 'department.id');
+          $query->join('course', 'course.department_id', '=', 'department.id');
           $query->join('department', 'department.id', '=', 'course.department_id');
           $query->join('faculty', 'faculty.id', '=', 'department.faculty');
           $query->join('users', 'users.faculty_id','=','faculty.id');
