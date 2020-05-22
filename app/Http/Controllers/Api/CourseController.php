@@ -126,7 +126,6 @@ class CourseController extends ApiController
     ->join('department_id','department.id','=','course.department')
     ->join('faculty','faculty.id','=','department.faculty')
     ->join('university','university.id','=','faculty.university')
-    ->join('mix','mix.id','=','course.mix')
     ->select('course.*','department.id as departmentID', 'faculty.id as facultyID', 'university.id as universityID','department.title as departmentTitle', 'faculty.title as facultyTitle', 'university.name as universityName')
     ->first();
     if ($data) {
