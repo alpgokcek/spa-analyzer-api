@@ -76,9 +76,9 @@ class StudentsTakesSectionsController extends ApiController
       break;
       }
       if ($request->has('student'))
-        $query->where('student_code', '=', $request->query('student'));
+        $query->where('student_id', '=', $request->query('student'));
       if ($request->has('section'))
-        $query->where('section_code', '=', $request->query('section'));
+        $query->where('section_id', '=', $request->query('section'));
         
       $length = count($query->get());
       $data = $query->offset($offset)->limit($limit)->get();
@@ -95,8 +95,8 @@ class StudentsTakesSectionsController extends ApiController
 			switch ($user->level) {
 				case 1:
 					$validator = Validator::make($request->all(), [
-							'student_code' => 'required',
-							'section_code' => 'required',
+							'student_id' => 'required',
+							'section_id' => 'required',
 							'letter_grade' => 'nullable',
 							'average' => 'nullable',
 							]);
@@ -104,13 +104,13 @@ class StudentsTakesSectionsController extends ApiController
 							return $this->apiResponse(ResaultType::Error, $validator->errors(), 'Validation Error', 422);
 					}
 					foreach ($split as $key) {
-							$user = UsersStudent::where('id','=', request('student_code'))->first();
+							$user = UsersStudent::where('id','=', request('student_id'))->first();
 							if ($user){
-									$section = Section::where('id','=', request('section_code'))->first();
+									$section = Section::where('id','=', request('section_id'))->first();
 									if ($section) {
 											$data = new StudentsTakesSections();
-											$data->student_code = request('student_code');
-											$data->section_code = request('section_code');
+											$data->student_id = request('student_id');
+											$data->section_id = request('section_id');
 											$data->letter_grade = request('letter_grade');
 											$data->average = request('average');
 											$data->save();
@@ -159,8 +159,8 @@ class StudentsTakesSectionsController extends ApiController
     public function update(Request $request, $id)
     {
         $validator = Validator::make($request->all(), [
-            'student_code' => 'nullable',
-            'section_code' => 'nullable',
+            'student_id' => 'nullable',
+            'section_id' => 'nullable',
             'letter_grade' => 'nullable',
             'average' => 'nullable',
         ]);
@@ -170,11 +170,11 @@ class StudentsTakesSectionsController extends ApiController
         $data = StudentsTakesSections::find($id);
 
         if ($data) {
-            if (request('student_code') != '') {
-                $data->student_code = request('student_code');
+            if (request('student_id') != '') {
+                $data->student_id = request('student_id');
             }
-            if (request('section_code') != '') {
-                $data->section_code = request('section_code');
+            if (request('section_id') != '') {
+                $data->section_id = request('section_id');
             }
             if (request('letter_grade') != '') {
                 $data->letter_grade = request('letter_grade');
