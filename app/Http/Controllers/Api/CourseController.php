@@ -34,7 +34,7 @@ class CourseController extends ApiController
     $query = Course::query();
 
     if ($request->has('department'))
-      $query->where('department', $request->query('department'));
+      $query->where('department_id', $request->query('department'));
 
     if ($request->has('code'))
       $query->where('code', $request->query('code'));
