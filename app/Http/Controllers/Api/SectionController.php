@@ -38,14 +38,14 @@ class SectionController extends ApiController
 
       switch ($user->level) {
         case 3:
-          $query->join('course', 'course.id', '=', 'section.course_id');
+          $query->join('course', 'course.id', '=', 'section.course');
           $query->join('department', 'department.id', '=', 'course.department_id');
           $query->join('faculty', 'faculty.id', '=', 'department.faculty');
           $query->join('users', 'users.faculty_id','=','faculty.id');
           $query->where('users.id','=',$user->id);
           break;
         case 4:
-          $query->join('course', 'course.id', '=', 'section.course_id');
+          $query->join('course', 'course.id', '=', 'section.course');
           $query->join('department', 'department.id', '=', 'course.department_id');
           $query->join('users', 'users.department_id','=','department.id');
           $query->where('users.id','=',$user->id);
@@ -64,7 +64,7 @@ class SectionController extends ApiController
           break;
         default:
           // 1 ve 2. leveller kontrol edilmeyeceği için diğer sorguları default içine ekliyoruz
-          $query->join('course', 'course.id', '=', 'section.course_id');
+          $query->join('course', 'course.id', '=', 'section.course');
         break;
       }
       // örnek olarak tüm assessment tablosunun yanında user.name değerini almak için
