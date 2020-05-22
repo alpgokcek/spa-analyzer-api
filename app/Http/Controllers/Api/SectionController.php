@@ -34,18 +34,18 @@ class SectionController extends ApiController
       $query = Section::query();
 
       if ($request->has('course'))
-        $query->where('course', $request->query('course'));
+        $query->where('section.course_id', $request->query('course'));
 
       switch ($user->level) {
         case 3:
-          $query->join('course', 'course.id', '=', 'section.course');
+          $query->join('course', 'course.id', '=', 'section.course_id');
           $query->join('department', 'department.id', '=', 'course.department_id');
           $query->join('faculty', 'faculty.id', '=', 'department.faculty');
           $query->join('users', 'users.faculty_id','=','faculty.id');
           $query->where('users.id','=',$user->id);
           break;
         case 4:
-          $query->join('course', 'course.id', '=', 'section.course');
+          $query->join('course', 'course.id', '=', 'section.course_id');
           $query->join('department', 'department.id', '=', 'course.department_id');
           $query->join('users', 'users.department_id','=','department.id');
           $query->where('users.id','=',$user->id);
@@ -64,7 +64,7 @@ class SectionController extends ApiController
           break;
         default:
           // 1 ve 2. leveller kontrol edilmeyeceği için diğer sorguları default içine ekliyoruz
-          $query->join('course', 'course.id', '=', 'section.course');
+          $query->join('course', 'course.id', '=', 'section.course_id');
         break;
       }
       // örnek olarak tüm assessment tablosunun yanında user.name değerini almak için
@@ -86,7 +86,7 @@ class SectionController extends ApiController
     switch ($user->level) {
       case 1:
         $validator = Validator::make($request->all(), [
-          'course' => 'required',
+          'course_id' => 'required',
           'code' => 'required',
           'title' => 'required',
           'status' => 'required'
@@ -95,7 +95,7 @@ class SectionController extends ApiController
           return $this->apiResponse(ResaultType::Error, $validator->errors(), 'Validation Error', 422);
         }
         $data = new Section();
-        $data->course = request('course');
+        $data->course_id = request('course_id');
         $data->code = request('code');
         $data->title = request('title');
         $data->status = request('status');
