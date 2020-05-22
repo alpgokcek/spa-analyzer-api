@@ -33,8 +33,7 @@ class SectionController extends ApiController
       $limit = $request->limit ? $request->limit : 99999999999999;
       $query = Section::query();
 
-      if ($request->has('course'))
-        $query->where('section.course_id', $request->query('course'));
+
 
       switch ($user->level) {
         case 3:
@@ -51,12 +50,13 @@ class SectionController extends ApiController
           $query->where('users.id','=',$user->id);
         break;
         case 5:
-          $query->join('instructors_gives_sections', 'instructors_gives_sections.section_id', '=', 'section.id');
-          $query->join('course', 'course.department_id', '=', 'section.course_id');
-          $query->join('department', 'department.id', '=', 'course.department_id');
-          $query->join('faculty', 'faculty.id', '=', 'department.faculty');
-          $query->join('users', 'users.faculty_id','=','faculty.id');
-          $query->where('instructors_gives_sections.instructor_email','=',$user->email);
+					$query->join('instructors_gives_sections', 'instructors_gives_sections.section_id', '=', 'section.id');
+					$query->join('users', 'users.email','=','instructors_gives_sections.instructor_email');
+					$query->join('faculty', 'faculty.id', '=', 'users.faculty_id');
+					$query->join('department', 'department.faculty', '=', 'faculty.id');
+					$query->join('course', 'course.department_id', '=', 'department.id');
+					$query->where('instructors_gives_sections.instructor_email','=',$user->email);
+					$query->where('course.id','=','course_id');
           break;
         case 6:
           // 6. seviyenin bu ekranda işi olmadığı için 403 verip gönderiyoruz.
@@ -69,7 +69,11 @@ class SectionController extends ApiController
         break;
       }
       // örnek olarak tüm assessment tablosunun yanında user.name değerini almak için
-      // 'assessment.*', 'users.name as userName'...
+			// 'assessment.*', 'users.name as userName'...
+
+			if ($request->has('course'))
+				$query->where('course_id', intval($request->query('course')));
+
       $query->select('section.*', 'course.title as courseName');
       // bu örnek üzerinden yeni değerler gönderebilirsiniz.
       $length = count($query->get());
