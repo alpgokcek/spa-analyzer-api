@@ -50,48 +50,50 @@ class StudentGetsMeasuredGradeProgramOutcomeController extends ApiController
 
 					$query->select('student_gets_measured_grade_program_outcome.*');
 				break;
-						case 6:
-							// 6. seviyenin bu ekranda işi olmadığı için 403 verip gönderiyoruz.
-							// 403ün yönlendirme fonksiyonu vue tarafında gerçekleştirilecek.
-							return $this->apiResponse(ResaultType::Error, 403, 'Authorization Error', 0, 403);
-							break;
-						default:
-					// 1 ve 2. leveller kontrol edilmeyeceği için diğer sorguları default içine ekliyoruz
-									$query->select('student_gets_measured_grade_program_outcome.*');
-						break;
-				}
+					case 6:
+						// 6. seviyenin bu ekranda işi olmadığı için 403 verip gönderiyoruz.
+						// 403ün yönlendirme fonksiyonu vue tarafında gerçekleştirilecek.
+					return $this->apiResponse(ResaultType::Error, 403, 'Authorization Error', 0, 403);
+				break;
+				default:
+				// 1 ve 2. leveller kontrol edilmeyeceği için diğer sorguları default içine ekliyoruz
+					$query->select('student_gets_measured_grade_program_outcome.*');
+				break;
 			}
-        else{
-					switch ($user->level) {
-						case 6:
-							return $this->apiResponse(ResaultType::Error, 403, 'Authorization Error', 0, 403);
-							break;
-						default:
-							$query->join('program_outcome','program_outcome.id','=','student_gets_measured_grade_program_outcome.program_outcome_id');
-							$query->join('course','course.id','=','student_gets_measured_grade_program_outcome.course_id');
-							$query->join('users','users.student_id','=','student_gets_measured_grade_program_outcome.student_id');
-							if($request->has('student'))
-								$query->where('users.student_id', '=', intval($request->query('student')));
-							if($request->has('code'))
-								$query->where('program_outcome.id', '=', intval($request->query('code')));
-							$query->select('course.code','course.title','course.year_and_term','student_gets_measured_grade_program_outcome.*');
-							break;
-					}
+		}
+		else{
+			switch ($user->level) {
+				case 6:
+					return $this->apiResponse(ResaultType::Error, 403, 'Authorization Error', 0, 403);
+					break;
+				default:
+					$query->join('program_outcome','program_outcome.id','=','student_gets_measured_grade_program_outcome.program_outcome_id');
+					$query->join('course','course.id','=','student_gets_measured_grade_program_outcome.course_id');
+					$query->join('users','users.student_id','=','student_gets_measured_grade_program_outcome.student_id');
+					if($request->has('student'))
+						$query->where('users.student_id', '=', intval($request->query('student')));
+					if($request->has('code'))
+						$query->where('program_outcome.id', '=', intval($request->query('code')));
+					$query->select('course.code','course.title','course.year_and_term','student_gets_measured_grade_program_outcome.*');
+					break;
 			}
+		}
+		if ($request->has('program'))
+			$query->where('program_outcome_id', '=', $request->query('program'));
+		if ($request->has('student'))
+			$query->where('student_id', '=', $request->query('student'));
 
-
-
-				$length = count($query->get());
-				if(intval($request->query('type')) == 1)
-					$data = $query->offset($offset)->limit($limit)->orderBy('course.year_and_term', 'asc')->get();
-				else
-        	$data = $query->offset($offset)->limit($limit)->get();
-        if ($data) {
-            return $this->apiResponse(ResaultType::Success, $data, 'Listing: '.$offset.'-'.$limit, $length, 200);
-        } else {
-            return $this->apiResponse(ResaultType::Error, null, 'StudentGetsMeasuredGradeProgramOutcome Not Found', 0, 404);
-        }
-    }
+		$length = count($query->get());
+		if(intval($request->query('type')) == 1)
+			$data = $query->offset($offset)->limit($limit)->orderBy('course.year_and_term', 'asc')->get();
+		else
+			$data = $query->offset($offset)->limit($limit)->get();
+		if ($data) {
+			return $this->apiResponse(ResaultType::Success, $data, 'Listing: '.$offset.'-'.$limit, $length, 200);
+		} else {
+			return $this->apiResponse(ResaultType::Error, null, 'StudentGetsMeasuredGradeProgramOutcome Not Found', 0, 404);
+		}
+	}
 
     public function store(Request $request)
     {
