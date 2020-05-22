@@ -79,9 +79,9 @@ class StudentGetsMeasuredGradeProgramOutcomeController extends ApiController
 			}
 		}
 		if ($request->has('program'))
-			$query->where('program_outcome_id', '=', $request->query('program'));
+			$query->where('student_gets_measured_grade_program_outcome.program_outcome_id', '=', $request->query('program'));
 		if ($request->has('student'))
-			$query->where('student_id', '=', $request->query('student'));
+			$query->where('student_gets_measured_grade_program_outcome.student_id', '=', $request->query('student'));
 
 		$length = count($query->get());
 		if(intval($request->query('type')) == 1)
