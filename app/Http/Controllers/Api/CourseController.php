@@ -122,9 +122,7 @@ class CourseController extends ApiController
 
   public function show($id)
   {
-    $data = Course::find($id)
-    ->select('course.*')
-    ->first();
+    $data = Course::find($id);
     if ($data) {
       return $this->apiResponse(ResaultType::Success, $data, 'Course Detail', 201);
     } else {
