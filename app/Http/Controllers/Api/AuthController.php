@@ -28,6 +28,7 @@ class AuthController extends Controller
             'photo' => $user->photo,
             'access_token' => $newToken,
             'level' => $user->level,
+            'user' => $user,
             'time' => time()
           ]);
         }
