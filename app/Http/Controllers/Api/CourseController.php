@@ -34,10 +34,10 @@ class CourseController extends ApiController
     $query = Course::query();
 
     if ($request->has('department'))
-      $query->where('department_id', $request->query('department'));
+      $query->where('course.department_id', $request->query('department'));
 
     if ($request->has('code'))
-      $query->where('code', $request->query('code'));
+      $query->where('course.code', $request->query('code'));
 
     switch ($user->level) {
       case 3:
