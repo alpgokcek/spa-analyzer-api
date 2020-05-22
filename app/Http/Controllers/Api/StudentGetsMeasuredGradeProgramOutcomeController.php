@@ -85,7 +85,7 @@ class StudentGetsMeasuredGradeProgramOutcomeController extends ApiController
 
 		$length = count($query->get());
 		if(intval($request->query('type')) == 1)
-			$data = $query->offset($offset)->limit($limit)->orderBy('course.year_and_term', 'desc')->get();
+			$data = $query->offset($offset)->limit($limit)->orderBy('course.year_and_term', 'asc')->get();
 		else
 			$data = $query->offset($offset)->limit($limit)->get();
 		if ($data) {
