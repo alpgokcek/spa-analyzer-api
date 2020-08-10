@@ -81,9 +81,9 @@ class UserController extends ApiController
         }
     }
 
-    public function show($email)
+    public function show($token)
     {
-        $data = User::where('email','=',$email)->first();
+        $data = User::where('api_token','=',$token)->first();
         if (count($data) >= 1) {
             return response()->json($data);
         } else {
