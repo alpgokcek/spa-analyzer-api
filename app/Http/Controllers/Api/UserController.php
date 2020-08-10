@@ -84,7 +84,7 @@ class UserController extends ApiController
     public function show($token)
     {
         $data = User::where('api_token','=',$token)->first();
-        if (count($data) >= 1) {
+        if ($data) {
             return response()->json($data);
         } else {
             return response()->json(['error' => 'Content Not Found'], 404);
