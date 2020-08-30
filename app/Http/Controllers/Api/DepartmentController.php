@@ -47,6 +47,9 @@ class DepartmentController extends ApiController
         $query->select('department.*');
       break;
     }
+    if ($request->has('status')) {
+      $query->where('department.status', '=', $request->status);
+    }
 
     if ($request->has('faculty'))
       $query->where('department.faculty', '=', $request->query('faculty'));
@@ -153,5 +156,6 @@ class DepartmentController extends ApiController
       return $this->apiResponse(ResaultType::Error, $data, 'Deleted Error', 500);
     }
   }
+
 }
 

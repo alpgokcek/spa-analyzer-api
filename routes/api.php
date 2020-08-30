@@ -52,6 +52,4 @@ Route::middleware('api-token')->group(function() {
     Route::post('/course/uploadedFile', 'Api\CourseController@uploadedFile');
 		Route::post('/program-outcome/uploadedFile', 'Api\ProgramOutcomeController@uploadedFile');
 		Route::post('/user/uploadedFile', 'Api\UserController@uploadedFile');
-
-
 });
