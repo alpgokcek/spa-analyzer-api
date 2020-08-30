@@ -21,6 +21,10 @@ class FacultyController extends ApiController
 	$limit = $request->limit ? $request->limit : 99999999999999;
 	$query = Faculty::query();
 
+	if ($request->has('status')) {
+    $query->where('faculty.status', '=', $request->status);
+	}
+
 	switch ($user->level) {
 		case 3:
 			return $this->apiResponse(ResaultType::Error, 403, 'Authorization Error', 0, 403);
@@ -42,6 +46,8 @@ class FacultyController extends ApiController
 			$query->select('faculty.*');
 			break;
 	}
+
+
 	$query->join('university','university.id','faculty.university');
 	$query->select('faculty.*', 'university.name as universityName');
 	$length = count($query->get());
