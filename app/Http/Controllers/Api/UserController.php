@@ -44,15 +44,17 @@ class UserController extends ApiController
                 break;
 
             default:
-                // 1 ve 2. leveller kontrol edilmeyeceği için diğer sorguları default içine ekliyoruz
-                $query->join('department', 'department.faculty', '=', 'faculty.id');
-                $query->join('faculty','faculty.university','=','university.id');
-                $query->join('university','university.id' ,'=','users.university');
-                $query->where($request->query('department'),'=', 'users.department_id');
+								// 1 ve 2. leveller kontrol edilmeyeceği için diğer sorguları default içine ekliyoruz
+								$query->join('university','university.id' ,'=','users.university');
+								$query->join('faculty','faculty.id','=','users.faculty_id');
+								$query->join('department', 'department.id', '=', 'users.department_id');
+								if ($request->has('department')){
+									$query->where( 'users.department_id', '=',$request->query('department'));
+								}
                 if ($request->has('level')){
-                    $query->where($request->query('level'),'=', 'users.level');
+                    $query->where( 'users.level', '=', $request->query('level'));
                 }
-                $query->select('users.name as name', 'department.name as departmentName', 'users.student_id as studentID', 'users.level as level', 'university.name', 'faculty.title');
+                $query->select('users.name as name', 'department.name as departmentName', 'users.student_id as studentID', 'users.level as level', 'university.name as universityName', 'faculty.title as facultyTitle');
                 break;
             }
 
