@@ -36,6 +36,24 @@ class UserController extends ApiController
 
         if ($request->has('university'))
             $query->where('university', '=', $request->query('university'));
+        
+        switch ($user->level) {
+            case 6:
+                return $this->apiResponse(ResaultType::Error, 403, 'Authorization Error', 0, 403);
+                break;
+
+            default:
+                // 1 ve 2. leveller kontrol edilmeyeceği için diğer sorguları default içine ekliyoruz
+                $query->join('department', 'department.faculty', '=', 'faculty.id');
+                $query->join('faculty','faculty.university','=','university.id');
+                $query->join('university','university.id' ,'=','users.university');
+                $query->where($request->query('department'),'=', 'users.department_id');
+                if ($request->has('level')){
+                    $query->where($request->query('level'),'=', 'users.level');
+                }               
+                $query->select('users.name as name', 'department.name as departmentName', 'users.student_id studentID', 'users.level as level', 'university.name', 'faculty.title');
+                break;
+            }
 
         $length = count($query->get());
         $data = $query->offset($offset)->limit($limit)->get();
