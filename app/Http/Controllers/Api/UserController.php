@@ -52,7 +52,7 @@ class UserController extends ApiController
                 if ($request->has('level')){
                     $query->where($request->query('level'),'=', 'users.level');
                 }
-                $query->select('users.name as name', 'department.name as departmentName', 'users.student_id studentID', 'users.level as level', 'university.name', 'faculty.title');
+                $query->select('users.name as name', 'department.name as departmentName', 'users.student_id as studentID', 'users.level as level', 'university.name', 'faculty.title');
                 break;
             }
 
