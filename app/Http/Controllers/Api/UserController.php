@@ -30,13 +30,14 @@ class UserController extends ApiController
 
     public function index(Request $request)
     {
+				$user = User::find(Auth::id()); // oturum açan kişinin bilgilerini buradan alıyoruz.
         $offset = $request->offset ? $request->offset : 0;
         $limit = $request->limit ? $request->limit : 99999999999999;
         $query = User::query();
 
         if ($request->has('university'))
             $query->where('university', '=', $request->query('university'));
-        
+
         switch ($user->level) {
             case 6:
                 return $this->apiResponse(ResaultType::Error, 403, 'Authorization Error', 0, 403);
@@ -50,7 +51,7 @@ class UserController extends ApiController
                 $query->where($request->query('department'),'=', 'users.department_id');
                 if ($request->has('level')){
                     $query->where($request->query('level'),'=', 'users.level');
-                }               
+                }
                 $query->select('users.name as name', 'department.name as departmentName', 'users.student_id studentID', 'users.level as level', 'university.name', 'faculty.title');
                 break;
             }
