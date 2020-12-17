@@ -99,7 +99,7 @@ class FacultyController extends ApiController
 
 	public function show($id)
 	{
-		$data = Faculty::where('token', '=', $id)->first();
+		$data = Faculty::where('id', '=', $id)->first();
 		if ($data) {
 			return $this->apiResponse(ResaultType::Success, $data, 'Faculty Detail', 201);
 		} else {

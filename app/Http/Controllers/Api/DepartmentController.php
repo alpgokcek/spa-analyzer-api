@@ -47,16 +47,18 @@ class DepartmentController extends ApiController
         $query->select('department.*');
       break;
     }
-    if ($request->has('status')) {
-      $query->where('department.status', '=', $request->status);
-    }
-
-    if ($request->has('faculty'))
-      $query->where('department.faculty', '=', $request->query('faculty'));
+    
 
     $query->join('faculty','faculty.id','=','department.faculty');
     $query->join('university','university.id','=','faculty.university');
     $query->select('department.*','faculty.title as facultyName', 'university.name as universityName', 'university.id as university');
+    if ($request->has('status')) {
+      $query->where('department.status', '=', $request->status);
+    }
+    if ($request->has('faculty')){
+      $query->where('department.faculty', '=', $request->query('faculty'));
+    }
+    
     $length = count($query->get());
     $data = $query->offset($offset)->limit($limit)->get();
 
