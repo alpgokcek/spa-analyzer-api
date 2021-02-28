@@ -78,7 +78,10 @@ class CourseOutcomeController extends ApiController
     {
 			$user = User::find(Auth::id()); // oturum açan kişinin bilgilerini buradan alıyoruz.
 			switch ($user->level) {
-				case 5:
+				case 6:
+					return $this->apiResponse(ResaultType::Error, 403, 'Authorization Error', 0, 403);
+					break;
+				default:
 					$query = Course::query();
 					$query->join('section','section.course_id','=','course.id');
 					$query->join('instructors_gives_sections','section.id','=','instructors_gives_sections.section_id');
@@ -130,9 +133,6 @@ class CourseOutcomeController extends ApiController
 						} else {
 								return $this->apiResponse(ResaultType::Error, null, 'CourseOutcome not saved', 500);
 						}
-						break;
-					default:
-						return $this->apiResponse(ResaultType::Error, 403, 'Authorization Error', 0, 403);
 						break;
 				}
     }
