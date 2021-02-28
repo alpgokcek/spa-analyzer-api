@@ -93,7 +93,7 @@ class CourseController extends ApiController
           return $this->apiResponse(ResaultType::Error, $validator->errors(), 'Validation Error', 422);
         }
         $data = new Course();
-        $data->department = request('department_id');
+        $data->department_id = request('department_id');
         $data->code = request('code');
         $data->year_and_term = request('year_and_term');
         $data->title = request('title');
