@@ -31,7 +31,7 @@ class CourseOutcomeController extends ApiController
 
                 $query->where('department.faculty','=',$user->faculty_id);
 
-                $query->select('course_outcome.*');
+                $query->select('course_outcome.*', 'course.title as courseName');
             break;
 
             case 4:
@@ -39,7 +39,7 @@ class CourseOutcomeController extends ApiController
 
                 $query->where('course.department','=',$user->department_id);
 
-                $query->select('course_outcome.*');
+                $query->select('course_outcome.*', 'course.title as courseName');
             break;
 
             case 5:
@@ -49,7 +49,7 @@ class CourseOutcomeController extends ApiController
 
                 $query->where('instructors_gives_sections.instructor_email','=',$user->email);
 
-                $query->select('course_outcome.*');
+                $query->select('course_outcome.*', 'course.title as courseName');
             break;
             case 6:
                 // 6. seviyenin bu ekranda işi olmadığı için 403 verip gönderiyoruz.
@@ -57,7 +57,8 @@ class CourseOutcomeController extends ApiController
                 return $this->apiResponse(ResaultType::Error, 403, 'Authorization Error', 0, 403);
             break;
             default:
-                $query->select('course_outcome.*');
+								$query->join('course','course.id','=','course_outcome.course_id');
+                $query->select('course_outcome.*', 'course.title as courseName');
             break;
         }
 
