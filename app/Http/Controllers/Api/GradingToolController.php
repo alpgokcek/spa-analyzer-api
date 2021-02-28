@@ -29,7 +29,7 @@ class GradingToolController extends ApiController
 
 						$query->where('department.faculty','=',$user->faculty_id);
 
-			      $query->select('grading_tool.*', 'course.title as courseName', 'course.id as course_id');
+						$query->select('grading_tool.*', 'course.title as courseName', 'course.id as course_id', 'assessment.name as assessmentName');
 
             break;
 				case 4:
@@ -39,7 +39,7 @@ class GradingToolController extends ApiController
 
 						$query->where('department.id','=',$user->department_id);
 
-						$query->select('grading_tool.*', 'course.title as courseName', 'course.id as course_id');
+						$query->select('grading_tool.*', 'course.title as courseName', 'course.id as course_id', 'assessment.name as assessmentName');
 
           break;
 					case 5:
@@ -50,7 +50,7 @@ class GradingToolController extends ApiController
 
 						$query->where('instructors_gives_sections.instructor_email','=',$user->email);
 
-						$query->select('grading_tool.*', 'course.title as courseName', 'course.id as course_id');
+						$query->select('grading_tool.*', 'course.title as courseName', 'course.id as course_id', 'assessment.name as assessmentName');
             break;
           case 6:
             // 6. seviyenin bu ekranda işi olmadığı için 403 verip gönderiyoruz.
@@ -59,7 +59,9 @@ class GradingToolController extends ApiController
             break;
           default:
 						// 1 ve 2. leveller kontrol edilmeyeceği için diğer sorguları default içine ekliyoruz
-              $query->select('grading_tool.*', 'course.title as courseName', 'course.id as course_id');
+							$query->join('assessment','assessment.id','=','grading_tool.assessment_id');
+							$query->join('course', 'course.id', '=', 'assessment.course_id');
+              $query->select('grading_tool.*', 'course.title as courseName', 'course.id as course_id', 'assessment.name as assessmentName');
 
           break;
         }
