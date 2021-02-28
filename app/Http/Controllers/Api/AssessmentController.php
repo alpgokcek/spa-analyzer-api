@@ -58,7 +58,7 @@ class AssessmentController extends ApiController
 			$query->where('course.id','=',$request->course);
       // örnek olarak tüm assessment tablosunun yanında user.name değerini almak için
       // 'assessment.*', 'users.name as userName'...
-      $query->select('assessment.*');
+      $query->select('assessment.*', 'course.title as courseName');
       // bu örnek üzerinden yeni değerler gönderebilirsiniz.
       $length = count($query->get());
       $data = $query->offset($offset)->limit($limit)->get();
