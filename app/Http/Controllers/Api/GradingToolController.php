@@ -29,7 +29,7 @@ class GradingToolController extends ApiController
 
 						$query->where('department.faculty','=',$user->faculty_id);
 
-			      $query->select('grading_tool.*');
+			      $query->select('grading_tool.*', 'course.title as courseName', 'course.id as course_id');
 
             break;
 				case 4:
@@ -39,7 +39,7 @@ class GradingToolController extends ApiController
 
 						$query->where('department.id','=',$user->department_id);
 
-						$query->select('grading_tool.*');
+						$query->select('grading_tool.*', 'course.title as courseName', 'course.id as course_id');
 
           break;
 					case 5:
@@ -50,7 +50,7 @@ class GradingToolController extends ApiController
 
 						$query->where('instructors_gives_sections.instructor_email','=',$user->email);
 
-						$query->select('grading_tool.*');
+						$query->select('grading_tool.*', 'course.title as courseName', 'course.id as course_id');
             break;
           case 6:
             // 6. seviyenin bu ekranda işi olmadığı için 403 verip gönderiyoruz.
@@ -59,7 +59,7 @@ class GradingToolController extends ApiController
             break;
           default:
 						// 1 ve 2. leveller kontrol edilmeyeceği için diğer sorguları default içine ekliyoruz
-                        $query->select('grading_tool.*');
+              $query->select('grading_tool.*', 'course.title as courseName', 'course.id as course_id');
 
           break;
         }
@@ -80,7 +80,10 @@ class GradingToolController extends ApiController
     {
 				$user = User::find(Auth::id()); // oturum açan kişinin bilgilerini buradan alıyoruz.
 				switch ($user->level) {
-					case 5:
+					case 6:
+						return $this->apiResponse(ResaultType::Error, 403, 'Authorization Error', 0, 403);
+						break;
+					default:
               $query = Course::query();
               $query->join('assessment','assessment.course_id','=','course.id');
 							$query->join('section','section.course_id','=','course.id');
@@ -121,9 +124,7 @@ class GradingToolController extends ApiController
 							return $this->apiResponse(ResaultType::Error, null, 'GradingTool not saved', 500);
 					}
 						break;
-					default:
-						return $this->apiResponse(ResaultType::Error, 403, 'Authorization Error', 0, 403);
-						break;
+
 				}
 		}
 
