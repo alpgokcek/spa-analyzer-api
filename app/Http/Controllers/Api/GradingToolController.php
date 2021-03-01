@@ -92,7 +92,6 @@ class GradingToolController extends ApiController
               $query->join('instructors_gives_sections','section.id','=','instructors_gives_sections.section_id');
 
 						$query->where('instructors_gives_sections.instructor_email','=',$user->email);
-						$query->where('course.id','=',request('course_id'));
 						$query->where('assessment.id','=',request('assessment_id'));
 						$length = count($query->get());
 
