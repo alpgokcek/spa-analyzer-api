@@ -83,7 +83,8 @@ class ProgramOutcomeController extends ApiController
 					$validator = Validator::make($request->all(), [
             'explanation' => 'required',
             'code' => 'required',
-            'department_id' => 'required'
+            'department_id' => 'required',
+						'year_and_term' => 'required',
           ]);
 					if ($validator->fails()) {
 							return $this->apiResponse(ResaultType::Error, $validator->errors(), 'Validation Error', 422);
@@ -92,6 +93,7 @@ class ProgramOutcomeController extends ApiController
 					$data->explanation = request('explanation');
 					$data->code = request('code');
 					$data->department_id = request('department_id');
+					$data->year_and_term = request('year_and_term');
 					$data->save();
 					if ($data) {
 							$log = new Log();
