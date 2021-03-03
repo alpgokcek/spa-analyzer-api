@@ -100,7 +100,7 @@ class SectionController extends ApiController
         }
         $data = new Section();
         $data->course_id = request('course_id');
-        $data->code = request('is_file_uploaded') || '0';
+        $data->is_file_uploaded = request('is_file_uploaded') || '0';
         $data->title = request('title');
         $data->status = request('status');
         $data->save();
