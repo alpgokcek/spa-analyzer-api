@@ -92,7 +92,6 @@ class SectionController extends ApiController
       case 1:
         $validator = Validator::make($request->all(), [
           'course_id' => 'required',
-          'code' => 'required',
           'title' => 'required',
           'status' => 'required'
         ]);
@@ -101,7 +100,7 @@ class SectionController extends ApiController
         }
         $data = new Section();
         $data->course_id = request('course_id');
-        $data->code = request('code');
+        $data->code = request('is_file_uploaded') || '0';
         $data->title = request('title');
         $data->status = request('status');
         $data->save();
