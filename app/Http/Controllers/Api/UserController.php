@@ -54,7 +54,21 @@ class UserController extends ApiController
                 if ($request->has('level')){
                     $query->where( 'users.level', '=', $request->query('level'));
                 }
-                $query->select('users.id as id', 'users.name as name', 'department.name as departmentName', 'users.student_id as studentID', 'users.level as level', 'university.name as universityName', 'faculty.title as facultyTitle');
+                $query->select(
+									'users.id as id',
+									'users.name as name',
+									'users.email as email',
+									'users.phone as phone',
+									'users.university as university_id',
+									'users.faculty_id as faculty_id',
+									'department.name as departmentName',
+									'users.department_id as department_id',
+									'users.student_id as studentID',
+									'users.level as level',
+									'university.name as universityName',
+									'faculty.title as facultyTitle',
+									'users.api_token as api_token',
+								);
                 break;
             }
 
@@ -72,11 +86,12 @@ class UserController extends ApiController
     {
         $validator = Validator::make($request->all(), [
             'name' => 'required',
-            'company' => 'required',
+            'university' => 'required',
+						'faculty_id' => 'required',
+						'department_id' => 'required',
             'email' => 'required|unique:users,email|email',
             'password' => 'required',
-            'level' => 'required',
-            'phone' => 'required',
+            'level' => 'required'
         ]);
         if ($validator->fails()) {
             return $this->apiResponse(ResaultType::Error, $validator->errors(), 'Validation Error', 422);
@@ -87,7 +102,10 @@ class UserController extends ApiController
         } else {
             $data = new User();
             $data->name = request('name');
-            $data->company = request('company');
+            $data->university = request('university');
+						$data->faculty_id = request('faculty_id');
+						$data->department_id = request('department_id');
+						$data->student_id = request('student_id');
             $data->email = request('email');
             $data->password = Hash::make(request('password'));
             $data->level = request('level');
@@ -124,10 +142,16 @@ class UserController extends ApiController
             return $this->apiResponse(ResaultType::Error, $validator->errors(), 'Validation Error', 422);
         }
         $data = User::where('api_token','=',$token)->first();
-        $data->name = request('name');
+
+				$data->name = request('name');
+        $data->university = request('university');
+				$data->faculty_id = request('faculty_id');
+				$data->department_id = request('department_id');
+				$data->student_id = request('student_id');
         $data->email = request('email');
         $data->level = request('level');
-        $data->userPhone = request('userPhone');
+        $data->phone = request('phone');
+
         $data->save();
         if ($data) {
             return $this->apiResponse(ResaultType::Success, $data, 'User Updated', 200);
