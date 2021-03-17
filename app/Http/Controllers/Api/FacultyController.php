@@ -24,6 +24,9 @@ class FacultyController extends ApiController
 	if ($request->has('status')) {
     $query->where('faculty.status', '=', $request->status);
 	}
+	if ($request->has('university')) {
+    $query->where('faculty.university', '=', $request->university);
+	}
 
 	switch ($user->level) {
 		case 3:
