@@ -86,9 +86,6 @@ class UserController extends ApiController
     {
         $validator = Validator::make($request->all(), [
             'name' => 'required',
-            'university' => 'required',
-						'faculty_id' => 'required',
-						'department_id' => 'required',
             'email' => 'required|unique:users,email|email',
             'password' => 'required',
             'level' => 'required'
