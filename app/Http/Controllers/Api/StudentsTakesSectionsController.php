@@ -125,7 +125,7 @@ class StudentsTakesSectionsController extends ApiController
 									return $this->apiResponse(ResaultType::Error, null, 'User not found', 404);
 							}
 						}
-						else{
+					} else{
 								$user = Users::where('student_id','=', request('student_id'))->first();
 								if ($user){
 										$section = Section::where('id','=', request('section_id'))->first();
@@ -156,8 +156,6 @@ class StudentsTakesSectionsController extends ApiController
 										return $this->apiResponse(ResaultType::Error, null, 'User not found', 404);
 								}
 						}
-					}
-
 				break;
 				default:
 					return $this->apiResponse(ResaultType::Error, 403, 'Authorization Error', 0, 403);
