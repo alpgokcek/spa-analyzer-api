@@ -66,7 +66,7 @@ class StudentsTakesSectionsController extends ApiController
       break;
       }
       if ($request->has('student'))
-        $query->where('student_id', '=', $request->query('student'));
+        $query->where('users.student_id', '=', $request->query('student'));
       if ($request->has('section'))
         $query->where('section_id', '=', $request->query('section'));
 
