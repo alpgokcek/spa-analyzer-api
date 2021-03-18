@@ -42,44 +42,34 @@ class StudentsTakesSectionsController extends ApiController
         $query->join('section','section.id','=','students_takes_sections.section_id');
         $query->join('course','course.id','=','section.course_id');
         $query->join('department','department.id','=','course.department_id');
-
-        $query->where('users.student_id','=',$user->id);
-
-        $query->select('users.*', 'users.name as userName', 'section.title as sectionTitle');
+        $query->select('students_takes_sections.*', 'users.name as user_name', 'section.title as section_title', 'course.*');
       break;
 			case 4:
         //********************************************* */
-        $query->join('users','users.student_id','=','students_takes_sections.student_id');
-        $query->join('section','section.id','=','students_takes_sections.section_id');
-        $query->join('course','course.id','=','section.course_id');
-        $query->join('faculty','faculty.id','=','course.faculty_id');
-
-        $query->where('users.student_id','=',$user->id);
-
-        $query->select('users.*');
+        return $this->apiResponse(ResaultType::Error, 403, 'Authorization Error', 0, 403);
       break;
       case 5:
-        $query->join('instructors_gives_sections','instructors_gives_sections.section_id','=','students_takes_sections.section_id');
-
-        $query->where('instructors_gives_sections.instructor_id','=',$user->id);
-
-        $query->select('students_takes_sections.*');
+        return $this->apiResponse(ResaultType::Error, 403, 'Authorization Error', 0, 403);
       break;
       case 6:
-        $query->where('students_takes_sections.student_id','=',$user->id);
-        $query->select('students_takes_sections.*');
+				$query->join('users','users.student_id','=','students_takes_sections.student_id');
+				$query->join('section','section.id','=','students_takes_sections.section_id');
+				$query->join('course','course.id','=','section.course_id');
+        $query->where('students_takes_sections.student_id','=',$user->student_id);
+        $query->select('students_takes_sections.*', 'users.name as user_name', 'section.title as section_title', 'course.*');
       break;
       default:
         $query->join('users','users.student_id','=','students_takes_sections.student_id');
         $query->join('section','section.id','=','students_takes_sections.section_id');
-        $query->select('students_takes_sections.*', 'users.name as userName', 'section.title as sectionTitle');
+				$query->join('course','course.id','=','section.course_id');
+        $query->select('students_takes_sections.*', 'users.name as user_name', 'section.title as section_title', 'course.*');
       break;
       }
       if ($request->has('student'))
         $query->where('student_id', '=', $request->query('student'));
       if ($request->has('section'))
         $query->where('section_id', '=', $request->query('section'));
-        
+
       $length = count($query->get());
       $data = $query->offset($offset)->limit($limit)->get();
       if ($data) {
