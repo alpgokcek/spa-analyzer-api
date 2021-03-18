@@ -42,7 +42,7 @@ class StudentsTakesSectionsController extends ApiController
         $query->join('section','section.id','=','students_takes_sections.section_id');
         $query->join('course','course.id','=','section.course_id');
         $query->join('department','department.id','=','course.department_id');
-        $query->select('students_takes_sections.*', 'users.name as user_name', 'section.title as section_title', 'course.*');
+        $query->select('course.code as course_code', 'course.id as course_id', 'course.title as course_name', 'users.name as user_name', 'section.title as section_title', 'students_takes_sections.*');
       break;
 			case 4:
         //********************************************* */
@@ -56,13 +56,13 @@ class StudentsTakesSectionsController extends ApiController
 				$query->join('section','section.id','=','students_takes_sections.section_id');
 				$query->join('course','course.id','=','section.course_id');
         $query->where('students_takes_sections.student_id','=',$user->student_id);
-        $query->select('students_takes_sections.*', 'users.name as user_name', 'section.title as section_title', 'course.*');
+        $query->select('course.code as course_code', 'course.id as course_id', 'course.title as course_name', 'users.name as user_name', 'section.title as section_title', 'students_takes_sections.*');
       break;
       default:
         $query->join('users','users.student_id','=','students_takes_sections.student_id');
         $query->join('section','section.id','=','students_takes_sections.section_id');
 				$query->join('course','course.id','=','section.course_id');
-        $query->select('students_takes_sections.*', 'users.name as user_name', 'section.title as section_title', 'course.*');
+        $query->select('course.code as course_code', 'course.id as course_id', 'course.title as course_name', 'users.name as user_name', 'section.title as section_title', 'students_takes_sections.*');
       break;
       }
       if ($request->has('student'))
