@@ -94,7 +94,7 @@ class StudentsTakesSectionsController extends ApiController
 							return $this->apiResponse(ResaultType::Error, $validator->errors(), 'Validation Error', 422);
 					}
 					foreach ($split as $key) {
-							$user = UsersStudent::where('id','=', request('student_id'))->first();
+							$user = Users::where('student_id','=', request('student_id'))->first();
 							if ($user){
 									$section = Section::where('id','=', request('section_id'))->first();
 									if ($section) {
