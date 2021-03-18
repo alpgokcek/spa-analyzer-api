@@ -141,7 +141,7 @@ class StudentsTakesSectionsController extends ApiController
         $query->join('section','section.id','=','students_takes_sections.section_id');
 				$query->join('course','course.id','=','section.course_id');
         $query->where('students_takes_sections.id', '=', $id);
-        $query->select('course.code as course_code', 'course.id as course_id', 'course.department_id as department_id','course.title as course_name', 'users.name as user_name', 'section.title as section_title', 'students_takes_sections.*');
+        $query->select('course.code as course_code', 'course.id as course_id', 'users.department_id as department_id','course.title as course_name', 'users.name as user_name', 'section.title as section_title', 'students_takes_sections.*');
 				$data = $query->get()->first();
         if ($data) {
             return $this->apiResponse(ResaultType::Success, $data, 'StudentsTakesSections Detail', 201);
