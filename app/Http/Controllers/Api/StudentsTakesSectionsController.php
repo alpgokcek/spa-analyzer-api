@@ -7,6 +7,8 @@ use App\Imports\StudentsTakesSectionsImport;
 
 use App\Log;
 use App\User;
+use App\Section;
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
