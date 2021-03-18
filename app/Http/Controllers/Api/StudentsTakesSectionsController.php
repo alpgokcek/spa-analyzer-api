@@ -93,8 +93,6 @@ class StudentsTakesSectionsController extends ApiController
 					if ($validator->fails()) {
 							return $this->apiResponse(ResaultType::Error, $validator->errors(), 'Validation Error', 422);
 					}
-					if($split){
-						foreach ($split as $key) {
 							$user = Users::where('student_id','=', request('student_id'))->first();
 							if ($user){
 									$section = Section::where('id','=', request('section_id'))->first();
@@ -124,38 +122,6 @@ class StudentsTakesSectionsController extends ApiController
 							} else {
 									return $this->apiResponse(ResaultType::Error, null, 'User not found', 404);
 							}
-						}
-					} else{
-								$user = Users::where('student_id','=', request('student_id'))->first();
-								if ($user){
-										$section = Section::where('id','=', request('section_id'))->first();
-										if ($section) {
-												$data = new StudentsTakesSections();
-												$data->student_id = request('student_id');
-												$data->section_id = request('section_id');
-												$data->letter_grade = request('letter_grade');
-												$data->average = request('average');
-												$data->save();
-												if ($data) {
-														$log = new Log();
-														$log->area = 'StudentsTakesSections';
-														$log->areaid = $data->id;
-														$log->user = Auth::id();
-														$log->ip = \Request::ip();
-														$log->type = 1;
-														$log->info = 'StudentsTakesSections '.$data->id.' Created for the University '.$data->university;
-														$log->save();
-														return $this->apiResponse(ResaultType::Success, $data, 'StudentsTakesSections Created', 201);
-												} else {
-														return $this->apiResponse(ResaultType::Error, null, 'StudentsTakesSections not saved', 500);
-												}
-										} else {
-												return $this->apiResponse(ResaultType::Error, null, 'Section not found', 404);
-										}
-								} else {
-										return $this->apiResponse(ResaultType::Error, null, 'User not found', 404);
-								}
-						}
 				break;
 				default:
 					return $this->apiResponse(ResaultType::Error, 403, 'Authorization Error', 0, 403);
