@@ -39,31 +39,32 @@ class InstructorsGivesSectionsController extends ApiController
             case 3:
 								$query->join('users','users.id','=','instructors_gives_sections.instructor_id');
                 $query->join('section','section.id','=','instructors_gives_sections.section_id');
-                $query->join('course','course.id','=','section.course');
+								$query->join('course','course.id','=','section.course_id');
                 $query->join('department','department.id','=','course.department_id');
 
                 $query->where('department.faculty','=',$user->faculty_id);
 
-                $query->select('instructors_gives_sections.*');
+								$query->select('course.code as course_code', 'course.id as course_id', 'course.title as course_name', 'users.name as user_name', 'section.title as section_title', 'instructors_gives_sections.*');
             break;
 
             case 4:
 								$query->join('users','users.id','=','instructors_gives_sections.instructor_id');
                 $query->join('section','section.id','=','instructors_gives_sections.section_id');
-                $query->join('course','course.id','=','section.course');
+								$query->join('course','course.id','=','section.course_id');
                 $query->join('department','department.id','=','course.department_id');
 
                 $query->where('course.department','=',$user->department_id);
 
-                $query->select('instructors_gives_sections.*');
+								$query->select('course.code as course_code', 'course.id as course_id', 'course.title as course_name', 'users.name as user_name', 'section.title as section_title', 'instructors_gives_sections.*');
             break;
 
             case 5:
 								$query->join('users','users.id','=','instructors_gives_sections.instructor_id');
 								$query->join('section','section.id','=','instructors_gives_sections.section_id');
+								$query->join('course','course.id','=','section.course_id');
                 $query->where('instructors_gives_sections.instructor_id','=',$user->id);
 
-                $query->select('instructors_gives_sections.*');
+								$query->select('course.code as course_code', 'course.id as course_id', 'course.title as course_name', 'users.name as user_name', 'section.title as section_title', 'instructors_gives_sections.*');
             break;
             case 6:
                 // 6. seviyenin bu ekranda işi olmadığı için 403 verip gönderiyoruz.
@@ -73,7 +74,9 @@ class InstructorsGivesSectionsController extends ApiController
             default:
 								$query->join('users','users.id','=','instructors_gives_sections.instructor_id');
 								$query->join('section','section.id','=','instructors_gives_sections.section_id');
-                $query->select('instructors_gives_sections.*');
+								$query->join('course','course.id','=','section.course_id');
+								$query->select('course.code as course_code', 'course.id as course_id', 'course.title as course_name', 'users.name as user_name', 'section.title as section_title', 'instructors_gives_sections.*');
+
             break;
         }
 
