@@ -46,7 +46,7 @@ class StudentGetsMeasuredGradeProgramOutcomeController extends ApiController
 					$query->join('instructors_gives_sections','instructors_gives_sections.section_id','=','students_takes_sections.section_id');
 					$query->join('users','users.student_id','=','student_gets_measured_grade_program_outcome.student_id');
 
-					$query->where('instructors_gives_sections.instructor_email','=',$user->email);
+					$query->where('instructors_gives_sections.instructor_id','=',$user->id);
 
 					$query->select('student_gets_measured_grade_program_outcome.*');
 				break;
@@ -103,7 +103,7 @@ class StudentGetsMeasuredGradeProgramOutcomeController extends ApiController
 					$query = Course::query();
 					$query->join('section','section.course_id','=','course.id');
 					$query->join('instructors_gives_sections','section.id','=','instructors_gives_sections.section_id');
-					$query->where('instructors_gives_sections.instructor_email','=',$user->email);
+					$query->where('instructors_gives_sections.instructor_id','=',$user->id);
 					$query->where('course.id','=',request('course_id'));
 					$length = count($query->get());
 

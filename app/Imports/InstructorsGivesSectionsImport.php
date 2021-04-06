@@ -29,7 +29,7 @@ class InstructorsGivesSectionsImport implements ToModel, SkipsOnError, SkipsOnFa
     {
         ++$this->rowNo;
         return new InstructorsGivesSections([
-            'instructor_email' => $row[0],
+            'instructor_id' => $row[0],
             'section_id' => $row[1]
         ]);
     }

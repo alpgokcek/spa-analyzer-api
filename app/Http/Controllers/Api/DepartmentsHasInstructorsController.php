@@ -46,11 +46,11 @@ class DepartmentsHasInstructorsController extends ApiController
         default:
           // 1 ve 2. leveller kontrol edilmeyeceği için diğer sorguları default içine ekliyoruz
           $query->join('department', 'department.id', '=', 'departments_has_instructors.department_id');
-          $query->join('users', 'users.email', '=', 'departments_has_instructors.instructor_email');
+          $query->join('users', 'users.email', '=', 'departments_has_instructors.instructor_id');
           if($request->query('department')){
             $query->where('departments_has_instructors.department_id','=',$request->query('department'));
           }
-          
+
           $query->select('departments_has_instructors.*', 'department.name as departmentName', 'users.name as instructorName');
         break;
       }

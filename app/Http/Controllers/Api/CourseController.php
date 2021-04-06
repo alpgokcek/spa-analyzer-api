@@ -56,7 +56,7 @@ class CourseController extends ApiController
         $query->join('instructors_gives_sections', 'instructors_gives_sections.section_id', '=', 'section.id');
         $query->join('department', 'department.id', '=', 'course.department_id');
         $query->join('users', 'users.department_id','=','department.id');
-        $query->where('instructors_gives_sections.instructor_email','=',$user->email);
+        $query->where('instructors_gives_sections.instructor_id','=',$user->id);
       break;
       case 6:
         return $this->apiResponse(ResaultType::Error, 403, 'Authorization Error', 0, 403);

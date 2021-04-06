@@ -45,7 +45,7 @@ class ProgramOutcomesProvidesCourseOutcomesController extends ApiController
                 $query->join('section','section.course_id','=','course.id');
                 $query->join('instructors_gives_sections','instructors_gives_sections.section_id','=','section.id');
 
-                $query->where('instructors_gives_sections.instructor_email','=',$user->email);
+                $query->where('instructors_gives_sections.instructor_id','=',$user->id);
 
                 $query->select('program_outcomes_provides_course_outcomes.*');
             break;
@@ -80,7 +80,7 @@ class ProgramOutcomesProvidesCourseOutcomesController extends ApiController
 					$query = Course::query();
 					$query->join('section','section.course_id','=','course.id');
 					$query->join('instructors_gives_sections','section.id','=','instructors_gives_sections.section_id');
-					$query->where('instructors_gives_sections.instructor_email','=',$user->email);
+					$query->where('instructors_gives_sections.instructor_id','=',$user->id);
 					$query->where('course.id','=',request('course_id'));
 					$length = count($query->get());
 

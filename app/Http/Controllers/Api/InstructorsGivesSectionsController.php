@@ -57,7 +57,7 @@ class InstructorsGivesSectionsController extends ApiController
             break;
 
             case 5:
-                $query->where('instructors_gives_sections.instructor_email','=',$user->email);
+                $query->where('instructors_gives_sections.instructor_id','=',$user->id);
 
                 $query->select('instructors_gives_sections.*');
             break;

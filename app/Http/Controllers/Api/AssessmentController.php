@@ -43,7 +43,7 @@ class AssessmentController extends ApiController
           $query->join('department', 'department.id', '=', 'course.department_id');
           $query->join('faculty', 'faculty.id', '=', 'department.faculty');
           $query->join('users', 'users.faculty_id','=','faculty.id');
-          $query->where('instructors_gives_sections.instructor_email','=',$user->email);
+          $query->where('instructors_gives_sections.instructor_id','=',$user->id);
           break;
         case 6:
           // 6. seviyenin bu ekranda işi olmadığı için 403 verip gönderiyoruz.
@@ -80,7 +80,7 @@ class AssessmentController extends ApiController
 					$query = Course::query();
 					$query->join('section','section.course_id','=','course.id');
 					$query->join('instructors_gives_sections','section.id','=','instructors_gives_sections.section_id');
-					$query->where('instructors_gives_sections.instructor_email','=',$user->email);
+					$query->where('instructors_gives_sections.instructor_id','=',$user->id);
 					$query->where('course.id','=',request('course_id'));
 					$length = count($query->get());
 

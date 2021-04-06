@@ -48,7 +48,7 @@ class GradingToolController extends ApiController
             $query->join('section', 'section.course_id', '=', 'course.id');
             $query->join('instructors_gives_sections', 'instructors_gives_sections.section_id', '=', 'section.id');
 
-						$query->where('instructors_gives_sections.instructor_email','=',$user->email);
+						$query->where('instructors_gives_sections.instructor_id','=',$user->id);
 
 						$query->select('grading_tool.*', 'course.title as courseName', 'course.id as course_id', 'assessment.name as assessmentName');
             break;
@@ -91,7 +91,7 @@ class GradingToolController extends ApiController
 							$query->join('section','section.course_id','=','course.id');
               $query->join('instructors_gives_sections','section.id','=','instructors_gives_sections.section_id');
 
-						$query->where('instructors_gives_sections.instructor_email','=',$user->email);
+						$query->where('instructors_gives_sections.instructor_id','=',$user->id);
 						$query->where('assessment.id','=',request('assessment_id'));
 						$length = count($query->get());
 
