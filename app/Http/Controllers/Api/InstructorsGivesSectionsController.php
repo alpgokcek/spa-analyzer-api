@@ -7,6 +7,8 @@ use App\Imports\InstructorsGivesSectionsImport;
 
 use App\Log;
 use App\User;
+use App\Section;
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -106,7 +108,7 @@ class InstructorsGivesSectionsController extends ApiController
 					if ($validator->fails()) {
 							return $this->apiResponse(ResaultType::Error, $validator->errors(), 'Validation Error', 422);
 					}
-					$data = new InstructorsGivesSections();
+					$query = InstructorsGivesSections::query();
 					$data->instructor_id = request('instructor_id');
 					$data->section_id = request('section_id');
 					$data->save();
