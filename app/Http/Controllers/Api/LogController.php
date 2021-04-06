@@ -34,9 +34,9 @@ class LogController extends ApiController
         $data = $query->offset($offset)->limit($limit)->get();
 
         if (count($data) >= 1) {
-            return $this->apiResponse(ResaultType::Success, $data, 'Listing: '.$offset.'-'.$limit, $length, 200);
+            return $this->apiResponse(ResultType::Success, $data, 'Listing: '.$offset.'-'.$limit, $length, 200);
         } else {
-            return $this->apiResponse(ResaultType::Error, null, 'Log Not Found', 0, 404);
+            return $this->apiResponse(ResultType::Error, null, 'Log Not Found', 0, 404);
         }
     }
 
@@ -50,7 +50,7 @@ class LogController extends ApiController
             'info' => 'requred',
         ]);
         if ($validator->fails()) {
-            return $this->apiResponse(ResaultType::Error, $validator->errors(), 'Validation Error', 422);
+            return $this->apiResponse(ResultType::Error, $validator->errors(), 'Validation Error', 422);
         }
         $data = new Log();
         $data->area = request('area');
@@ -60,9 +60,9 @@ class LogController extends ApiController
         $data->info = request('info');
         $data->save();
         if ($data) {
-            return $this->apiResponse(ResaultType::Success, $data, 'Logged', 201);
+            return $this->apiResponse(ResultType::Success, $data, 'Logged', 201);
         } else {
-            return $this->apiResponse(ResaultType::Error, null, 'Log error', 500);
+            return $this->apiResponse(ResultType::Error, null, 'Log error', 500);
         }
     }
 

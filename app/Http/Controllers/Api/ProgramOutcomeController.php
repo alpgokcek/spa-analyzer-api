@@ -24,7 +24,7 @@ class ProgramOutcomeController extends ApiController
     $import = new ProgramOutcomeImport();
     $import->import($request->fileUrl);
 
-    return $this->apiResponse(ResaultType::Error, $import->err, 'hatalar', 403);
+    return $this->apiResponse(ResultType::Error, $import->err, 'hatalar', 403);
   }
 
     public function index(Request $request)
@@ -69,9 +69,9 @@ class ProgramOutcomeController extends ApiController
       $length = count($query->get());
       $data = $query->offset($offset)->limit($limit)->get();
       if ($data) {
-        return $this->apiResponse(ResaultType::Success, $data, 'Listing: '.$offset.'-'.$limit, $length, 200);
+        return $this->apiResponse(ResultType::Success, $data, 'Listing: '.$offset.'-'.$limit, $length, 200);
       } else {
-        return $this->apiResponse(ResaultType::Error, null, 'ProgramOutcome Not Found', 0, 404);
+        return $this->apiResponse(ResultType::Error, null, 'ProgramOutcome Not Found', 0, 404);
       }
     }
 
@@ -87,7 +87,7 @@ class ProgramOutcomeController extends ApiController
 						'year_and_term' => 'required',
           ]);
 					if ($validator->fails()) {
-							return $this->apiResponse(ResaultType::Error, $validator->errors(), 'Validation Error', 422);
+							return $this->apiResponse(ResultType::Error, $validator->errors(), 'Validation Error', 422);
 					}
 					$data = new ProgramOutcome();
 					$data->explanation = request('explanation');
@@ -104,13 +104,13 @@ class ProgramOutcomeController extends ApiController
 							$log->type = 1;
 							$log->info = 'ProgramOutcome '.$data->id.' Created for the University '.$data->university;
 							$log->save();
-							return $this->apiResponse(ResaultType::Success, $data, 'ProgramOutcome Created', 201);
+							return $this->apiResponse(ResultType::Success, $data, 'ProgramOutcome Created', 201);
 					} else {
-							return $this->apiResponse(ResaultType::Error, null, 'ProgramOutcome not saved', 500);
+							return $this->apiResponse(ResultType::Error, null, 'ProgramOutcome not saved', 500);
 					}
 					break;
 					default:
-						return $this->apiResponse(ResaultType::Error, 403, 'Authorization Error', 0, 403);
+						return $this->apiResponse(ResultType::Error, 403, 'Authorization Error', 0, 403);
 					break;
 				}
     }
@@ -120,9 +120,9 @@ class ProgramOutcomeController extends ApiController
     {
         $data = ProgramOutcome::find($id);
         if ($data) {
-            return $this->apiResponse(ResaultType::Success, $data, 'ProgramOutcome Detail', 201);
+            return $this->apiResponse(ResultType::Success, $data, 'ProgramOutcome Detail', 201);
         } else {
-            return $this->apiResponse(ResaultType::Error, null, 'ProgramOutcome Not Found', 404);
+            return $this->apiResponse(ResultType::Error, null, 'ProgramOutcome Not Found', 404);
         }
     }
 
@@ -134,7 +134,7 @@ class ProgramOutcomeController extends ApiController
             'department_id' => 'nullable',
         ]);
         if ($validator->fails()) {
-            return $this->apiResponse(ResaultType::Error, $validator->errors(), 'Validation Error', 422);
+            return $this->apiResponse(ResultType::Error, $validator->errors(), 'Validation Error', 422);
         }
         $data = ProgramOutcome::find($id);
 
@@ -160,12 +160,12 @@ class ProgramOutcomeController extends ApiController
                 $log->info = 'ProgramOutcome '.$data->id;
                 $log->save();
 
-                return $this->apiResponse(ResaultType::Success, $data, 'ProgramOutcome Updated', 200);
+                return $this->apiResponse(ResultType::Success, $data, 'ProgramOutcome Updated', 200);
             } else {
-                return $this->apiResponse(ResaultType::Error, null, 'ProgramOutcome not updated', 500);
+                return $this->apiResponse(ResultType::Error, null, 'ProgramOutcome not updated', 500);
             }
         } else {
-            return $this->apiResponse(ResaultType::Warning, null, 'Data not found', 404);
+            return $this->apiResponse(ResultType::Warning, null, 'Data not found', 404);
         }
     }
 
@@ -174,9 +174,9 @@ class ProgramOutcomeController extends ApiController
         $data = ProgramOutcome::find($id);
         if ($data) {
             $data->delete();
-            return $this->apiResponse(ResaultType::Success, $data, 'ProgramOutcome Deleted', 200);
+            return $this->apiResponse(ResultType::Success, $data, 'ProgramOutcome Deleted', 200);
         } else {
-            return $this->apiResponse(ResaultType::Error, $data, 'Deleted Error', 500);
+            return $this->apiResponse(ResultType::Error, $data, 'Deleted Error', 500);
         }
     }
 }

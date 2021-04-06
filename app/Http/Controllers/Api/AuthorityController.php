@@ -33,9 +33,9 @@ class AuthorityController extends ApiController
         $data->each->setAppends(['authorityStatus']);
 
         if (count($data) >= 1) {
-            return $this->apiResponse(ResaultType::Success, $data, 'Listing: '.$offset.'-'.$limit, $length, 200);
+            return $this->apiResponse(ResultType::Success, $data, 'Listing: '.$offset.'-'.$limit, $length, 200);
         } else {
-            return $this->apiResponse(ResaultType::Error, null, 'Content Not Found', 0, 404);
+            return $this->apiResponse(ResultType::Error, null, 'Content Not Found', 0, 404);
         }
     }
 
@@ -52,7 +52,7 @@ class AuthorityController extends ApiController
             'd' => 'required',
             ]);
         if ($validator->fails()) {
-            return $this->apiResponse(ResaultType::Error, $validator->errors(), 'Validation Error', 422);
+            return $this->apiResponse(ResultType::Error, $validator->errors(), 'Validation Error', 422);
         }
         $data = new Authority();
         $data->type = request('type');
@@ -65,9 +65,9 @@ class AuthorityController extends ApiController
         $data->d = request('d');
         $data->save();
         if ($data) {
-            return $this->apiResponse(ResaultType::Success, $data, 'Authorization Successful', 201);
+            return $this->apiResponse(ResultType::Success, $data, 'Authorization Successful', 201);
         } else {
-            return $this->apiResponse(ResaultType::Error, null, 'Content not saved', 500);
+            return $this->apiResponse(ResultType::Error, null, 'Content not saved', 500);
         }
     }
 
@@ -76,9 +76,9 @@ class AuthorityController extends ApiController
         $data = Authority::find($id);
         $data->each->setAppends(['authorityStatus']);
         if (count($data) >= 1) {
-            return $this->apiResponse(ResaultType::Success, $data, 'Authority Detail', 201);
+            return $this->apiResponse(ResultType::Success, $data, 'Authority Detail', 201);
         } else {
-            return $this->apiResponse(ResaultType::Error, null, 'Authority Not Found', 404);
+            return $this->apiResponse(ResultType::Error, null, 'Authority Not Found', 404);
         }
     }
 
@@ -91,7 +91,7 @@ class AuthorityController extends ApiController
             'd' => 'nullable'
         ]);
         if ($validator->fails()) {
-            return $this->apiResponse(ResaultType::Error, $validator->errors(), 'Validation Error', 422);
+            return $this->apiResponse(ResultType::Error, $validator->errors(), 'Validation Error', 422);
         }
         $data = Project::where('token','=',$token)->first();
 
@@ -103,12 +103,12 @@ class AuthorityController extends ApiController
             $data->save();
 
             if ($data) {
-                return $this->apiResponse(ResaultType::Success, $data, 'Content Updated', 200);
+                return $this->apiResponse(ResultType::Success, $data, 'Content Updated', 200);
             } else {
-                return $this->apiResponse(ResaultType::Error, null, 'Content not updated', 500);
+                return $this->apiResponse(ResultType::Error, null, 'Content not updated', 500);
             }
         } else {
-            return $this->apiResponse(ResaultType::Warning, null, 'Data not found', 404);
+            return $this->apiResponse(ResultType::Warning, null, 'Data not found', 404);
         }
     }
 
@@ -117,9 +117,9 @@ class AuthorityController extends ApiController
         $data = Authority::where('id','=',$id)->first();
         if (count($data) >= 1) {
             $data->delete();
-            return $this->apiResponse(ResaultType::Success, $data, 'Authority Deleted', 200);
+            return $this->apiResponse(ResultType::Success, $data, 'Authority Deleted', 200);
         } else {
-            return $this->apiResponse(ResaultType::Error, $data, 'Deleted Error', 500);
+            return $this->apiResponse(ResultType::Error, $data, 'Deleted Error', 500);
         }
     }
 }

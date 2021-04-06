@@ -30,19 +30,19 @@ class FacultyController extends ApiController
 
 	switch ($user->level) {
 		case 3:
-			return $this->apiResponse(ResaultType::Error, 403, 'Authorization Error', 0, 403);
+			return $this->apiResponse(ResultType::Error, 403, 'Authorization Error', 0, 403);
 			break;
 
 		case 4:
-			return $this->apiResponse(ResaultType::Error, 403, 'Authorization Error', 0, 403);
+			return $this->apiResponse(ResultType::Error, 403, 'Authorization Error', 0, 403);
 			break;
 
 		case 5:
-			return $this->apiResponse(ResaultType::Error, 403, 'Authorization Error', 0, 403);
+			return $this->apiResponse(ResultType::Error, 403, 'Authorization Error', 0, 403);
 			break;
 
 		case 6:
-			return $this->apiResponse(ResaultType::Error, 403, 'Authorization Error', 0, 403);
+			return $this->apiResponse(ResultType::Error, 403, 'Authorization Error', 0, 403);
 			break;
 		default:
 			// 1 ve 2. leveller kontrol edilmeyeceği için diğer sorguları default içine ekliyoruz
@@ -56,9 +56,9 @@ class FacultyController extends ApiController
 	$length = count($query->get());
 	$data = $query->offset($offset)->limit($limit)->get();
 	if ($length >= 1) {
-		return $this->apiResponse(ResaultType::Success, $data, 'Listing: '.$offset.'-'.$limit, $length, 200);
+		return $this->apiResponse(ResultType::Success, $data, 'Listing: '.$offset.'-'.$limit, $length, 200);
 	} else {
-			return $this->apiResponse(ResaultType::Error, null, 'Faculty Not Found', 0, 404);
+			return $this->apiResponse(ResultType::Error, null, 'Faculty Not Found', 0, 404);
 	}
 }
 
@@ -73,7 +73,7 @@ class FacultyController extends ApiController
 					'status' => 'required'
 				]);
 				if ($validator->fails()) {
-					return $this->apiResponse(ResaultType::Error, $validator->errors(), 'Validation Error', 422);
+					return $this->apiResponse(ResultType::Error, $validator->errors(), 'Validation Error', 422);
 				}
 				$data = new Faculty();
 				$data->university = request('university');
@@ -89,13 +89,13 @@ class FacultyController extends ApiController
 					$log->type = 1;
 					$log->info = 'Faculty '.$data->id.' Created for the University '.$data->university;
 					$log->save();
-					return $this->apiResponse(ResaultType::Success, $data, 'Faculty Created', 201);
+					return $this->apiResponse(ResultType::Success, $data, 'Faculty Created', 201);
 				}
 				else {
-					return $this->apiResponse(ResaultType::Error, null, 'Faculty not saved', 500);
+					return $this->apiResponse(ResultType::Error, null, 'Faculty not saved', 500);
 				}
 				default:
-					return $this->apiResponse(ResaultType::Error, 403, 'Authorization Error', 0, 403);
+					return $this->apiResponse(ResultType::Error, 403, 'Authorization Error', 0, 403);
 				break;
 		}
 	}
@@ -104,9 +104,9 @@ class FacultyController extends ApiController
 	{
 		$data = Faculty::where('id', '=', $id)->first();
 		if ($data) {
-			return $this->apiResponse(ResaultType::Success, $data, 'Faculty Detail', 201);
+			return $this->apiResponse(ResultType::Success, $data, 'Faculty Detail', 201);
 		} else {
-			return $this->apiResponse(ResaultType::Error, null, 'Faculty Not Found', 404);
+			return $this->apiResponse(ResultType::Error, null, 'Faculty Not Found', 404);
 		}
 	}
 
@@ -117,7 +117,7 @@ class FacultyController extends ApiController
 			'status' => 'nullable'
 		]);
 		if ($validator->fails()) {
-			return $this->apiResponse(ResaultType::Error, $validator->errors(), 'Validation Error', 422);
+			return $this->apiResponse(ResultType::Error, $validator->errors(), 'Validation Error', 422);
 		}
 		$data = Faculty::find($id);
 
@@ -140,12 +140,12 @@ class FacultyController extends ApiController
 				$log->info = 'Faculty '.$data->id;
 				$log->save();
 
-				return $this->apiResponse(ResaultType::Success, $data, 'Faculty Updated', 200);
+				return $this->apiResponse(ResultType::Success, $data, 'Faculty Updated', 200);
 			} else {
-				return $this->apiResponse(ResaultType::Error, null, 'Faculty not updated', 500);
+				return $this->apiResponse(ResultType::Error, null, 'Faculty not updated', 500);
 			}
 		} else {
-			return $this->apiResponse(ResaultType::Warning, null, 'Data not found', 404);
+			return $this->apiResponse(ResultType::Warning, null, 'Data not found', 404);
 		}
 	}
 
@@ -154,9 +154,9 @@ class FacultyController extends ApiController
 		$data = Faculty::find($id);
 		if ($data) {
 			$data->delete();
-			return $this->apiResponse(ResaultType::Success, $data, 'Faculty Deleted', 200);
+			return $this->apiResponse(ResultType::Success, $data, 'Faculty Deleted', 200);
 		} else {
-			return $this->apiResponse(ResaultType::Error, $data, 'Deleted Error', 500);
+			return $this->apiResponse(ResultType::Error, $data, 'Deleted Error', 500);
 		}
 	}
 }

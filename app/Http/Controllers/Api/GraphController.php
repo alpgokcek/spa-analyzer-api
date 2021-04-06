@@ -42,12 +42,12 @@ class GraphController extends Controller
             $length = count($testQuery->get());//->get());
             $data = $testQuery->offset($offset)->limit($limit)->get();
             if ($data) {
-                return $this->apiResponse(ResaultType::Success, $data, 'Listing: '.$offset.'-'.$limit, $length, 200);
+                return $this->apiResponse(ResultType::Success, $data, 'Listing: '.$offset.'-'.$limit, $length, 200);
             } else {
-                return $this->apiResponse(ResaultType::Error, null, 'StudentGetsMeasuredGradeCourseOutcome Not Found', 0, 404);
+                return $this->apiResponse(ResultType::Error, null, 'StudentGetsMeasuredGradeCourseOutcome Not Found', 0, 404);
             }
         } else{
-            return $this->apiResponse(ResaultType::Error, null, 'Course ID is needed for this operation', 0, 400);
+            return $this->apiResponse(ResultType::Error, null, 'Course ID is needed for this operation', 0, 400);
         }
     }
 }

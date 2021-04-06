@@ -54,7 +54,7 @@ class GradingToolCoversCourseOutcomeController extends ApiController
             case 6:
                 // 6. seviyenin bu ekranda işi olmadığı için 403 verip gönderiyoruz.
                 // 403ün yönlendirme fonksiyonu vue tarafında gerçekleştirilecek.
-                return $this->apiResponse(ResaultType::Error, 403, 'Authorization Error', 0, 403);
+                return $this->apiResponse(ResultType::Error, 403, 'Authorization Error', 0, 403);
             break;
             default:
 				// 1 ve 2. leveller kontrol edilmeyeceği için diğer sorguları default içine ekliyoruz
@@ -71,9 +71,9 @@ class GradingToolCoversCourseOutcomeController extends ApiController
         $length = count($query->get());
         $data = $query->offset($offset)->limit($limit)->get();
         if ($data) {
-            return $this->apiResponse(ResaultType::Success, $data, 'Listing: '.$offset.'-'.$limit, $length, 200);
+            return $this->apiResponse(ResultType::Success, $data, 'Listing: '.$offset.'-'.$limit, $length, 200);
         } else {
-            return $this->apiResponse(ResaultType::Error, null, 'GradingToolCoversCourseOutcome Not Found', 0, 404);
+            return $this->apiResponse(ResultType::Error, null, 'GradingToolCoversCourseOutcome Not Found', 0, 404);
         }
     }
 
@@ -90,14 +90,14 @@ class GradingToolCoversCourseOutcomeController extends ApiController
 					$length = count($query->get());
 
 					if($length == 0){
-						return $this->apiResponse(ResaultType::Error, 403, 'Authorization Error', 0, 403);
+						return $this->apiResponse(ResultType::Error, 403, 'Authorization Error', 0, 403);
 					}
         $validator = Validator::make($request->all(), [
             'grading_tool_id' => 'required',
             'course_outcome_id' => 'required',
             ]);
         if ($validator->fails()) {
-            return $this->apiResponse(ResaultType::Error, $validator->errors(), 'Validation Error', 422);
+            return $this->apiResponse(ResultType::Error, $validator->errors(), 'Validation Error', 422);
         }
         $data = new GradingToolCoversCourseOutcome();
         $data->grading_tool_id = request('grading_tool_id');
@@ -112,13 +112,13 @@ class GradingToolCoversCourseOutcomeController extends ApiController
             $log->type = 1;
             $log->info = 'GradingToolCoversCourseOutcome '.$data->id.' Created for the University '.$data->university;
             $log->save();
-            return $this->apiResponse(ResaultType::Success, $data, 'GradingToolCoversCourseOutcome Created', 201);
+            return $this->apiResponse(ResultType::Success, $data, 'GradingToolCoversCourseOutcome Created', 201);
         } else {
-            return $this->apiResponse(ResaultType::Error, null, 'GradingToolCoversCourseOutcome not saved', 500);
+            return $this->apiResponse(ResultType::Error, null, 'GradingToolCoversCourseOutcome not saved', 500);
 				}
 				break;
 				default:
-					return $this->apiResponse(ResaultType::Error, 403, 'Authorization Error', 0, 403);
+					return $this->apiResponse(ResultType::Error, 403, 'Authorization Error', 0, 403);
 				break;
 			}
 		}
@@ -127,9 +127,9 @@ class GradingToolCoversCourseOutcomeController extends ApiController
     {
         $data = GradingToolCoversCourseOutcome::find($id);
         if ($data) {
-            return $this->apiResponse(ResaultType::Success, $data, 'GradingToolCoversCourseOutcome Detail', 201);
+            return $this->apiResponse(ResultType::Success, $data, 'GradingToolCoversCourseOutcome Detail', 201);
         } else {
-            return $this->apiResponse(ResaultType::Error, null, 'GradingToolCoversCourseOutcome Not Found', 404);
+            return $this->apiResponse(ResultType::Error, null, 'GradingToolCoversCourseOutcome Not Found', 404);
         }
     }
 
@@ -140,7 +140,7 @@ class GradingToolCoversCourseOutcomeController extends ApiController
             'course_outcome_id' => 'nullable',
         ]);
         if ($validator->fails()) {
-            return $this->apiResponse(ResaultType::Error, $validator->errors(), 'Validation Error', 422);
+            return $this->apiResponse(ResultType::Error, $validator->errors(), 'Validation Error', 422);
         }
         $data = GradingToolCoversCourseOutcome::find($id);
 
@@ -163,12 +163,12 @@ class GradingToolCoversCourseOutcomeController extends ApiController
                 $log->info = 'GradingToolCoversCourseOutcome '.$data->id;
                 $log->save();
 
-                return $this->apiResponse(ResaultType::Success, $data, 'GradingToolCoversCourseOutcome Updated', 200);
+                return $this->apiResponse(ResultType::Success, $data, 'GradingToolCoversCourseOutcome Updated', 200);
             } else {
-                return $this->apiResponse(ResaultType::Error, null, 'GradingToolCoversCourseOutcome not updated', 500);
+                return $this->apiResponse(ResultType::Error, null, 'GradingToolCoversCourseOutcome not updated', 500);
             }
         } else {
-            return $this->apiResponse(ResaultType::Warning, null, 'Data not found', 404);
+            return $this->apiResponse(ResultType::Warning, null, 'Data not found', 404);
         }
     }
 
@@ -177,9 +177,9 @@ class GradingToolCoversCourseOutcomeController extends ApiController
         $data = GradingToolCoversCourseOutcome::find($id);
         if ($data) {
             $data->delete();
-            return $this->apiResponse(ResaultType::Success, $data, 'GradingToolCoversCourseOutcome Deleted', 200);
+            return $this->apiResponse(ResultType::Success, $data, 'GradingToolCoversCourseOutcome Deleted', 200);
         } else {
-            return $this->apiResponse(ResaultType::Error, $data, 'Deleted Error', 500);
+            return $this->apiResponse(ResultType::Error, $data, 'Deleted Error', 500);
         }
     }
 }

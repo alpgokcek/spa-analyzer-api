@@ -57,7 +57,7 @@ class StudentGetsMeasuredGradeCourseOutcomeController extends ApiController
           case 6:
             // 6. seviyenin bu ekranda işi olmadığı için 403 verip gönderiyoruz.
             // 403ün yönlendirme fonksiyonu vue tarafında gerçekleştirilecek.
-            return $this->apiResponse(ResaultType::Error, 403, 'Authorization Error', 0, 403);
+            return $this->apiResponse(ResultType::Error, 403, 'Authorization Error', 0, 403);
             break;
           default:
 					// 1 ve 2. leveller kontrol edilmeyeceği için diğer sorguları default içine ekliyoruz
@@ -75,9 +75,9 @@ class StudentGetsMeasuredGradeCourseOutcomeController extends ApiController
 					$length = count($query->get());
 					$data = $query->offset($offset)->limit($limit)->get();
 					if ($data) {
-							return $this->apiResponse(ResaultType::Success, $data, 'Listing: '.$offset.'-'.$limit, $length, 200);
+							return $this->apiResponse(ResultType::Success, $data, 'Listing: '.$offset.'-'.$limit, $length, 200);
 					} else {
-							return $this->apiResponse(ResaultType::Error, null, 'StudentGetsMeasuredGradeProgramOutcome Not Found', 0, 404);
+							return $this->apiResponse(ResultType::Error, null, 'StudentGetsMeasuredGradeProgramOutcome Not Found', 0, 404);
 					}
     }
 
@@ -94,7 +94,7 @@ class StudentGetsMeasuredGradeCourseOutcomeController extends ApiController
 					$length = count($query->get());
 
 					if($length == 0){
-						return $this->apiResponse(ResaultType::Error, 403, 'Authorization Error', 0, 403);
+						return $this->apiResponse(ResultType::Error, 403, 'Authorization Error', 0, 403);
 					}
 					$validator = Validator::make($request->all(), [
 							'course_outcome_id' => 'required',
@@ -102,7 +102,7 @@ class StudentGetsMeasuredGradeCourseOutcomeController extends ApiController
 							'grade' => 'required',
 							]);
 					if ($validator->fails()) {
-							return $this->apiResponse(ResaultType::Error, $validator->errors(), 'Validation Error', 422);
+							return $this->apiResponse(ResultType::Error, $validator->errors(), 'Validation Error', 422);
 					}
 					$data = new StudentGetsMeasuredGradeCourseOutcome();
 					$data->course_outcome_id = request('course_outcome_id');
@@ -118,13 +118,13 @@ class StudentGetsMeasuredGradeCourseOutcomeController extends ApiController
 							$log->type = 1;
 							$log->info = 'StudentGetsMeasuredGradeCourseOutcome '.$data->id.' Created for the University '.$data->university;
 							$log->save();
-							return $this->apiResponse(ResaultType::Success, $data, 'StudentGetsMeasuredGradeCourseOutcome Created', 201);
+							return $this->apiResponse(ResultType::Success, $data, 'StudentGetsMeasuredGradeCourseOutcome Created', 201);
 					} else {
-							return $this->apiResponse(ResaultType::Error, null, 'StudentGetsMeasuredGradeCourseOutcome not saved', 500);
+							return $this->apiResponse(ResultType::Error, null, 'StudentGetsMeasuredGradeCourseOutcome not saved', 500);
 					}
 				break;
 				default:
-					return $this->apiResponse(ResaultType::Error, 403, 'Authorization Error', 0, 403);
+					return $this->apiResponse(ResultType::Error, 403, 'Authorization Error', 0, 403);
 				break;
 			}
     }
@@ -133,9 +133,9 @@ class StudentGetsMeasuredGradeCourseOutcomeController extends ApiController
     {
         $data = StudentGetsMeasuredGradeCourseOutcome::find($id);
         if ($data) {
-            return $this->apiResponse(ResaultType::Success, $data, 'StudentGetsMeasuredGradeCourseOutcome Detail', 201);
+            return $this->apiResponse(ResultType::Success, $data, 'StudentGetsMeasuredGradeCourseOutcome Detail', 201);
         } else {
-            return $this->apiResponse(ResaultType::Error, null, 'StudentGetsMeasuredGradeCourseOutcome Not Found', 404);
+            return $this->apiResponse(ResultType::Error, null, 'StudentGetsMeasuredGradeCourseOutcome Not Found', 404);
         }
     }
 
@@ -147,7 +147,7 @@ class StudentGetsMeasuredGradeCourseOutcomeController extends ApiController
             'grade' => 'nullable',
         ]);
         if ($validator->fails()) {
-            return $this->apiResponse(ResaultType::Error, $validator->errors(), 'Validation Error', 422);
+            return $this->apiResponse(ResultType::Error, $validator->errors(), 'Validation Error', 422);
         }
         $data = StudentGetsMeasuredGradeCourseOutcome::find($id);
 
@@ -173,12 +173,12 @@ class StudentGetsMeasuredGradeCourseOutcomeController extends ApiController
                 $log->info = 'StudentGetsMeasuredGradeCourseOutcome '.$data->id;
                 $log->save();
 
-                return $this->apiResponse(ResaultType::Success, $data, 'StudentGetsMeasuredGradeCourseOutcome Updated', 200);
+                return $this->apiResponse(ResultType::Success, $data, 'StudentGetsMeasuredGradeCourseOutcome Updated', 200);
             } else {
-                return $this->apiResponse(ResaultType::Error, null, 'StudentGetsMeasuredGradeCourseOutcome not updated', 500);
+                return $this->apiResponse(ResultType::Error, null, 'StudentGetsMeasuredGradeCourseOutcome not updated', 500);
             }
         } else {
-            return $this->apiResponse(ResaultType::Warning, null, 'Data not found', 404);
+            return $this->apiResponse(ResultType::Warning, null, 'Data not found', 404);
         }
     }
 
@@ -187,9 +187,9 @@ class StudentGetsMeasuredGradeCourseOutcomeController extends ApiController
         $data = StudentGetsMeasuredGradeCourseOutcome::find($id);
         if ($data) {
             $data->delete();
-            return $this->apiResponse(ResaultType::Success, $data, 'StudentGetsMeasuredGradeCourseOutcome Deleted', 200);
+            return $this->apiResponse(ResultType::Success, $data, 'StudentGetsMeasuredGradeCourseOutcome Deleted', 200);
         } else {
-            return $this->apiResponse(ResaultType::Error, $data, 'Deleted Error', 500);
+            return $this->apiResponse(ResultType::Error, $data, 'Deleted Error', 500);
         }
     }
 }

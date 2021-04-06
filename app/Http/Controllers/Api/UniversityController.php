@@ -24,9 +24,9 @@ class UniversityController extends ApiController
         $length = count($query->get());
         $data = $query->offset($offset)->limit($limit)->get();
         if ($data) {
-            return $this->apiResponse(ResaultType::Success, $data, 'Listing: '.$offset.'-'.$limit, $length, 200);
+            return $this->apiResponse(ResultType::Success, $data, 'Listing: '.$offset.'-'.$limit, $length, 200);
         } else {
-            return $this->apiResponse(ResaultType::Error, null, 'Content Not Found', 0, 404);
+            return $this->apiResponse(ResultType::Error, null, 'Content Not Found', 0, 404);
         }
     }
 
@@ -41,7 +41,7 @@ class UniversityController extends ApiController
             'status' => 'required'
         ]);
         if ($validator->fails()) {
-            return $this->apiResponse(ResaultType::Error, $validator->errors(), 'Validation Error', 422);
+            return $this->apiResponse(ResultType::Error, $validator->errors(), 'Validation Error', 422);
         }
         $data = new University();
         $data->bank_account = request('bank_account');
@@ -61,9 +61,9 @@ class UniversityController extends ApiController
             $log->info = 'University Created';
             $log->save();
 
-            return $this->apiResponse(ResaultType::Success, $data, 'University Created', 201);
+            return $this->apiResponse(ResultType::Success, $data, 'University Created', 201);
         } else {
-            return $this->apiResponse(ResaultType::Error, null, 'Content not saved', 500);
+            return $this->apiResponse(ResultType::Error, null, 'Content not saved', 500);
         }
     }
 
@@ -71,9 +71,9 @@ class UniversityController extends ApiController
     {
         $data = University::where('id','=',$id)->first();
         if ($data) {
-            return $this->apiResponse(ResaultType::Success, $data, 'Content Detail', 201);
+            return $this->apiResponse(ResultType::Success, $data, 'Content Detail', 201);
         } else {
-            return $this->apiResponse(ResaultType::Error, null, 'Content Not Found', 404);
+            return $this->apiResponse(ResultType::Error, null, 'Content Not Found', 404);
         }
     }
 
@@ -88,7 +88,7 @@ class UniversityController extends ApiController
             'status' => 'nullable',
         ]);
         if ($validator->fails()) {
-            return $this->apiResponse(ResaultType::Error, $validator->errors(), 'Validation Error', 422);
+            return $this->apiResponse(ResultType::Error, $validator->errors(), 'Validation Error', 422);
         }
         $data = University::where('id','=',$id)->first();
 
@@ -121,12 +121,12 @@ class UniversityController extends ApiController
                 $log->info = 'University Updated';
                 $log->save();
 
-                return $this->apiResponse(ResaultType::Success, $data, 'University Updated', 200);
+                return $this->apiResponse(ResultType::Success, $data, 'University Updated', 200);
             } else {
-                return $this->apiResponse(ResaultType::Error, null, 'University not updated', 500);
+                return $this->apiResponse(ResultType::Error, null, 'University not updated', 500);
             }
         } else {
-            return $this->apiResponse(ResaultType::Warning, null, 'Data not found', 404);
+            return $this->apiResponse(ResultType::Warning, null, 'Data not found', 404);
         }
     }
 
@@ -137,9 +137,9 @@ class UniversityController extends ApiController
             $data->status = 9;
             $data->save();
             // $data->delete();
-            return $this->apiResponse(ResaultType::Success, $data, 'University Deleted', 200);
+            return $this->apiResponse(ResultType::Success, $data, 'University Deleted', 200);
         } else {
-            return $this->apiResponse(ResaultType::Error, $data, 'Deleted Error', 500);
+            return $this->apiResponse(ResultType::Error, $data, 'Deleted Error', 500);
         }
     }
 }

@@ -33,21 +33,21 @@ class DepartmentController extends ApiController
         $query->select('department.*');
       break;
       case 4:
-        return $this->apiResponse(ResaultType::Error, 403, 'Authorization Error', 0, 403);
+        return $this->apiResponse(ResultType::Error, 403, 'Authorization Error', 0, 403);
       break;
 
       case 5:
-        return $this->apiResponse(ResaultType::Error, 403, 'Authorization Error', 0, 403);
+        return $this->apiResponse(ResultType::Error, 403, 'Authorization Error', 0, 403);
       break;
 
       case 6:
-        return $this->apiResponse(ResaultType::Error, 403, 'Authorization Error', 0, 403);
+        return $this->apiResponse(ResultType::Error, 403, 'Authorization Error', 0, 403);
       break;
       default:
         $query->select('department.*');
       break;
     }
-    
+
 
     $query->join('faculty','faculty.id','=','department.faculty');
     $query->join('university','university.id','=','faculty.university');
@@ -58,14 +58,14 @@ class DepartmentController extends ApiController
     if ($request->has('faculty')){
       $query->where('department.faculty', '=', $request->query('faculty'));
     }
-    
+
     $length = count($query->get());
     $data = $query->offset($offset)->limit($limit)->get();
 
     if ($data) {
-      return $this->apiResponse(ResaultType::Success, $data, 'Listing: '.$offset.'-'.$limit, $length, 200);
+      return $this->apiResponse(ResultType::Success, $data, 'Listing: '.$offset.'-'.$limit, $length, 200);
     } else {
-      return $this->apiResponse(ResaultType::Success, null, 'Content Not Found', 0, 202);
+      return $this->apiResponse(ResultType::Success, null, 'Content Not Found', 0, 202);
     }
   }
 
@@ -80,7 +80,7 @@ class DepartmentController extends ApiController
           'status' => 'required',
         ]);
         if ($validator->fails()) {
-          return $this->apiResponse(ResaultType::Error, $validator->errors(), 'Validation Error', 422);
+          return $this->apiResponse(ResultType::Error, $validator->errors(), 'Validation Error', 422);
         }
         $data = new Department();
         $data->faculty = request('faculty');
@@ -96,13 +96,13 @@ class DepartmentController extends ApiController
           $log->type = 1;
           $log->info = 'Department '.$data->id.' Created for the Faculty '.$data->faculty;
           $log->save();
-          return $this->apiResponse(ResaultType::Success, $data, 'Department Added', 201);
+          return $this->apiResponse(ResultType::Success, $data, 'Department Added', 201);
         }
         else {
-          return $this->apiResponse(ResaultType::Error, null, 'Department not Added', 500);
+          return $this->apiResponse(ResultType::Error, null, 'Department not Added', 500);
         }
       default:
-        return $this->apiResponse(ResaultType::Error, 403, 'Authorization Error', 0, 403);
+        return $this->apiResponse(ResultType::Error, 403, 'Authorization Error', 0, 403);
       break;
     }
   }
@@ -111,9 +111,9 @@ class DepartmentController extends ApiController
   {
     $data = Department::where('department.id','=', $id)->first();
     if ($data) {
-      return $this->apiResponse(ResaultType::Success, $data, 'Department Detail', 201);
+      return $this->apiResponse(ResultType::Success, $data, 'Department Detail', 201);
     } else {
-      return $this->apiResponse(ResaultType::Error, null, 'Content Not Found', 404);
+      return $this->apiResponse(ResultType::Error, null, 'Content Not Found', 404);
     }
   }
 
@@ -124,7 +124,7 @@ class DepartmentController extends ApiController
       'status' => 'nullable',
     ]);
     if ($validator->fails()) {
-      return $this->apiResponse(ResaultType::Error, $validator->errors(), 'Validation Error', 422);
+      return $this->apiResponse(ResultType::Error, $validator->errors(), 'Validation Error', 422);
     }
     $data = Department::find($id);
     if (request('name')) {
@@ -142,9 +142,9 @@ class DepartmentController extends ApiController
       $log->info = 'Department '.$data->id.' Updated in Faculty '.$data->faculty;
       $log->save();
 
-      return $this->apiResponse(ResaultType::Success, $data, 'Department Updated', 200);
+      return $this->apiResponse(ResultType::Success, $data, 'Department Updated', 200);
     } else {
-      return $this->apiResponse(ResaultType::Error, null, 'Content not updated', 500);
+      return $this->apiResponse(ResultType::Error, null, 'Content not updated', 500);
     }
   }
 
@@ -153,9 +153,9 @@ class DepartmentController extends ApiController
     $data = Department::find($id);
     if ($data) {
       $data->delete();
-      return $this->apiResponse(ResaultType::Success, $data, 'Department Deleted', 200);
+      return $this->apiResponse(ResultType::Success, $data, 'Department Deleted', 200);
     } else {
-      return $this->apiResponse(ResaultType::Error, $data, 'Deleted Error', 500);
+      return $this->apiResponse(ResultType::Error, $data, 'Deleted Error', 500);
     }
   }
 

@@ -48,7 +48,7 @@ class AssessmentController extends ApiController
         case 6:
           // 6. seviyenin bu ekranda işi olmadığı için 403 verip gönderiyoruz.
           // 403ün yönlendirme fonksiyonu vue tarafında gerçekleştirilecek.
-          return $this->apiResponse(ResaultType::Error, 403, 'Authorization Error', 0, 403);
+          return $this->apiResponse(ResultType::Error, 403, 'Authorization Error', 0, 403);
           break;
         default:
           // 1 ve 2. leveller kontrol edilmeyeceği için diğer sorguları default içine ekliyoruz
@@ -63,9 +63,9 @@ class AssessmentController extends ApiController
       $length = count($query->get());
       $data = $query->offset($offset)->limit($limit)->get();
       if ($length >= 1) {
-        return $this->apiResponse(ResaultType::Success, $data, 'Listing: '.$offset.'-'.$limit, $length, 200);
+        return $this->apiResponse(ResultType::Success, $data, 'Listing: '.$offset.'-'.$limit, $length, 200);
       } else {
-        return $this->apiResponse(ResaultType::Error, null, 'Assessment Not Found', 0, 404);
+        return $this->apiResponse(ResultType::Error, null, 'Assessment Not Found', 0, 404);
       }
     }
 
@@ -74,7 +74,7 @@ class AssessmentController extends ApiController
 			$user = User::find(Auth::id()); // oturum açan kişinin bilgilerini buradan alıyoruz.
 			switch ($user->level) {
 				case 6:
-					return $this->apiResponse(ResaultType::Error, 403, 'Authorization Error', 0, 403);
+					return $this->apiResponse(ResultType::Error, 403, 'Authorization Error', 0, 403);
         	break;
 				default:
 					$query = Course::query();
@@ -85,7 +85,7 @@ class AssessmentController extends ApiController
 					$length = count($query->get());
 
 					if($length == 0){
-						return $this->apiResponse(ResaultType::Error, 403, 'Authorization Error', 0, 403);
+						return $this->apiResponse(ResultType::Error, 403, 'Authorization Error', 0, 403);
 					}
           $validator = Validator::make($request->all(), [
             'name' => 'required',
@@ -93,7 +93,7 @@ class AssessmentController extends ApiController
             'course_id' => 'required',
             ]);
           if ($validator->fails()) {
-            return $this->apiResponse(ResaultType::Error, $validator->errors(), 'Validation Error', 422);
+            return $this->apiResponse(ResultType::Error, $validator->errors(), 'Validation Error', 422);
           }
           $data = new Assessment();
           $data->name = request('name');
@@ -109,9 +109,9 @@ class AssessmentController extends ApiController
             $log->type = 1;
             $log->info = 'Assessment '.$data->id.' Created for the University '.$data->university;
             $log->save();
-            return $this->apiResponse(ResaultType::Success, $data, 'Assessment Created', 201);
+            return $this->apiResponse(ResultType::Success, $data, 'Assessment Created', 201);
           } else {
-            return $this->apiResponse(ResaultType::Error, null, 'Assessment not saved', 500);
+            return $this->apiResponse(ResultType::Error, null, 'Assessment not saved', 500);
           }
           break;
       }
@@ -121,9 +121,9 @@ class AssessmentController extends ApiController
     {
       $data = Assessment::find($id);
       if ($data) {
-        return $this->apiResponse(ResaultType::Success, $data, 'Assessment Detail', 201);
+        return $this->apiResponse(ResultType::Success, $data, 'Assessment Detail', 201);
       } else {
-        return $this->apiResponse(ResaultType::Error, null, 'Assessment Not Found', 0, 404);
+        return $this->apiResponse(ResultType::Error, null, 'Assessment Not Found', 0, 404);
       }
     }
 
@@ -135,7 +135,7 @@ class AssessmentController extends ApiController
             'course_id' => 'nullable',
         ]);
         if ($validator->fails()) {
-            return $this->apiResponse(ResaultType::Error, $validator->errors(), 'Validation Error', 422);
+            return $this->apiResponse(ResultType::Error, $validator->errors(), 'Validation Error', 422);
         }
         $data = Assessment::find($id);
 
@@ -161,12 +161,12 @@ class AssessmentController extends ApiController
                 $log->info = 'Assessment '.$data->id;
                 $log->save();
 
-                return $this->apiResponse(ResaultType::Success, $data, 'Assessment Updated', 200);
+                return $this->apiResponse(ResultType::Success, $data, 'Assessment Updated', 200);
             } else {
-                return $this->apiResponse(ResaultType::Error, null, 'Assessment not updated', 500);
+                return $this->apiResponse(ResultType::Error, null, 'Assessment not updated', 500);
             }
         } else {
-            return $this->apiResponse(ResaultType::Warning, null, 'Data not found', 404);
+            return $this->apiResponse(ResultType::Warning, null, 'Data not found', 404);
         }
     }
 
@@ -175,9 +175,9 @@ class AssessmentController extends ApiController
         $data = Assessment::find($id);
         if ($data) {
             $data->delete();
-            return $this->apiResponse(ResaultType::Success, $data, 'Assessment Deleted', 200);
+            return $this->apiResponse(ResultType::Success, $data, 'Assessment Deleted', 200);
         } else {
-            return $this->apiResponse(ResaultType::Error, $data, 'Deleted Error', 500);
+            return $this->apiResponse(ResultType::Error, $data, 'Deleted Error', 500);
         }
     }
 }

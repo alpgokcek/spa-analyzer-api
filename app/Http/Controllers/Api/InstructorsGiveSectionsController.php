@@ -25,7 +25,7 @@ class InstructorsGiveSectionsController extends ApiController
         $import = new InstructorsGiveSectionsImport();
         $import->import($request->fileUrl);
 
-        return $this->apiResponse(ResaultType::Error, $import->err, 'hatalar', 403);
+        return $this->apiResponse(ResultType::Error, $import->err, 'hatalar', 403);
     }
 
 
@@ -71,7 +71,7 @@ class InstructorsGiveSectionsController extends ApiController
             case 6:
                 // 6. seviyenin bu ekranda işi olmadığı için 403 verip gönderiyoruz.
                 // 403ün yönlendirme fonksiyonu vue tarafında gerçekleştirilecek.
-                return $this->apiResponse(ResaultType::Error, 403, 'Authorization Error', 0, 403);
+                return $this->apiResponse(ResultType::Error, 403, 'Authorization Error', 0, 403);
             break;
             default:
 								$query->join('users','users.id','=','instructors_gives_sections.instructor_id');
@@ -90,9 +90,9 @@ class InstructorsGiveSectionsController extends ApiController
         $length = count($query->get());
         $data = $query->offset($offset)->limit($limit)->get();
         if ($data) {
-            return $this->apiResponse(ResaultType::Success, $data, 'Listing: '.$offset.'-'.$limit, $length, 200);
+            return $this->apiResponse(ResultType::Success, $data, 'Listing: '.$offset.'-'.$limit, $length, 200);
         } else {
-            return $this->apiResponse(ResaultType::Error, null, 'InstructorsGiveSections Not Found', 0, 404);
+            return $this->apiResponse(ResultType::Error, null, 'InstructorsGiveSections Not Found', 0, 404);
         }
     }
 
@@ -106,7 +106,7 @@ class InstructorsGiveSectionsController extends ApiController
 							'section_id' => 'required',
 							]);
 					if ($validator->fails()) {
-							return $this->apiResponse(ResaultType::Error, $validator->errors(), 'Validation Error', 422);
+							return $this->apiResponse(ResultType::Error, $validator->errors(), 'Validation Error', 422);
 					}
 					$query = InstructorsGiveSections::query();
 					$data->instructor_id = request('instructor_id');
@@ -121,13 +121,13 @@ class InstructorsGiveSectionsController extends ApiController
 							$log->type = 1;
 							$log->info = 'InstructorsGiveSections '.$data->id.' Created for the University '.$data->university;
 							$log->save();
-							return $this->apiResponse(ResaultType::Success, $data, 'InstructorsGiveSections Created', 201);
+							return $this->apiResponse(ResultType::Success, $data, 'InstructorsGiveSections Created', 201);
 					} else {
-							return $this->apiResponse(ResaultType::Error, null, 'InstructorsGiveSections not saved', 500);
+							return $this->apiResponse(ResultType::Error, null, 'InstructorsGiveSections not saved', 500);
 					}
 					break;
 					default:
-          return $this->apiResponse(ResaultType::Error, 403, 'Authorization Error', 0, 403);
+          return $this->apiResponse(ResultType::Error, 403, 'Authorization Error', 0, 403);
         break;
       }
     }
@@ -142,9 +142,9 @@ class InstructorsGiveSectionsController extends ApiController
 				$query->select('course.code as course_code', 'course.id as course_id', 'course.title as course_name', 'users.name as user_name', 'section.title as section_title', 'instructors_gives_sections.*');
 				$data = $query->get()->first();
         if ($data) {
-            return $this->apiResponse(ResaultType::Success, $data, 'InstructorsGiveSections Detail', 201);
+            return $this->apiResponse(ResultType::Success, $data, 'InstructorsGiveSections Detail', 201);
         } else {
-            return $this->apiResponse(ResaultType::Error, null, 'InstructorsGiveSections Not Found', 404);
+            return $this->apiResponse(ResultType::Error, null, 'InstructorsGiveSections Not Found', 404);
         }
     }
 
@@ -155,7 +155,7 @@ class InstructorsGiveSectionsController extends ApiController
             'section_id' => 'nullable',
         ]);
         if ($validator->fails()) {
-            return $this->apiResponse(ResaultType::Error, $validator->errors(), 'Validation Error', 422);
+            return $this->apiResponse(ResultType::Error, $validator->errors(), 'Validation Error', 422);
         }
         $data = InstructorsGiveSections::find($id);
 
@@ -176,12 +176,12 @@ class InstructorsGiveSectionsController extends ApiController
                 $log->type = 2;
                 $log->info = 'InstructorsGiveSections '.$data->id;
                 $log->save();
-                return $this->apiResponse(ResaultType::Success, $data, 'InstructorsGiveSections Updated', 200);
+                return $this->apiResponse(ResultType::Success, $data, 'InstructorsGiveSections Updated', 200);
             } else {
-                return $this->apiResponse(ResaultType::Error, null, 'InstructorsGiveSections not updated', 500);
+                return $this->apiResponse(ResultType::Error, null, 'InstructorsGiveSections not updated', 500);
             }
         } else {
-            return $this->apiResponse(ResaultType::Warning, null, 'Data not found', 404);
+            return $this->apiResponse(ResultType::Warning, null, 'Data not found', 404);
         }
     }
 
@@ -190,9 +190,9 @@ class InstructorsGiveSectionsController extends ApiController
         $data = InstructorsGiveSections::find($id);
         if ($data) {
             $data->delete();
-            return $this->apiResponse(ResaultType::Success, $data, 'InstructorsGiveSections Deleted', 200);
+            return $this->apiResponse(ResultType::Success, $data, 'InstructorsGiveSections Deleted', 200);
         } else {
-            return $this->apiResponse(ResaultType::Error, $data, 'Deleted Error', 500);
+            return $this->apiResponse(ResultType::Error, $data, 'Deleted Error', 500);
         }
     }
 }

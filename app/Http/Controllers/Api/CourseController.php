@@ -23,7 +23,7 @@ class CourseController extends ApiController
     // dosya yükleme yetkisi hangi seviyelerde geçerli ?
     $import = new CourseImport();
     $import->import($request->fileUrl);
-    return $this->apiResponse(ResaultType::Error, $import->err, 'hatalar', 403);
+    return $this->apiResponse(ResultType::Error, $import->err, 'hatalar', 403);
   }
 
   public function index(Request $request)
@@ -59,7 +59,7 @@ class CourseController extends ApiController
         $query->where('instructors_gives_sections.instructor_id','=',$user->id);
       break;
       case 6:
-        return $this->apiResponse(ResaultType::Error, 403, 'Authorization Error', 0, 403);
+        return $this->apiResponse(ResultType::Error, 403, 'Authorization Error', 0, 403);
         break;
     default:
         $query->join('department','department.id','=','course.department_id');
@@ -69,9 +69,9 @@ class CourseController extends ApiController
     $length = count($query->get());
     $data = $query->offset($offset)->limit($limit)->get();
     if ($length >= 1) {
-      return $this->apiResponse(ResaultType::Success, $data, 'Listing: '.$offset.'-'.$limit, $length, 200);
+      return $this->apiResponse(ResultType::Success, $data, 'Listing: '.$offset.'-'.$limit, $length, 200);
     } else {
-      return $this->apiResponse(ResaultType::Error, null, 'Course Not Found', 0, 404);
+      return $this->apiResponse(ResultType::Error, null, 'Course Not Found', 0, 404);
     }
   }
 
@@ -90,7 +90,7 @@ class CourseController extends ApiController
           'status' => 'required'
         ]);
         if ($validator->fails()) {
-          return $this->apiResponse(ResaultType::Error, $validator->errors(), 'Validation Error', 422);
+          return $this->apiResponse(ResultType::Error, $validator->errors(), 'Validation Error', 422);
         }
         $data = new Course();
         $data->department_id = request('department_id');
@@ -110,12 +110,12 @@ class CourseController extends ApiController
           $log->type = 1;
           $log->info = 'Course '.$data->id.' Created for the Department '.$data->department;
           $log->save();
-          return $this->apiResponse(ResaultType::Success, $data, 'Course Created', 201);
+          return $this->apiResponse(ResultType::Success, $data, 'Course Created', 201);
         } else {
-          return $this->apiResponse(ResaultType::Error, null, 'Course not saved', 500);
+          return $this->apiResponse(ResultType::Error, null, 'Course not saved', 500);
         }
       default:
-        return $this->apiResponse(ResaultType::Error, 403, 'Authorization Error', 0, 403);
+        return $this->apiResponse(ResultType::Error, 403, 'Authorization Error', 0, 403);
       break;
     }
   }
@@ -124,9 +124,9 @@ class CourseController extends ApiController
   {
     $data = Course::find($id);
     if ($data) {
-      return $this->apiResponse(ResaultType::Success, $data, 'Course Detail', 201);
+      return $this->apiResponse(ResultType::Success, $data, 'Course Detail', 201);
     } else {
-      return $this->apiResponse(ResaultType::Error, null, 'Course Not Found', 404);
+      return $this->apiResponse(ResultType::Error, null, 'Course Not Found', 404);
     }
   }
 
@@ -141,7 +141,7 @@ class CourseController extends ApiController
       'status' => 'nullable'
     ]);
     if ($validator->fails()) {
-      return $this->apiResponse(ResaultType::Error, $validator->errors(), 'Validation Error', 422);
+      return $this->apiResponse(ResultType::Error, $validator->errors(), 'Validation Error', 422);
     }
     $data = Course::find($id);
     if ($data) {
@@ -174,12 +174,12 @@ class CourseController extends ApiController
         $log->type = 2;
         $log->info = 'Course '.$data->id.' Updated in Department '.$data->department;
         $log->save();
-        return $this->apiResponse(ResaultType::Success, $data, 'Course Updated', 200);
+        return $this->apiResponse(ResultType::Success, $data, 'Course Updated', 200);
       } else {
-        return $this->apiResponse(ResaultType::Error, null, 'Course not updated', 500);
+        return $this->apiResponse(ResultType::Error, null, 'Course not updated', 500);
       }
     } else {
-      return $this->apiResponse(ResaultType::Warning, null, 'Data not found', 404);
+      return $this->apiResponse(ResultType::Warning, null, 'Data not found', 404);
     }
   }
 
@@ -188,9 +188,9 @@ class CourseController extends ApiController
     $data = Course::find($id);
     if ($data) {
       $data->delete();
-      return $this->apiResponse(ResaultType::Success, $data, 'Course Deleted', 200);
+      return $this->apiResponse(ResultType::Success, $data, 'Course Deleted', 200);
     } else {
-      return $this->apiResponse(ResaultType::Error, $data, 'Deleted Error', 500);
+      return $this->apiResponse(ResultType::Error, $data, 'Deleted Error', 500);
     }
   }
 }

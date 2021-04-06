@@ -69,9 +69,9 @@ class UploadController extends ApiController
             //////////////////////////////
             // canlıya aldığımızda $path veya $fileurl datalarından hangisini vermemiz gerektiğini test edicez.
             if ($data) {
-                return $this->apiResponse(ResaultType::Success, $path, 'File Uploaded', 201);
+                return $this->apiResponse(ResultType::Success, $path, 'File Uploaded', 201);
             } else {
-                return $this->apiResponse(ResaultType::Error, null, 'File can\'t uploaded', 500);
+                return $this->apiResponse(ResultType::Error, null, 'File can\'t uploaded', 500);
             }
         }
     }

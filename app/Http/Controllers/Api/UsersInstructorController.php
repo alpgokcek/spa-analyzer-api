@@ -22,7 +22,7 @@ class UsersInstructorController extends ApiController
         $import = new UsersInstructorImport();
         $import->import($request->fileUrl);
 
-        return $this->apiResponse(ResaultType::Error, $import->err, 'hatalar', 403);
+        return $this->apiResponse(ResultType::Error, $import->err, 'hatalar', 403);
     }
 
     public function index(Request $request)
@@ -36,11 +36,11 @@ class UsersInstructorController extends ApiController
         $data = $query->offset($offset)->limit($limit)->get();
 
         if ($user->level == 1 && $data) {
-					return $this->apiResponse(ResaultType::Success, $data, 'Listing: '.$offset.'-'.$limit, $length, 200);
+					return $this->apiResponse(ResultType::Success, $data, 'Listing: '.$offset.'-'.$limit, $length, 200);
 				} elseif ($user->level != 1) {
-					return $this->apiResponse(ResaultType::Error, 403, 'Authorization Error', 0, 403);
+					return $this->apiResponse(ResultType::Error, 403, 'Authorization Error', 0, 403);
 				} else {
-						return $this->apiResponse(ResaultType::Error, null, 'Instructor Not Found', 0, 404);
+						return $this->apiResponse(ResultType::Error, null, 'Instructor Not Found', 0, 404);
 				}
     }
 
@@ -53,7 +53,7 @@ class UsersInstructorController extends ApiController
             'role' => 'required'
             ]);
         if ($validator->fails()) {
-            return $this->apiResponse(ResaultType::Error, $validator->errors(), 'Validation Error', 422);
+            return $this->apiResponse(ResultType::Error, $validator->errors(), 'Validation Error', 422);
         }
         $data = new UsersInstructor();
         $data->user = request('user');
@@ -68,9 +68,9 @@ class UsersInstructorController extends ApiController
             $log->type = 1;
             $log->info = 'Instructor '.$data->id.' Created for the University '.$data->university;
             $log->save();
-            return $this->apiResponse(ResaultType::Success, $data, 'Instructor Created', 201);
+            return $this->apiResponse(ResultType::Success, $data, 'Instructor Created', 201);
         } else {
-            return $this->apiResponse(ResaultType::Error, null, 'Instructor not saved', 500);
+            return $this->apiResponse(ResultType::Error, null, 'Instructor not saved', 500);
 				}
 			}
     }
@@ -79,9 +79,9 @@ class UsersInstructorController extends ApiController
     {
         $data = UsersInstructor::find($id);
         if ($data) {
-            return $this->apiResponse(ResaultType::Success, $data, 'Instructor Detail', 201);
+            return $this->apiResponse(ResultType::Success, $data, 'Instructor Detail', 201);
         } else {
-            return $this->apiResponse(ResaultType::Error, null, 'Instructor Not Found', 404);
+            return $this->apiResponse(ResultType::Error, null, 'Instructor Not Found', 404);
         }
     }
 
@@ -92,7 +92,7 @@ class UsersInstructorController extends ApiController
             'role' => 'nullable'
         ]);
         if ($validator->fails()) {
-            return $this->apiResponse(ResaultType::Error, $validator->errors(), 'Validation Error', 422);
+            return $this->apiResponse(ResultType::Error, $validator->errors(), 'Validation Error', 422);
         }
         $data = UsersInstructor::find($id);
 
@@ -115,12 +115,12 @@ class UsersInstructorController extends ApiController
                 $log->info = 'Instructor '.$data->id;
                 $log->save();
 
-                return $this->apiResponse(ResaultType::Success, $data, 'Instructor Updated', 200);
+                return $this->apiResponse(ResultType::Success, $data, 'Instructor Updated', 200);
             } else {
-                return $this->apiResponse(ResaultType::Error, null, 'Instructor not updated', 500);
+                return $this->apiResponse(ResultType::Error, null, 'Instructor not updated', 500);
             }
         } else {
-            return $this->apiResponse(ResaultType::Warning, null, 'Data not found', 404);
+            return $this->apiResponse(ResultType::Warning, null, 'Data not found', 404);
         }
     }
 
@@ -129,9 +129,9 @@ class UsersInstructorController extends ApiController
         $data = UsersInstructor::find($id);
         if ($data) {
             $data->delete();
-            return $this->apiResponse(ResaultType::Success, $data, 'Instructor Deleted', 200);
+            return $this->apiResponse(ResultType::Success, $data, 'Instructor Deleted', 200);
         } else {
-            return $this->apiResponse(ResaultType::Error, $data, 'Deleted Error', 500);
+            return $this->apiResponse(ResultType::Error, $data, 'Deleted Error', 500);
         }
     }
 }

@@ -25,7 +25,7 @@ class UserController extends ApiController
         $import = new UserImport();
         $import->import($request->fileUrl);
 
-        return $this->apiResponse(ResaultType::Error, $import->err, 'hatalar', 403);
+        return $this->apiResponse(ResultType::Error, $import->err, 'hatalar', 403);
     }
 
     public function index(Request $request)
@@ -40,7 +40,7 @@ class UserController extends ApiController
 
         switch ($user->level) {
             case 6:
-                return $this->apiResponse(ResaultType::Error, 403, 'Authorization Error', 0, 403);
+                return $this->apiResponse(ResultType::Error, 403, 'Authorization Error', 0, 403);
                 break;
 
             default:
@@ -76,9 +76,9 @@ class UserController extends ApiController
         $data = $query->offset($offset)->limit($limit)->get();
 
         if (count($data) >= 1) {
-            return $this->apiResponse(ResaultType::Success, $data, 'Listing: '.$offset.'-'.$limit, $length, 200);
+            return $this->apiResponse(ResultType::Success, $data, 'Listing: '.$offset.'-'.$limit, $length, 200);
         } else {
-            return $this->apiResponse(ResaultType::Error, null, 'Content Not Found', 404);
+            return $this->apiResponse(ResultType::Error, null, 'Content Not Found', 404);
         }
     }
 
@@ -91,11 +91,11 @@ class UserController extends ApiController
             'level' => 'required'
         ]);
         if ($validator->fails()) {
-            return $this->apiResponse(ResaultType::Error, $validator->errors(), 'Validation Error', 422);
+            return $this->apiResponse(ResultType::Error, $validator->errors(), 'Validation Error', 422);
         }
         $control = User::where('email','=',request('email'))->first();
         if ($control) {
-            return $this->apiResponse(ResaultType::Error, $control->email, 'User Already Registered', 500);
+            return $this->apiResponse(ResultType::Error, $control->email, 'User Already Registered', 500);
         } else {
             $data = new User();
             $data->name = request('name');
@@ -110,9 +110,9 @@ class UserController extends ApiController
             $data->api_token = Str::random(64);
             $data->save();
             if ($data) {
-                return $this->apiResponse(ResaultType::Success, $data, 'User Created', 201);
+                return $this->apiResponse(ResultType::Success, $data, 'User Created', 201);
             } else {
-                return $this->apiResponse(ResaultType::Error, null, 'User Not Created', 500);
+                return $this->apiResponse(ResultType::Error, null, 'User Not Created', 500);
             }
         }
     }
@@ -136,7 +136,7 @@ class UserController extends ApiController
             'phone' => 'nullable',
         ]);
         if ($validator->fails()) {
-            return $this->apiResponse(ResaultType::Error, $validator->errors(), 'Validation Error', 422);
+            return $this->apiResponse(ResultType::Error, $validator->errors(), 'Validation Error', 422);
         }
         $data = User::where('api_token','=',$token)->first();
 
@@ -151,9 +151,9 @@ class UserController extends ApiController
 
         $data->save();
         if ($data) {
-            return $this->apiResponse(ResaultType::Success, $data, 'User Updated', 200);
+            return $this->apiResponse(ResultType::Success, $data, 'User Updated', 200);
         } else {
-            return $this->apiResponse(ResaultType::Error, null, 'User Not Updated', 500);
+            return $this->apiResponse(ResultType::Error, null, 'User Not Updated', 500);
         }
     }
 

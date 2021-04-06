@@ -17,9 +17,9 @@ class CheckAuth extends ApiController
     {
         $user = User::find(Auth::id()); // oturum açan kişinin bilgilerini buradan alıyoruz.
         if ($user->level == 1 || $user->level == 5) {
-						return $this->apiResponse(ResaultType::Success, 204, NULL, 0, 204);
+						return $this->apiResponse(ResultType::Success, 204, NULL, 0, 204);
         } else{
-						return $this->apiResponse(ResaultType::Error, 403, 'Authorization Error', 0, 403);
+						return $this->apiResponse(ResultType::Error, 403, 'Authorization Error', 0, 403);
         }
     }
 }

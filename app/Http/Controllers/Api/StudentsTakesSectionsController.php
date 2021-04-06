@@ -27,7 +27,7 @@ class StudentsTakesSectionsController extends ApiController
       $import->import($request->fileUrl);
 
       // return($import->err);
-      return $this->apiResponse(ResaultType::Error, $import->err, 'hatalar', 403);
+      return $this->apiResponse(ResultType::Error, $import->err, 'hatalar', 403);
   }
 
   public function index(Request $request)
@@ -48,10 +48,10 @@ class StudentsTakesSectionsController extends ApiController
       break;
 			case 4:
         //********************************************* */
-        return $this->apiResponse(ResaultType::Error, 403, 'Authorization Error', 0, 403);
+        return $this->apiResponse(ResultType::Error, 403, 'Authorization Error', 0, 403);
       break;
       case 5:
-        return $this->apiResponse(ResaultType::Error, 403, 'Authorization Error', 0, 403);
+        return $this->apiResponse(ResultType::Error, 403, 'Authorization Error', 0, 403);
       break;
       case 6:
 				$query->join('users','users.student_id','=','students_takes_sections.student_id');
@@ -75,9 +75,9 @@ class StudentsTakesSectionsController extends ApiController
       $length = count($query->get());
       $data = $query->offset($offset)->limit($limit)->get();
       if ($data) {
-        return $this->apiResponse(ResaultType::Success, $data, 'Listing: '.$offset.'-'.$limit, $length, 200);
+        return $this->apiResponse(ResultType::Success, $data, 'Listing: '.$offset.'-'.$limit, $length, 200);
       } else {
-        return $this->apiResponse(ResaultType::Error, null, 'StudentsTakesSections Not Found', 0, 404);
+        return $this->apiResponse(ResultType::Error, null, 'StudentsTakesSections Not Found', 0, 404);
       }
     }
 
@@ -93,7 +93,7 @@ class StudentsTakesSectionsController extends ApiController
 							'average' => 'nullable',
 							]);
 					if ($validator->fails()) {
-							return $this->apiResponse(ResaultType::Error, $validator->errors(), 'Validation Error', 422);
+							return $this->apiResponse(ResultType::Error, $validator->errors(), 'Validation Error', 422);
 					}
 							$user = User::where('student_id','=', request('student_id'))->first();
 							if ($user){
@@ -114,19 +114,19 @@ class StudentsTakesSectionsController extends ApiController
 													$log->type = 1;
 													$log->info = 'StudentsTakesSections '.$data->id.' Created for the University '.$data->university;
 													$log->save();
-													return $this->apiResponse(ResaultType::Success, $data, 'StudentsTakesSections Created', 201);
+													return $this->apiResponse(ResultType::Success, $data, 'StudentsTakesSections Created', 201);
 											} else {
-													return $this->apiResponse(ResaultType::Error, null, 'StudentsTakesSections not saved', 500);
+													return $this->apiResponse(ResultType::Error, null, 'StudentsTakesSections not saved', 500);
 											}
 									} else {
-											return $this->apiResponse(ResaultType::Error, null, 'Section not found', 404);
+											return $this->apiResponse(ResultType::Error, null, 'Section not found', 404);
 									}
 							} else {
-									return $this->apiResponse(ResaultType::Error, null, 'User not found', 404);
+									return $this->apiResponse(ResultType::Error, null, 'User not found', 404);
 							}
 				break;
 				default:
-					return $this->apiResponse(ResaultType::Error, 403, 'Authorization Error', 0, 403);
+					return $this->apiResponse(ResultType::Error, 403, 'Authorization Error', 0, 403);
 				break;
 		}
 
@@ -143,9 +143,9 @@ class StudentsTakesSectionsController extends ApiController
         $query->select('course.code as course_code', 'course.id as course_id', 'users.department_id as department_id','course.title as course_name', 'users.name as user_name', 'section.title as section_title', 'students_takes_sections.*');
 				$data = $query->get()->first();
         if ($data) {
-            return $this->apiResponse(ResaultType::Success, $data, 'StudentsTakesSections Detail', 201);
+            return $this->apiResponse(ResultType::Success, $data, 'StudentsTakesSections Detail', 201);
         } else {
-            return $this->apiResponse(ResaultType::Error, null, 'StudentsTakesSections Not Found', 404);
+            return $this->apiResponse(ResultType::Error, null, 'StudentsTakesSections Not Found', 404);
         }
     }
 
@@ -158,7 +158,7 @@ class StudentsTakesSectionsController extends ApiController
             'average' => 'nullable',
         ]);
         if ($validator->fails()) {
-            return $this->apiResponse(ResaultType::Error, $validator->errors(), 'Validation Error', 422);
+            return $this->apiResponse(ResultType::Error, $validator->errors(), 'Validation Error', 422);
         }
         $data = StudentsTakesSections::find($id);
 
@@ -187,12 +187,12 @@ class StudentsTakesSectionsController extends ApiController
                 $log->info = 'StudentsTakesSections '.$data->id;
                 $log->save();
 
-                return $this->apiResponse(ResaultType::Success, $data, 'StudentsTakesSections Updated', 200);
+                return $this->apiResponse(ResultType::Success, $data, 'StudentsTakesSections Updated', 200);
             } else {
-                return $this->apiResponse(ResaultType::Error, null, 'StudentsTakesSections not updated', 500);
+                return $this->apiResponse(ResultType::Error, null, 'StudentsTakesSections not updated', 500);
             }
         } else {
-            return $this->apiResponse(ResaultType::Warning, null, 'Data not found', 404);
+            return $this->apiResponse(ResultType::Warning, null, 'Data not found', 404);
         }
     }
 
@@ -201,9 +201,9 @@ class StudentsTakesSectionsController extends ApiController
         $data = StudentsTakesSections::find($id);
         if ($data) {
             $data->delete();
-            return $this->apiResponse(ResaultType::Success, $data, 'StudentsTakesSections Deleted', 200);
+            return $this->apiResponse(ResultType::Success, $data, 'StudentsTakesSections Deleted', 200);
         } else {
-            return $this->apiResponse(ResaultType::Error, $data, 'Deleted Error', 500);
+            return $this->apiResponse(ResultType::Error, $data, 'Deleted Error', 500);
         }
     }
 }
