@@ -132,7 +132,13 @@ class InstructorsGivesSectionsController extends ApiController
 
     public function show($id)
     {
-        $data = InstructorsGivesSections::find($id);
+				$query = StudentsTakesSections::query();
+				$query->join('users','users.id','=','instructors_gives_sections.instructor_id');
+				$query->join('section','section.id','=','instructors_gives_sections.section_id');
+				$query->join('course','course.id','=','section.course_id');
+				$query->where('instructors_gives_sections.id', '=', $id);
+				$query->select('course.code as course_code', 'course.id as course_id', 'course.title as course_name', 'users.name as user_name', 'section.title as section_title', 'instructors_gives_sections.*');
+				$data = $query->get()->first();
         if ($data) {
             return $this->apiResponse(ResaultType::Success, $data, 'InstructorsGivesSections Detail', 201);
         } else {
