@@ -108,7 +108,7 @@ class InstructorsGiveSectionsController extends ApiController
 					if ($validator->fails()) {
 							return $this->apiResponse(ResultType::Error, $validator->errors(), 'Validation Error', 422);
 					}
-					$query = new InstructorsGiveSections();
+					$data = new InstructorsGiveSections();
 					$data->instructor_id = request('instructor_id');
 					$data->section_id = request('section_id');
 					$data->save();
