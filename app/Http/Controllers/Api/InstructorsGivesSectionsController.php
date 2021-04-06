@@ -132,7 +132,7 @@ class InstructorsGivesSectionsController extends ApiController
 
     public function show($id)
     {
-				$query = StudentsTakesSections::query();
+				$query = InstructorsGiveSections::query();
 				$query->join('users','users.id','=','instructors_gives_sections.instructor_id');
 				$query->join('section','section.id','=','instructors_gives_sections.section_id');
 				$query->join('course','course.id','=','section.course_id');
