@@ -37,6 +37,7 @@ class InstructorsGivesSectionsController extends ApiController
 
         switch ($user->level) {
             case 3:
+								$query->join('users','users.id','=','instructors_gives_sections.instructor_id');
                 $query->join('section','section.id','=','instructors_gives_sections.section_id');
                 $query->join('course','course.id','=','section.course');
                 $query->join('department','department.id','=','course.department_id');
@@ -47,6 +48,7 @@ class InstructorsGivesSectionsController extends ApiController
             break;
 
             case 4:
+								$query->join('users','users.id','=','instructors_gives_sections.instructor_id');
                 $query->join('section','section.id','=','instructors_gives_sections.section_id');
                 $query->join('course','course.id','=','section.course');
                 $query->join('department','department.id','=','course.department_id');
@@ -57,6 +59,8 @@ class InstructorsGivesSectionsController extends ApiController
             break;
 
             case 5:
+								$query->join('users','users.id','=','instructors_gives_sections.instructor_id');
+								$query->join('section','section.id','=','instructors_gives_sections.section_id');
                 $query->where('instructors_gives_sections.instructor_id','=',$user->id);
 
                 $query->select('instructors_gives_sections.*');
@@ -67,6 +71,8 @@ class InstructorsGivesSectionsController extends ApiController
                 return $this->apiResponse(ResaultType::Error, 403, 'Authorization Error', 0, 403);
             break;
             default:
+								$query->join('users','users.id','=','instructors_gives_sections.instructor_id');
+								$query->join('section','section.id','=','instructors_gives_sections.section_id');
                 $query->select('instructors_gives_sections.*');
             break;
         }
