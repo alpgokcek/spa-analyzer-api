@@ -2,7 +2,7 @@
 
 namespace App\Imports;
 
-use App\InstructorsGivesSections;
+use App\InstructorsGiveSections;
 
 use Maatwebsite\Excel\Concerns\Importable;
 use Maatwebsite\Excel\Concerns\ToModel;
@@ -15,7 +15,7 @@ use Maatwebsite\Excel\Concerns\WithBatchInserts;
 
 use Maatwebsite\Excel\Concerns\WithStartRow;
 
-class InstructorsGivesSectionsImport implements ToModel, SkipsOnError, SkipsOnFailure, WithStartRow
+class InstructorsGiveSectionsImport implements ToModel, SkipsOnError, SkipsOnFailure, WithStartRow
 {
     use Importable, SkipsErrors, SkipsFailures;
 
@@ -28,7 +28,7 @@ class InstructorsGivesSectionsImport implements ToModel, SkipsOnError, SkipsOnFa
     public function model(array $row)
     {
         ++$this->rowNo;
-        return new InstructorsGivesSections([
+        return new InstructorsGiveSections([
             'instructor_id' => $row[0],
             'section_id' => $row[1]
         ]);

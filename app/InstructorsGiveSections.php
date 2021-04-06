@@ -4,7 +4,7 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class InstructorsGivesSections extends Model
+class InstructorsGiveSections extends Model
 {
     protected $table = 'instructors_gives_sections';
     protected $fillable = ['instructor_id','section_id'];

@@ -27,7 +27,7 @@ Route::middleware('api-token')->group(function() {
     Route::apiResource('/faculty', 'Api\FacultyController');
     Route::apiResource('/grading-tool', 'Api\GradingToolController');
     Route::apiResource('/gtcco', 'Api\GradingToolCoversCourseOutcomeController');
-    Route::apiResource('/igs', 'Api\InstructorsGivesSectionsController');
+    Route::apiResource('/igs', 'Api\InstructorsGiveSectionsController');
     Route::apiResource('/log', 'Api\LogController');
     Route::apiResource('/program-outcome', 'Api\ProgramOutcomeController');
     Route::apiResource('/popco', 'Api\ProgramOutcomesProvidesCourseOutcomesController');
@@ -48,7 +48,7 @@ Route::middleware('api-token')->group(function() {
     Route::post('/users-student/uploadedFile', 'Api\UsersStudentController@uploadedFile');
     Route::post('/users-instructor/uploadedFile', 'Api\UsersInstructorController@uploadedFile');
     Route::post('/section/uploadedFile', 'Api\SectionController@uploadedFile');
-    Route::post('/igs/uploadedFile', 'Api\InstructorsGivesSectionsController@uploadedFile');
+    Route::post('/igs/uploadedFile', 'Api\InstructorsGiveSectionsController@uploadedFile');
     Route::post('/course/uploadedFile', 'Api\CourseController@uploadedFile');
 		Route::post('/program-outcome/uploadedFile', 'Api\ProgramOutcomeController@uploadedFile');
 		Route::post('/user/uploadedFile', 'Api\UserController@uploadedFile');

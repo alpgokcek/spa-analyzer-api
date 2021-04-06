@@ -6,7 +6,7 @@ use App\Assessment;
 use App\User;
 use App\Log;
 use App\Course;
-use App\InstructorsGivesSections;
+use App\InstructorsGiveSections;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
