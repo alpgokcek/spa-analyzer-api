@@ -124,7 +124,11 @@ class SectionController extends ApiController
 
     public function show($id)
     {
-        $data = Section::find($id);
+			$query = Section::query();
+			$query->join('course', 'course.id', '=', 'section.course_id');
+			$query->where('section.id', '=', $id);
+      $query->select('section.*', 'course.title as courseName', 'course.year_and_term as year_and_term', 'course.code as course_code', 'course.credit as credit');
+			$data = $query->get()->first();
         if ($data) {
             return $this->apiResponse(ResultType::Success, $data, 'Section Detail', 201);
         } else {
