@@ -72,8 +72,7 @@ class SectionController extends ApiController
 			if ($request->has('course'))
 				$query->where('course_id', intval($request->query('course')));
 
-      $query->select('section.*', 'course.title as courseName', 'course.year_and_term as year_and_term',
-		'course.code as course_code', 'course.credit as credit');
+      $query->select('section.*', 'course.title as courseName', 'course.year_and_term as year_and_term', 'course.code as course_code', 'course.credit as credit');
       // bu örnek üzerinden yeni değerler gönderebilirsiniz.
       $length = count($query->get());
       $data = $query->offset($offset)->limit($limit)->get();
