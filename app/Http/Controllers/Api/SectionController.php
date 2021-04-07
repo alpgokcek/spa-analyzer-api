@@ -33,8 +33,6 @@ class SectionController extends ApiController
       $limit = $request->limit ? $request->limit : 99999999999999;
       $query = Section::query();
 
-
-
       switch ($user->level) {
         case 3:
           $query->join('course', 'course.id', '=', 'section.course_id');
@@ -74,7 +72,8 @@ class SectionController extends ApiController
 			if ($request->has('course'))
 				$query->where('course_id', intval($request->query('course')));
 
-      $query->select('section.*', 'course.title as courseName');
+      $query->select('section.*', 'course.title as courseName', 'course.year_and_term as year_and_term',
+		'course.code as course_code', 'course.credit as credit');
       // bu örnek üzerinden yeni değerler gönderebilirsiniz.
       $length = count($query->get());
       $data = $query->offset($offset)->limit($limit)->get();
