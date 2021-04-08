@@ -31,7 +31,7 @@ class CourseOutcomeController extends ApiController
 
                 $query->where('department.faculty','=',$user->faculty_id);
 
-                $query->select('course_outcome.*', 'course.title as courseName');
+                $query->select('course_outcome.*', 'course.title as courseName', 'course.department_id as department_id');
             break;
 
             case 4:
@@ -39,7 +39,7 @@ class CourseOutcomeController extends ApiController
 
                 $query->where('course.department','=',$user->department_id);
 
-                $query->select('course_outcome.*', 'course.title as courseName');
+                $query->select('course_outcome.*', 'course.title as courseName', 'course.department_id as department_id');
             break;
 
             case 5:
@@ -48,7 +48,7 @@ class CourseOutcomeController extends ApiController
                 $query->join('instructors_gives_sections','instructors_gives_sections.section_id','=','section.id');
 
                 $query->where('instructors_gives_sections.instructor_id','=',$user->id);
-                $query->select('course_outcome.*', 'course.title as courseName');
+                $query->select('course_outcome.*', 'course.title as courseName', 'course.department_id as department_id');
             break;
             case 6:
                 // 6. seviyenin bu ekranda işi olmadığı için 403 verip gönderiyoruz.
@@ -57,7 +57,7 @@ class CourseOutcomeController extends ApiController
             break;
             default:
 								$query->join('course','course.id','=','course_outcome.course_id');
-                $query->select('course_outcome.*', 'course.title as courseName');
+                $query->select('course_outcome.*', 'course.title as courseName', 'course.department_id as department_id');
             break;
         }
 
