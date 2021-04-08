@@ -4,7 +4,7 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class StudentAnswersGradingTool extends Model
+class StudentsAnswerGradingTools extends Model
 {
     protected $table = 'student_answers_grading_tool';
     protected $fillable = [];

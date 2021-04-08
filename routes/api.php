@@ -30,9 +30,9 @@ Route::middleware('api-token')->group(function() {
     Route::apiResource('/igs', 'Api\InstructorsGiveSectionsController');
     Route::apiResource('/log', 'Api\LogController');
     Route::apiResource('/program-outcome', 'Api\ProgramOutcomeController');
-    Route::apiResource('/popco', 'Api\ProgramOutcomesProvidesCourseOutcomesController');
+    Route::apiResource('/popco', 'Api\ProgramOutcomesProvideCourseOutcomesController');
     Route::apiResource('/section', 'Api\SectionController');
-    Route::apiResource('/sagt', 'Api\StudentAnswersGradingToolController');
+    Route::apiResource('/sagt', 'Api\StudentsAnswerGradingToolsController');
     Route::apiResource('/sgmgco', 'Api\StudentGetsMeasuredGradeCourseOutcomeController');
     Route::apiResource('/sgmgpo', 'Api\StudentGetsMeasuredGradeProgramOutcomeController');
     Route::apiResource('/sts', 'Api\StudentsTakesSectionsController');
@@ -45,8 +45,8 @@ Route::middleware('api-token')->group(function() {
 
     Route::post('/excelUpload', 'Api\UploadController@uploadExcel');
     Route::post('/sts/uploadedFile', 'Api\StudentsTakesSectionsController@uploadedFile');
-    Route::post('/users-student/uploadedFile', 'Api\UsersStudentController@uploadedFile');
-    Route::post('/users-instructor/uploadedFile', 'Api\UsersInstructorController@uploadedFile');
+    //Route::post('/users-student/uploadedFile', 'Api\UsersStudentController@uploadedFile');
+    //Route::post('/users-instructor/uploadedFile', 'Api\UsersInstructorController@uploadedFile');
     Route::post('/section/uploadedFile', 'Api\SectionController@uploadedFile');
     Route::post('/igs/uploadedFile', 'Api\InstructorsGiveSectionsController@uploadedFile');
     Route::post('/course/uploadedFile', 'Api\CourseController@uploadedFile');

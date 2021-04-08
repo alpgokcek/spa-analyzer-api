@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
-use App\ProgramOutcomesProvidesCourseOutcomes;
+use App\ProgramOutcomesProvideCourseOutcomes;
 use App\Log;
 use App\User;
 use App\Course;
@@ -12,14 +12,14 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
 use Validator;
 
-class ProgramOutcomesProvidesCourseOutcomesController extends ApiController
+class ProgramOutcomesProvideCourseOutcomesController extends ApiController
 {
     public function index(Request $request)
     {
         $user = User::find(Auth::id());
         $offset = $request->offset ? $request->offset : 0;
         $limit = $request->limit ? $request->limit : 99999999999999;
-        $query = ProgramOutcomesProvidesCourseOutcomes::query();
+        $query = ProgramOutcomesProvideCourseOutcomes::query();
         switch ($user->level) {
             case 3:
                 $query->join('program_outcome','program_outcome.id','=','program_outcomes_provides_course_outcomes.program_outcome_id');
@@ -68,7 +68,7 @@ class ProgramOutcomesProvidesCourseOutcomesController extends ApiController
         if ($data) {
             return $this->apiResponse(ResultType::Success, $data, 'Listing: '.$offset.'-'.$limit, $length, 200);
         } else {
-            return $this->apiResponse(ResultType::Error, null, 'ProgramOutcomesProvidesCourseOutcomes Not Found', 0, 404);
+            return $this->apiResponse(ResultType::Error, null, 'ProgramOutcomesProvideCourseOutcomes Not Found', 0, 404);
         }
     }
 
@@ -94,22 +94,22 @@ class ProgramOutcomesProvidesCourseOutcomesController extends ApiController
 					if ($validator->fails()) {
 							return $this->apiResponse(ResultType::Error, $validator->errors(), 'Validation Error', 422);
 					}
-					$data = new ProgramOutcomesProvidesCourseOutcomes();
+					$data = new ProgramOutcomesProvideCourseOutcomes();
 					$data->course_outcome_id = request('course_outcome_id');
 					$data->program_outcome_id = request('program_outcome_id');
 					$data->save();
 					if ($data) {
 							$log = new Log();
-							$log->area = 'ProgramOutcomesProvidesCourseOutcomes';
+							$log->area = 'ProgramOutcomesProvideCourseOutcomes';
 							$log->areaid = $data->id;
 							$log->user = Auth::id();
 							$log->ip = \Request::ip();
 							$log->type = 1;
-							$log->info = 'ProgramOutcomesProvidesCourseOutcomes '.$data->id.' Created for the University '.$data->university;
+							$log->info = 'ProgramOutcomesProvideCourseOutcomes '.$data->id.' Created for the University '.$data->university;
 							$log->save();
-							return $this->apiResponse(ResultType::Success, $data, 'ProgramOutcomesProvidesCourseOutcomes Created', 201);
+							return $this->apiResponse(ResultType::Success, $data, 'ProgramOutcomesProvideCourseOutcomes Created', 201);
 					} else {
-							return $this->apiResponse(ResultType::Error, null, 'ProgramOutcomesProvidesCourseOutcomes not saved', 500);
+							return $this->apiResponse(ResultType::Error, null, 'ProgramOutcomesProvideCourseOutcomes not saved', 500);
 					}
 					break;
 					default:
@@ -120,11 +120,11 @@ class ProgramOutcomesProvidesCourseOutcomesController extends ApiController
 
     public function show($id)
     {
-        $data = ProgramOutcomesProvidesCourseOutcomes::find($id);
+        $data = ProgramOutcomesProvideCourseOutcomes::find($id);
         if ($data) {
-            return $this->apiResponse(ResultType::Success, $data, 'ProgramOutcomesProvidesCourseOutcomes Detail', 201);
+            return $this->apiResponse(ResultType::Success, $data, 'ProgramOutcomesProvideCourseOutcomes Detail', 201);
         } else {
-            return $this->apiResponse(ResultType::Error, null, 'ProgramOutcomesProvidesCourseOutcomes Not Found', 404);
+            return $this->apiResponse(ResultType::Error, null, 'ProgramOutcomesProvideCourseOutcomes Not Found', 404);
         }
     }
 
@@ -137,7 +137,7 @@ class ProgramOutcomesProvidesCourseOutcomesController extends ApiController
         if ($validator->fails()) {
             return $this->apiResponse(ResultType::Error, $validator->errors(), 'Validation Error', 422);
         }
-        $data = ProgramOutcomesProvidesCourseOutcomes::find($id);
+        $data = ProgramOutcomesProvideCourseOutcomes::find($id);
 
         if ($data) {
             if (request('course_outcome_id') != '') {
@@ -150,17 +150,17 @@ class ProgramOutcomesProvidesCourseOutcomesController extends ApiController
 
             if ($data) {
                 $log = new Log();
-                $log->area = 'ProgramOutcomesProvidesCourseOutcomes';
+                $log->area = 'ProgramOutcomesProvideCourseOutcomes';
                 $log->areaid = $data->id;
                 $log->user = Auth::id();
                 $log->ip = \Request::ip();
                 $log->type = 2;
-                $log->info = 'ProgramOutcomesProvidesCourseOutcomes '.$data->id;
+                $log->info = 'ProgramOutcomesProvideCourseOutcomes '.$data->id;
                 $log->save();
 
-                return $this->apiResponse(ResultType::Success, $data, 'ProgramOutcomesProvidesCourseOutcomes Updated', 200);
+                return $this->apiResponse(ResultType::Success, $data, 'ProgramOutcomesProvideCourseOutcomes Updated', 200);
             } else {
-                return $this->apiResponse(ResultType::Error, null, 'ProgramOutcomesProvidesCourseOutcomes not updated', 500);
+                return $this->apiResponse(ResultType::Error, null, 'ProgramOutcomesProvideCourseOutcomes not updated', 500);
             }
         } else {
             return $this->apiResponse(ResultType::Warning, null, 'Data not found', 404);
@@ -169,10 +169,10 @@ class ProgramOutcomesProvidesCourseOutcomesController extends ApiController
 
     public function destroy($id)
     {
-        $data = ProgramOutcomesProvidesCourseOutcomes::find($id);
+        $data = ProgramOutcomesProvideCourseOutcomes::find($id);
         if ($data) {
             $data->delete();
-            return $this->apiResponse(ResultType::Success, $data, 'ProgramOutcomesProvidesCourseOutcomes Deleted', 200);
+            return $this->apiResponse(ResultType::Success, $data, 'ProgramOutcomesProvideCourseOutcomes Deleted', 200);
         } else {
             return $this->apiResponse(ResultType::Error, $data, 'Deleted Error', 500);
         }

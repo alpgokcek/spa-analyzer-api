@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
-use App\StudentAnswersGradingTool;
+use App\StudentsAnswerGradingTools;
 use App\Log;
 use App\User;
 use App\Course;
@@ -12,14 +12,14 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
 use Validator;
 
-class StudentAnswersGradingToolController extends ApiController
+class StudentsAnswerGradingToolsController extends ApiController
 {
     public function index(Request $request)
     {
 				$user = User::find(Auth::id()); // oturum açan kişinin bilgilerini buradan alıyoruz.
         $offset = $request->offset ? $request->offset : 0;
         $limit = $request->limit ? $request->limit : 99999999999999;
-        $query = StudentAnswersGradingTool::query();
+        $query = StudentsAnswerGradingTools::query();
         switch ($user->level) {
 		    case 3:
 						$query->join('users_student','users_student.id','=','student_answers_grading_tool.student_id');
@@ -67,7 +67,7 @@ class StudentAnswersGradingToolController extends ApiController
         if ($data) {
             return $this->apiResponse(ResultType::Success, $data, 'Listing: '.$offset.'-'.$limit, $length, 200);
         } else {
-            return $this->apiResponse(ResultType::Error, null, 'StudentAnswersGradingTool Not Found', 0, 404);
+            return $this->apiResponse(ResultType::Error, null, 'StudentsAnswerGradingTools Not Found', 0, 404);
         }
     }
 
@@ -94,23 +94,23 @@ class StudentAnswersGradingToolController extends ApiController
 					if ($validator->fails()) {
 							return $this->apiResponse(ResultType::Error, $validator->errors(), 'Validation Error', 422);
 					}
-					$data = new StudentAnswersGradingTool();
+					$data = new StudentsAnswerGradingTools();
 					$data->student_id = request('student_id');
 					$data->grading_tool_id = request('grading_tool_id');
 					$data->grade = request('grade');
 					$data->save();
 					if ($data) {
 							$log = new Log();
-							$log->area = 'StudentAnswersGradingTool';
+							$log->area = 'StudentsAnswerGradingTools';
 							$log->areaid = $data->id;
 							$log->user = Auth::id();
 							$log->ip = \Request::ip();
 							$log->type = 1;
-							$log->info = 'StudentAnswersGradingTool '.$data->id.' Created for the University '.$data->university;
+							$log->info = 'StudentsAnswerGradingTools '.$data->id.' Created for the University '.$data->university;
 							$log->save();
-							return $this->apiResponse(ResultType::Success, $data, 'StudentAnswersGradingTool Created', 201);
+							return $this->apiResponse(ResultType::Success, $data, 'StudentsAnswerGradingTools Created', 201);
 					} else {
-							return $this->apiResponse(ResultType::Error, null, 'StudentAnswersGradingTool not saved', 500);
+							return $this->apiResponse(ResultType::Error, null, 'StudentsAnswerGradingTools not saved', 500);
 					}
 				break;
         default:
@@ -121,11 +121,11 @@ class StudentAnswersGradingToolController extends ApiController
 
     public function show($id)
     {
-        $data = StudentAnswersGradingTool::find($id);
+        $data = StudentsAnswerGradingTools::find($id);
         if ($data) {
-            return $this->apiResponse(ResultType::Success, $data, 'StudentAnswersGradingTool Detail', 201);
+            return $this->apiResponse(ResultType::Success, $data, 'StudentsAnswerGradingTools Detail', 201);
         } else {
-            return $this->apiResponse(ResultType::Error, null, 'StudentAnswersGradingTool Not Found', 404);
+            return $this->apiResponse(ResultType::Error, null, 'StudentsAnswerGradingTools Not Found', 404);
         }
     }
 
@@ -139,7 +139,7 @@ class StudentAnswersGradingToolController extends ApiController
         if ($validator->fails()) {
             return $this->apiResponse(ResultType::Error, $validator->errors(), 'Validation Error', 422);
         }
-        $data = StudentAnswersGradingTool::find($id);
+        $data = StudentsAnswerGradingTools::find($id);
 
         if ($data) {
             if (request('student_id') != '') {
@@ -155,17 +155,17 @@ class StudentAnswersGradingToolController extends ApiController
 
             if ($data) {
                 $log = new Log();
-                $log->area = 'StudentAnswersGradingTool';
+                $log->area = 'StudentsAnswerGradingTools';
                 $log->areaid = $data->id;
                 $log->user = Auth::id();
                 $log->ip = \Request::ip();
                 $log->type = 2;
-                $log->info = 'StudentAnswersGradingTool '.$data->id;
+                $log->info = 'StudentsAnswerGradingTools '.$data->id;
                 $log->save();
 
-                return $this->apiResponse(ResultType::Success, $data, 'StudentAnswersGradingTool Updated', 200);
+                return $this->apiResponse(ResultType::Success, $data, 'StudentsAnswerGradingTools Updated', 200);
             } else {
-                return $this->apiResponse(ResultType::Error, null, 'StudentAnswersGradingTool not updated', 500);
+                return $this->apiResponse(ResultType::Error, null, 'StudentsAnswerGradingTools not updated', 500);
             }
         } else {
             return $this->apiResponse(ResultType::Warning, null, 'Data not found', 404);
@@ -174,10 +174,10 @@ class StudentAnswersGradingToolController extends ApiController
 
     public function destroy($id)
     {
-        $data = StudentAnswersGradingTool::find($id);
+        $data = StudentsAnswerGradingTools::find($id);
         if ($data) {
             $data->delete();
-            return $this->apiResponse(ResultType::Success, $data, 'StudentAnswersGradingTool Deleted', 200);
+            return $this->apiResponse(ResultType::Success, $data, 'StudentsAnswerGradingTools Deleted', 200);
         } else {
             return $this->apiResponse(ResultType::Error, $data, 'Deleted Error', 500);
         }
