@@ -22,6 +22,7 @@ class ProgramOutcomesProvideCourseOutcomesController extends ApiController
         $query = ProgramOutcomesProvideCourseOutcomes::query();
         switch ($user->level) {
             case 3:
+								$query->join('course_outcome','course_outcome.id','=','program_outcomes_provides_course_outcomes.course_outcome_id');
                 $query->join('program_outcome','program_outcome.id','=','program_outcomes_provides_course_outcomes.program_outcome_id');
                 $query->join('department','department.id','=','program_outcome.department_id');
 
@@ -31,15 +32,14 @@ class ProgramOutcomesProvideCourseOutcomesController extends ApiController
             break;
 
 			case 4:
+								$query->join('course_outcome','course_outcome.id','=','program_outcomes_provides_course_outcomes.course_outcome_id');
                 $query->join('program_outcome','program_outcome.id','=','program_outcomes_provides_course_outcomes.program_outcome_id');
-
                 $query->where('program_outcome.department_id', '=', $user->department_id);
-
-
-                $query->select('program_outcomes_provides_course_outcomes.*');
+                $query->select('program_outcome.code as po_code', 'course_outcome.code as co_code','program_outcomes_provides_course_outcomes.*');
             break;
 
             case 5:
+								$query->join('program_outcome','program_outcome.id','=','program_outcomes_provides_course_outcomes.course_outcome_id');
                 $query->join('course_outcome','course_outcome.id','=','program_outcomes_provides_course_outcomes.course_outcome_id');
                 $query->join('course','course.id','=','course_outcome.course_id');
                 $query->join('section','section.course_id','=','course.id');
@@ -47,7 +47,7 @@ class ProgramOutcomesProvideCourseOutcomesController extends ApiController
 
                 $query->where('instructors_gives_sections.instructor_id','=',$user->id);
 
-                $query->select('program_outcomes_provides_course_outcomes.*');
+                $query->select('program_outcome.code as po_code', 'course_outcome.code as co_code','program_outcomes_provides_course_outcomes.*');
             break;
             case 6:
                 // 6. seviyenin bu ekranda işi olmadığı için 403 verip gönderiyoruz.
@@ -55,7 +55,9 @@ class ProgramOutcomesProvideCourseOutcomesController extends ApiController
                 return $this->apiResponse(ResultType::Error, 403, 'Authorization Error', 0, 403);
             break;
             default:
-                $query->select('program_outcomes_provides_course_outcomes.*');
+								$query->join('course_outcome','course_outcome.id','=','program_outcomes_provides_course_outcomes.course_outcome_id');
+                $query->join('program_outcome','program_outcome.id','=','program_outcomes_provides_course_outcomes.program_outcome_id');
+                $query->select('program_outcome.code as po_code', 'course_outcome.code as co_code','program_outcomes_provides_course_outcomes.*');
             break;
         }
         if ($request->has('courseOutcome'))
