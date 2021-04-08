@@ -138,7 +138,11 @@ class CourseOutcomeController extends ApiController
 
     public function show($id)
     {
-        $data = CourseOutcome::find($id);
+				$query = CourseOutcome::query();
+				$query->join('course','course.id','=','course_outcome.course_id');
+				$query->where('course_outcome.id', '=', $id);
+        $query->select('course_outcome.*', 'course.title as courseName', 'course.department_id as department_id');
+				$data = $query->get()->first();
         if ($data) {
             return $this->apiResponse(ResultType::Success, $data, 'CourseOutcome Detail', 201);
         } else {
