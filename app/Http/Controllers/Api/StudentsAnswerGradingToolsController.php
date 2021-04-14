@@ -22,25 +22,33 @@ class StudentsAnswerGradingToolsController extends ApiController
         $query = StudentsAnswerGradingTools::query();
         switch ($user->level) {
 		    case 3:
-						$query->join('users_student','users_student.id','=','student_answers_grading_tool.student_id');
-						$query->join('users','users.id','=','users_student.user_id');
+						$query->join('users','users.student_id','=','student_answers_grading_tool.student_id');
+						$query->join('grading_tool','grading_tool.id','=','student_answers_grading_tool.grading_tool_id');
+						$query->join('assessment','assessment.id','=','grading_tool.assessment_id');
+						$query->join('course','course.id','=','assessment.course_id');
             $query->where('users.faculty_id','=',$user->faculty_id);
             $query->where('users.level','=','6');
-						$query->select('student_answers_grading_tool.*');
+						$query->select('course.code as course_code', 'course.id as course_id', 'users.department_id as department_id','course.title as course_name', 'users.name as user_name', 'users.student_id as student_id', 'grading_tool.question_number as question_number', 'student_answers_grading_tool.*');
             break;
 				case 4:
-						$query->join('users_student','users_student.id','=','student_answers_grading_tool.student_id');
-						$query->join('users','users.id','=','users_student.user_id');
+						$query->join('users','users.student_id','=','student_answers_grading_tool.student_id');
+						$query->join('grading_tool','grading_tool.id','=','student_answers_grading_tool.grading_tool_id');
+						$query->join('assessment','assessment.id','=','grading_tool.assessment_id');
+						$query->join('course','course.id','=','assessment.course_id');
 						$query->where('users_student.department_id','=',$user->department_id);
             $query->where('users.level','=','6');
-						$query->select('student_answers_grading_tool.*');
-          break;
+						$query->select('course.code as course_code', 'course.id as course_id', 'users.department_id as department_id','course.title as course_name', 'users.name as user_name', 'users.student_id as student_id', 'grading_tool.question_number as question_number', 'student_answers_grading_tool.*');
+						break;
 				case 5:
+					$query->join('users','users.student_id','=','student_answers_grading_tool.student_id');
+					$query->join('grading_tool','grading_tool.id','=','student_answers_grading_tool.grading_tool_id');
+					$query->join('assessment','assessment.id','=','grading_tool.assessment_id');
+					$query->join('course','course.id','=','assessment.course_id');
 					$query->join('students_takes_sections', 'students_takes_sections.student_id', '=', 'student_answers_grading_tool.student_id');
           $query->join('instructors_gives_sections', 'instructors_gives_sections.section_id', '=', 'students_takes_sections.section_id');
 
 					$query->where('instructors_gives_sections.instructor_id','=',$user->id);
-					$query->select('student_answers_grading_tool.*');
+					$query->select('course.code as course_code', 'course.id as course_id', 'users.department_id as department_id','course.title as course_name', 'users.name as user_name', 'users.student_id as student_id', 'grading_tool.question_number as question_number', 'student_answers_grading_tool.*');
 
             break;
           case 6:
@@ -52,7 +60,12 @@ class StudentsAnswerGradingToolsController extends ApiController
 						// 1 ve 2. leveller kontrol edilmeyeceği için diğer sorguları default içine ekliyoruz
 						//$query->join('assessment','assessment.id','=','grading_tool.assessment_id');
 						//$query->join('course', 'course.id', '=', 'assessment.course_id');
-						$query->select('student_answers_grading_tool.*');
+						$query->join('users','users.student_id','=','student_answers_grading_tool.student_id');
+						$query->join('grading_tool','grading_tool.id','=','student_answers_grading_tool.grading_tool_id');
+						$query->join('assessment','assessment.id','=','grading_tool.assessment_id');
+						$query->join('course','course.id','=','assessment.course_id');
+						$query->select('course.code as course_code', 'course.id as course_id', 'users.department_id as department_id','course.title as course_name', 'users.name as user_name', 'users.student_id as student_id', 'grading_tool.question_number as question_number', 'student_answers_grading_tool.*');
+
           break;
         }
         if ($request->has('student'))
@@ -121,7 +134,14 @@ class StudentsAnswerGradingToolsController extends ApiController
 
     public function show($id)
     {
-        $data = StudentsAnswerGradingTools::find($id);
+				$query = StudentsAnswerGradingTools::query();
+				$query->join('users','users.student_id','=','student_answers_grading_tool.student_id');
+				$query->join('grading_tool','grading_tool.id','=','student_answers_grading_tool.grading_tool_id');
+				$query->join('assessment','assessment.id','=','grading_tool.assessment_id');
+				$query->join('course','course.id','=','assessment.course_id');
+				$query->select('course.code as course_code', 'course.id as course_id', 'users.department_id as department_id','course.title as course_name', 'users.name as user_name', 'users.student_id as student_id', 'grading_tool.question_number as question_number', 'student_answers_grading_tool.*');
+				$data = $query->get()->first();
+
         if ($data) {
             return $this->apiResponse(ResultType::Success, $data, 'StudentsAnswerGradingTools Detail', 201);
         } else {
