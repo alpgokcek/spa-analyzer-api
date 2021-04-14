@@ -28,7 +28,7 @@ class StudentsAnswerGradingToolsController extends ApiController
 						$query->join('course','course.id','=','assessment.course_id');
             $query->where('users.faculty_id','=',$user->faculty_id);
             $query->where('users.level','=','6');
-						$query->select('assessment.name as assessment_name', 'course.code as course_code', 'course.id as course_id', 'users.department_id as department_id', 'course.title as course_name', 'course.year_and_term as year_and_term', 'users.name as user_name', 'grading_tool.question_number as question_number', 'student_answers_grading_tool.*');
+						$query->select('assessment.name as assessment_name', 'assessment.id as assessment_id', 'course.code as course_code', 'course.id as course_id', 'users.department_id as department_id', 'course.title as course_name', 'course.year_and_term as year_and_term', 'users.name as user_name', 'grading_tool.question_number as question_number', 'student_answers_grading_tool.*');
             break;
 				case 4:
 						$query->join('users','users.student_id','=','student_answers_grading_tool.student_id');
@@ -37,7 +37,7 @@ class StudentsAnswerGradingToolsController extends ApiController
 						$query->join('course','course.id','=','assessment.course_id');
 						$query->where('users_student.department_id','=',$user->department_id);
             $query->where('users.level','=','6');
-						$query->select('assessment.name as assessment_name', 'course.code as course_code', 'course.id as course_id', 'users.department_id as department_id', 'course.title as course_name', 'course.year_and_term as year_and_term', 'users.name as user_name', 'grading_tool.question_number as question_number', 'student_answers_grading_tool.*');
+						$query->select('assessment.name as assessment_name', 'assessment.id as assessment_id', 'course.code as course_code', 'course.id as course_id', 'users.department_id as department_id', 'course.title as course_name', 'course.year_and_term as year_and_term', 'users.name as user_name', 'grading_tool.question_number as question_number', 'student_answers_grading_tool.*');
 						break;
 				case 5:
 					$query->join('users','users.student_id','=','student_answers_grading_tool.student_id');
@@ -48,7 +48,7 @@ class StudentsAnswerGradingToolsController extends ApiController
           $query->join('instructors_gives_sections', 'instructors_gives_sections.section_id', '=', 'students_takes_sections.section_id');
 
 					$query->where('instructors_gives_sections.instructor_id','=',$user->id);
-					$query->select('assessment.name as assessment_name', 'course.code as course_code', 'course.id as course_id', 'users.department_id as department_id', 'course.title as course_name', 'course.year_and_term as year_and_term', 'users.name as user_name', 'grading_tool.question_number as question_number', 'student_answers_grading_tool.*');
+					$query->select('assessment.name as assessment_name', 'assessment.id as assessment_id', 'course.code as course_code', 'course.id as course_id', 'users.department_id as department_id', 'course.title as course_name', 'course.year_and_term as year_and_term', 'users.name as user_name', 'grading_tool.question_number as question_number', 'student_answers_grading_tool.*');
 
             break;
           case 6:
@@ -64,7 +64,7 @@ class StudentsAnswerGradingToolsController extends ApiController
 						$query->join('grading_tool','grading_tool.id','=','student_answers_grading_tool.grading_tool_id');
 						$query->join('assessment','assessment.id','=','grading_tool.assessment_id');
 						$query->join('course','course.id','=','assessment.course_id');
-						$query->select('assessment.name as assessment_name', 'course.code as course_code', 'course.id as course_id', 'users.department_id as department_id', 'course.title as course_name', 'course.year_and_term as year_and_term', 'users.name as user_name', 'grading_tool.question_number as question_number', 'student_answers_grading_tool.*');
+						$query->select('assessment.name as assessment_name', 'assessment.id as assessment_id', 'course.code as course_code', 'course.id as course_id', 'users.department_id as department_id', 'course.title as course_name', 'course.year_and_term as year_and_term', 'users.name as user_name', 'grading_tool.question_number as question_number', 'student_answers_grading_tool.*');
 
           break;
         }
@@ -139,7 +139,7 @@ class StudentsAnswerGradingToolsController extends ApiController
 				$query->join('grading_tool','grading_tool.id','=','student_answers_grading_tool.grading_tool_id');
 				$query->join('assessment','assessment.id','=','grading_tool.assessment_id');
 				$query->join('course','course.id','=','assessment.course_id');
-				$query->select('assessment.name as assessment_name', 'course.code as course_code', 'course.id as course_id', 'users.department_id as department_id', 'course.title as course_name', 'course.year_and_term as year_and_term', 'users.name as user_name', 'grading_tool.question_number as question_number', 'student_answers_grading_tool.*');
+				$query->select('assessment.name as assessment_name', 'assessment.id as assessment_id', 'course.code as course_code', 'course.id as course_id', 'users.department_id as department_id', 'course.title as course_name', 'course.year_and_term as year_and_term', 'users.name as user_name', 'grading_tool.question_number as question_number', 'student_answers_grading_tool.*');
 				$data = $query->get()->first();
 
         if ($data) {
