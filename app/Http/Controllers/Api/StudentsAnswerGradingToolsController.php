@@ -139,6 +139,7 @@ class StudentsAnswerGradingToolsController extends ApiController
 				$query->join('grading_tool','grading_tool.id','=','student_answers_grading_tool.grading_tool_id');
 				$query->join('assessment','assessment.id','=','grading_tool.assessment_id');
 				$query->join('course','course.id','=','assessment.course_id');
+				$query->where('student_answers_grading_tool.id', '=', $id);
 				$query->select('assessment.name as assessment_name', 'assessment.id as assessment_id', 'course.code as course_code', 'course.id as course_id', 'users.department_id as department_id', 'course.title as course_name', 'course.year_and_term as year_and_term', 'users.name as user_name', 'grading_tool.question_number as question_number', 'student_answers_grading_tool.*');
 				$data = $query->get()->first();
 
