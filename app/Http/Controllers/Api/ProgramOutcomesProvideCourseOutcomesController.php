@@ -122,7 +122,12 @@ class ProgramOutcomesProvideCourseOutcomesController extends ApiController
 
     public function show($id)
     {
-        $data = ProgramOutcomesProvideCourseOutcomes::find($id);
+				$query = ProgramOutcomesProvideCourseOutcomes::query();
+				$query->join('course_outcome','course_outcome.id','=','program_outcomes_provides_course_outcomes.course_outcome_id');
+				$query->join('program_outcome','program_outcome.id','=','program_outcomes_provides_course_outcomes.program_outcome_id');
+				$query->where('program_outcomes_provides_course_outcomes.id', '=', $id);
+				$query->select('program_outcome.code as po_code', 'course_outcome.code as co_code', 'program_outcome.department_id as department_id', 'course_outcome.course_id as course_id', 'program_outcomes_provides_course_outcomes.*');
+				$data = $query->get()->first();
         if ($data) {
             return $this->apiResponse(ResultType::Success, $data, 'ProgramOutcomesProvideCourseOutcomes Detail', 201);
         } else {
