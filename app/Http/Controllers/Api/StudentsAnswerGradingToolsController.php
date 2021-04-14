@@ -69,11 +69,11 @@ class StudentsAnswerGradingToolsController extends ApiController
           break;
         }
         if ($request->has('student'))
-            $query->where('student_id', '=', $request->query('student'));
+            $query->where('student_answers_grading_tool.student_id', '=', $request->query('student'));
         if ($request->has('gradingTool'))
-            $query->where('grading_tool_id', '=', $request->query('gradingTool'));
+            $query->where('student_answers_grading_tool.grading_tool_id', '=', $request->query('gradingTool'));
         if ($request->has('grade'))
-            $query->where('grade', '=', $request->query('grade'));
+            $query->where('student_answers_grading_tool.grade', '=', $request->query('grade'));
 
         $length = count($query->get());
         $data = $query->offset($offset)->limit($limit)->get();
