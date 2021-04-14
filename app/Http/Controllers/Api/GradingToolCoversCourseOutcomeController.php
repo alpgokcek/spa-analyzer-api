@@ -30,7 +30,7 @@ class GradingToolCoversCourseOutcomeController extends ApiController
 
                 $query->where('department.faculty','=',$user->faculty_id);
 
-                $query->select('assessment.name as assessment_name','course_outcome.code as co_code', 'grading_tool.question_number as question_number', 'grading_tool_covers_course_outcome.*');
+                $query->select('assessment.name as assessment_name','course_outcome.code as co_code', 'course_outcome.course_id as course_id', 'grading_tool.question_number as question_number', 'grading_tool_covers_course_outcome.*');
             break;
 
             case 4:
@@ -40,7 +40,7 @@ class GradingToolCoversCourseOutcomeController extends ApiController
 								$query->join('assessment','assessment.id','=','grading_tool.assessment_id');
 
                 $query->where('course.department_id','=',$user->department_id);
-                $query->select('assessment.name as assessment_name','course_outcome.code as co_code', 'grading_tool.question_number as question_number', 'grading_tool_covers_course_outcome.*');
+                $query->select('assessment.name as assessment_name','course_outcome.code as co_code', 'course_outcome.course_id as course_id', 'grading_tool.question_number as question_number', 'grading_tool_covers_course_outcome.*');
             break;
 
             case 5:
@@ -53,7 +53,7 @@ class GradingToolCoversCourseOutcomeController extends ApiController
 
                 $query->where('instructors_gives_sections.instructor_id','=',$user->id);
 
-                $query->select('assessment.name as assessment_name','course_outcome.code as co_code', 'grading_tool.question_number as question_number', 'grading_tool_covers_course_outcome.*');
+                $query->select('assessment.name as assessment_name','course_outcome.code as co_code', 'course_outcome.course_id as course_id', 'grading_tool.question_number as question_number', 'grading_tool_covers_course_outcome.*');
             break;
             case 6:
                 // 6. seviyenin bu ekranda işi olmadığı için 403 verip gönderiyoruz.
@@ -66,7 +66,7 @@ class GradingToolCoversCourseOutcomeController extends ApiController
 								$query->join('course_outcome','course_outcome.id','=','grading_tool_covers_course_outcome.course_outcome_id');
 								$query->join('grading_tool','grading_tool.id','=','grading_tool_covers_course_outcome.grading_tool_id');
 								$query->join('assessment','assessment.id','=','grading_tool.assessment_id');
-                $query->select('assessment.name as assessment_name','course_outcome.code as co_code', 'grading_tool.question_number as question_number', 'grading_tool_covers_course_outcome.*');
+                $query->select('assessment.name as assessment_name','course_outcome.code as co_code', 'course_outcome.course_id as course_id', 'grading_tool.question_number as question_number', 'grading_tool_covers_course_outcome.*');
             break;
         }
 
@@ -74,6 +74,8 @@ class GradingToolCoversCourseOutcomeController extends ApiController
             $query->where('grading_tool_id', '=', $request->query('gradingTool'));
         if ($request->has('courseOutcome'))
 						$query->where('course_outcome_id', '=', $request->query('courseOutcome'));
+				if ($request->has('course'))
+						$query->where('course_id', '=', $request->query('courseOutcome'));
 
         $length = count($query->get());
         $data = $query->offset($offset)->limit($limit)->get();
@@ -138,7 +140,7 @@ class GradingToolCoversCourseOutcomeController extends ApiController
 				$query->join('grading_tool','grading_tool.id','=','grading_tool_covers_course_outcome.grading_tool_id');
 				$query->join('assessment','assessment.id','=','grading_tool.assessment_id');
 				$query->where('grading_tool_covers_course_outcome.id', '=', $id);
-				$query->select('assessment.name as assessment_name','course_outcome.code as co_code', 'grading_tool.question_number as question_number', 'grading_tool_covers_course_outcome.*');
+				$query->select('assessment.name as assessment_name','course_outcome.code as co_code', 'course_outcome.course_id as course_id', 'grading_tool.question_number as question_number', 'grading_tool_covers_course_outcome.*');
 				$data = $query->get()->first();
         if ($data) {
             return $this->apiResponse(ResultType::Success, $data, 'GradingToolCoversCourseOutcome Detail', 201);
