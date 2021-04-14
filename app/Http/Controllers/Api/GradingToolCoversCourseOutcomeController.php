@@ -75,7 +75,7 @@ class GradingToolCoversCourseOutcomeController extends ApiController
         if ($request->has('courseOutcome'))
 						$query->where('course_outcome_id', '=', $request->query('courseOutcome'));
 				if ($request->has('course'))
-						$query->where('course_id', '=', $request->query('courseOutcome'));
+						$query->where('course_outcome.course_id', '=', $request->query('course'));
 
         $length = count($query->get());
         $data = $query->offset($offset)->limit($limit)->get();
