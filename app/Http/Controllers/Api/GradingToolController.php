@@ -68,6 +68,8 @@ class GradingToolController extends ApiController
 
         if ($request->has('assessment'))
             $query->where('assessment_id', '=', $request->query('assessment'));
+				if ($request->has('course'))
+            $query->where('course_id', '=', $request->query('course'));
 
         $length = count($query->get());
         $data = $query->offset($offset)->limit($limit)->get();
